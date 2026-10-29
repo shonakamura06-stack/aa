@@ -1,0 +1,5 @@
+# ELIGE TU PROBLEMA
+# Sitio estático de una sola página. Cuando tengas dominio definitivo,
+# añade aquí la línea Sitemap: https://tudominio.com/sitemap.xml
+User-agent: *
+Allow: /

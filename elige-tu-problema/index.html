@@ -1,0 +1,3427 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ELIGE TU PROBLEMA — Dos opciones. Mil consecuencias absurdas</title>
+<meta name="description" content="Juego gratuito de dilemas absurdos: elige entre dos problemas, sufre consecuencias cómicas y descubre qué tipo de leyenda del caos eres. Sin registro, sin conexión y sin instalar nada.">
+<meta name="theme-color" content="#0b0e1a">
+<meta name="color-scheme" content="dark">
+<meta property="og:title" content="ELIGE TU PROBLEMA">
+<meta property="og:description" content="Dos opciones. Mil consecuencias absurdas. Elige, sufre y comparte tu resultado.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_ES">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230b0e1a'/%3E%3Crect x='9' y='13' width='21' height='38' rx='7' fill='%23ff8a4c'/%3E%3Crect x='34' y='13' width='21' height='38' rx='7' fill='%237c5cff'/%3E%3Ctext x='19.5' y='39' font-family='Arial' font-size='18' font-weight='bold' fill='%230b0e1a' text-anchor='middle'%3EA%3C/text%3E%3Ctext x='44.5' y='39' font-family='Arial' font-size='18' font-weight='bold' fill='%23fff' text-anchor='middle'%3EB%3C/text%3E%3C/svg%3E">
+<style>
+/* ============================================================
+   ELIGE TU PROBLEMA — hoja de estilos única
+   Paleta, tipografía y componentes. Sin recursos externos.
+   ============================================================ */
+:root{
+  --bg-0:#070911;
+  --bg-1:#0e1222;
+  --surface:rgba(22,28,48,.82);
+  --surface-solid:#161c30;
+  --line:rgba(255,255,255,.11);
+  --line-strong:rgba(255,255,255,.22);
+  --txt:#f5f7ff;
+  --muted:#a6adc9;
+  --muted-2:#7f88a6;
+  --a-1:#ffb347;
+  --a-2:#ff4d6d;
+  --b-1:#7c5cff;
+  --b-2:#22d3ee;
+  --accent:#ffd166;
+  --mint:#3ce0a0;
+  --danger:#ff6b81;
+  --radius-lg:28px;
+  --radius-md:18px;
+  --radius-sm:12px;
+  --shadow:0 18px 50px -18px rgba(0,0,0,.85);
+  --shadow-soft:0 10px 30px -14px rgba(0,0,0,.7);
+  --font:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+  --font-display:ui-rounded,"Trebuchet MS","Segoe UI",system-ui,sans-serif;
+  --max:1240px;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;
+  overflow-wrap:break-word;
+  min-height:100vh;
+  font-family:var(--font);
+  color:var(--txt);
+  background:
+    radial-gradient(1100px 700px at 12% -10%,rgba(124,92,255,.30),transparent 60%),
+    radial-gradient(900px 620px at 92% 4%,rgba(255,77,109,.20),transparent 62%),
+    radial-gradient(800px 700px at 50% 110%,rgba(34,211,238,.14),transparent 65%),
+    var(--bg-0);
+  background-attachment:fixed;
+  line-height:1.55;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+img,svg{max-width:100%}
+[hidden]{display:none!important}
+::selection{background:var(--accent);color:#101426}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:8px}
+
+/* ---------- utilidades ---------- */
+.wrap{width:100%;max-width:var(--max);margin-inline:auto;padding-inline:clamp(14px,3vw,28px)}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.skip-link{position:absolute;left:12px;top:-60px;z-index:100;background:var(--accent);color:#12142a;font-weight:800;padding:10px 16px;border-radius:0 0 12px 12px;text-decoration:none;transition:top .15s}
+.skip-link:focus{top:0}
+.muted{color:var(--muted)}
+.small{font-size:.86rem}
+
+/* ---------- cabecera ---------- */
+.site-head{
+  position:sticky;top:0;z-index:40;
+  background:rgba(9,12,22,.78);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);
+}
+.head-in{display:flex;align-items:center;gap:20px;min-height:66px;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--txt);flex:0 0 auto}
+.brand-mark{width:38px;height:38px;flex:0 0 auto}
+.brand-name{font-family:var(--font-display);font-weight:900;font-size:1.02rem;letter-spacing:.02em;line-height:1.1;text-transform:uppercase}
+.brand-name span{display:block;font-size:.62rem;letter-spacing:.24em;color:var(--muted-2);font-weight:700}
+.site-nav{display:flex;align-items:center;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.nav-link{
+  appearance:none;border:0;background:transparent;color:var(--muted);
+  font:inherit;font-size:.92rem;font-weight:600;padding:9px 12px;border-radius:999px;
+  cursor:pointer;text-decoration:none;transition:color .15s,background .15s;
+}
+.nav-link:hover{color:var(--txt);background:rgba(255,255,255,.06)}
+.nav-link[aria-current="page"]{color:#0e1122;background:var(--accent)}
+.nav-cta{
+  margin-left:6px;background:linear-gradient(120deg,var(--a-1),var(--a-2));
+  color:#1a0f0a!important;font-weight:800;padding:9px 16px;border-radius:999px;
+  box-shadow:0 6px 18px -8px rgba(255,80,110,.9);
+}
+.nav-cta:hover{filter:brightness(1.06)}
+@media (max-width:720px){
+  .head-in{flex-wrap:wrap;padding-block:10px;gap:8px}
+  .site-nav{width:100%;justify-content:flex-start;gap:4px;flex-wrap:wrap;overflow:visible}
+  .nav-link{font-size:.82rem;padding:7px 10px;white-space:nowrap}
+  .nav-cta{margin-left:2px}
+}
+
+/* ---------- estructura con raíles publicitarios ---------- */
+.layout{
+  display:grid;
+  grid-template-columns:170px minmax(0,1fr) 170px;
+  gap:26px;
+  align-items:start;
+  width:100%;max-width:var(--max);
+  margin-inline:auto;
+  padding:30px clamp(14px,3vw,28px) 10px;
+}
+.layout > main{min-width:0}
+.ad-rail{position:sticky;top:88px;display:flex;flex-direction:column;gap:14px}
+.ad-rail .ad-box{min-height:600px}
+.ad-mobile{display:none}
+@media (max-width:1180px){
+  .layout{grid-template-columns:minmax(0,1fr);max-width:860px;gap:0}
+  .ad-rail{display:none}
+  .ad-mobile{display:block;margin:26px 0 6px}
+}
+@media (max-width:1180px){ .layout{max-width:900px} }
+
+/* ---------- espacios publicitarios ---------- */
+.ad-box{
+  border:1px dashed var(--line-strong);
+  border-radius:var(--radius-md);
+  background:rgba(255,255,255,.028);
+  color:var(--muted-2);
+  min-height:260px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  text-align:center;padding:16px;font-size:.76rem;letter-spacing:.06em;text-transform:uppercase;
+}
+.ad-box strong{color:var(--muted);font-size:.8rem}
+.ad-box .ad-tag{font-size:.62rem;letter-spacing:.18em;color:var(--muted-2)}
+.ad-mobile .ad-box{min-height:120px}
+body.ads-off .ad-rail,body.ads-off .ad-mobile{display:none}
+body.ads-off .layout{grid-template-columns:minmax(0,1fr);max-width:900px}
+
+/* ---------- utilidades de composición ---------- */
+.u-m0{margin:0}
+.u-mt0{margin-top:0}
+.u-mt12{margin-top:12px}
+.u-mt14{margin-top:14px}
+.u-mt18{margin-top:18px}
+.u-mb0{margin-bottom:0}
+.u-mb4{margin-bottom:4px}
+.u-flex{display:flex}
+.u-wrap{flex-wrap:wrap}
+.u-gap8{gap:8px}
+.u-gap14{gap:14px}
+.u-between{justify-content:space-between}
+.u-middle{align-items:center}
+.u-minw240{min-width:240px}
+.u-fw600{font-weight:600}
+.h-panel{font-family:var(--font-display);font-size:1.05rem;margin:0 0 12px}
+.h-panel--top{margin-top:0}
+.h-panel-sm{font-size:1.05rem}
+.panel--daily{margin-top:14px;border-color:rgba(255,209,102,.28)}
+.panel--mt18{margin-top:18px}
+.panel--mt16{margin-top:16px}
+.noscript-wrap{padding:20px 0 0}
+.danger-zone h3{margin:0 0 6px;font-size:.95rem}
+.danger-zone p{margin:0 0 12px}
+
+/* ---------- pantallas ---------- */
+.screen{animation:screenIn .32s ease both}
+@keyframes screenIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* ---------- inicio ---------- */
+.hero{padding:6px 0 8px;position:relative}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:.74rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--accent);background:rgba(255,209,102,.10);
+  border:1px solid rgba(255,209,102,.28);
+  padding:7px 14px;border-radius:999px;margin:0 0 18px;
+}
+.eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--mint);box-shadow:0 0 0 4px rgba(60,224,160,.16)}
+h1.hero-title{
+  font-family:var(--font-display);
+  font-size:clamp(2.5rem,7.2vw,4.9rem);
+  line-height:.94;
+  font-weight:900;
+  letter-spacing:-.03em;
+  margin:0 0 12px;
+  text-transform:uppercase;
+}
+.hero-title .l1{display:block;color:#fff}
+.hero-title .l2{
+  display:block;
+  background:linear-gradient(100deg,var(--a-1) 0%,var(--a-2) 42%,var(--b-1) 78%,var(--b-2) 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 8px 26px rgba(255,90,120,.18));
+}
+.hero-sub{font-size:clamp(1.02rem,2.2vw,1.26rem);color:var(--muted);max-width:46ch;margin:0 0 8px}
+.hero-sub b{color:var(--txt);font-weight:700}
+.hero-copy{color:var(--muted);font-size:.98rem;max-width:52ch;margin:0 0 6px}
+.sticker{
+  display:inline-block;margin:6px 0 22px;transform:rotate(-2.5deg);
+  background:var(--accent);color:#151328;font-weight:900;font-size:.76rem;
+  letter-spacing:.06em;text-transform:uppercase;padding:6px 13px;border-radius:8px;
+  box-shadow:3px 3px 0 rgba(0,0,0,.45);
+}
+.hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin:0 0 30px}
+.btn{
+  appearance:none;border:0;font:inherit;font-weight:800;cursor:pointer;touch-action:manipulation;
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  padding:15px 26px;border-radius:16px;font-size:1.02rem;line-height:1.2;
+  transition:transform .14s ease,box-shadow .18s ease,filter .18s ease,background .18s;
+  text-decoration:none;min-height:52px;
+}
+.btn:active{transform:translateY(1px) scale(.99)}
+.btn-primary{
+  background:linear-gradient(120deg,#ffc24d,#ff5c7a 55%,#ff3d9a);
+  color:#22101a;
+  box-shadow:0 14px 34px -12px rgba(255,80,120,.85);
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 20px 40px -14px rgba(255,80,120,.95)}
+.btn-ghost{
+  background:rgba(255,255,255,.055);color:var(--txt);
+  border:1px solid var(--line-strong);
+}
+.btn-ghost:hover{background:rgba(255,255,255,.1);transform:translateY(-2px)}
+.btn-mint{background:linear-gradient(120deg,#2ee6a8,#25c2d8);color:#06251f;box-shadow:0 14px 30px -14px rgba(46,230,168,.8)}
+.btn-mint:hover{transform:translateY(-2px)}
+.btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
+.btn-sm{padding:11px 18px;font-size:.9rem;border-radius:12px;min-height:44px}
+.btn-block{width:100%}
+
+.mode-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin-bottom:14px}
+.mode-card{
+  position:relative;text-align:left;font:inherit;color:var(--txt);cursor:pointer;
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-md);
+  padding:18px 18px 16px;transition:border-color .18s,transform .18s,background .18s;
+  display:flex;flex-direction:column;gap:6px;
+}
+.mode-card:hover{transform:translateY(-3px);border-color:var(--line-strong);background:rgba(30,38,64,.9)}
+.mode-card .mc-emoji{font-size:1.5rem;line-height:1}
+.mode-card .mc-name{font-weight:800;font-size:1.02rem}
+.mode-card .mc-desc{color:var(--muted);font-size:.85rem;line-height:1.45}
+.mode-card .mc-tag{
+  position:absolute;top:14px;right:14px;font-size:.64rem;font-weight:800;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--mint);background:rgba(60,224,160,.12);
+  border:1px solid rgba(60,224,160,.3);padding:3px 8px;border-radius:999px;
+}
+.mode-card.daily{border-color:rgba(255,209,102,.32);background:linear-gradient(150deg,rgba(255,209,102,.10),rgba(124,92,255,.10))}
+.daily-line{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:6px 0 4px;color:var(--muted);font-size:.85rem}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--line);font-size:.78rem;font-weight:600;color:var(--muted)}
+.pill.ok{color:var(--mint);border-color:rgba(60,224,160,.35);background:rgba(60,224,160,.1)}
+
+.home-cols{display:grid;grid-template-columns:1.15fr .85fr;gap:16px;margin-top:26px}
+@media (max-width:760px){.home-cols{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);padding:22px}
+.panel h2{font-family:var(--font-display);font-size:1.18rem;margin:0 0 6px;letter-spacing:-.01em}
+.panel h3{font-size:.98rem;margin:18px 0 6px}
+.panel p{color:var(--muted);font-size:.92rem;margin:0 0 10px}
+.panel ul{margin:8px 0 0;padding-left:18px;color:var(--muted);font-size:.9rem}
+.panel li{margin-bottom:5px}
+.panel li b{color:var(--txt)}
+.mini-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}
+.mini-stat{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.mini-stat b{display:block;font-family:var(--font-display);font-size:1.5rem;line-height:1.1}
+.mini-stat span{font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted-2);font-weight:700}
+
+/* ---------- juego ---------- */
+.game-top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px}
+.crumb{font-size:.76rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-2)}
+.crumb b{color:var(--accent)}
+.icon-btn{
+  appearance:none;font:inherit;font-size:.82rem;font-weight:700;cursor:pointer;
+  background:rgba(255,255,255,.05);border:1px solid var(--line);color:var(--muted);
+  border-radius:999px;padding:7px 14px;min-height:38px;transition:background .15s,color .15s;
+}
+.icon-btn:hover{background:rgba(255,255,255,.11);color:var(--txt)}
+.progress{height:8px;border-radius:999px;background:rgba(255,255,255,.09);overflow:hidden;margin-bottom:22px}
+.progress > i{display:block;height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,var(--a-1),var(--a-2) 50%,var(--b-1));transition:width .4s cubic-bezier(.2,.7,.3,1)}
+.q-head{text-align:center;margin-bottom:20px}
+.q-cat{display:inline-flex;align-items:center;gap:7px;font-size:.74rem;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);background:rgba(255,255,255,.05);border:1px solid var(--line);padding:6px 13px;border-radius:999px;margin-bottom:12px}
+.q-title{font-family:var(--font-display);font-size:clamp(1.15rem,2.6vw,1.55rem);font-weight:800;margin:0;letter-spacing:-.015em;color:#eef1ff}
+.options{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media (max-width:720px){.options{grid-template-columns:1fr;gap:14px}}
+.opt{
+  position:relative;text-align:left;font:inherit;color:#fff;cursor:pointer;touch-action:manipulation;
+  border:0;border-radius:var(--radius-lg);padding:26px 24px 24px;
+  min-height:210px;display:flex;flex-direction:column;justify-content:space-between;gap:18px;
+  box-shadow:var(--shadow);
+  transition:transform .18s cubic-bezier(.2,.7,.3,1),box-shadow .2s,filter .2s;
+  isolation:isolate;overflow:hidden;
+}
+.opt::after{
+  content:"";position:absolute;inset:0;z-index:-1;
+  background:radial-gradient(120% 90% at 15% 0%,rgba(255,255,255,.26),transparent 55%);
+  opacity:.85;pointer-events:none;
+}
+.opt-a{background:linear-gradient(150deg,#ff9a3d 0%,#ff5a4d 48%,#e12b63 100%)}
+.opt-b{background:linear-gradient(150deg,#8b5cff 0%,#5b6cff 45%,#12b7d8 100%)}
+@media (hover:hover){
+  .opt:hover{transform:translateY(-5px) rotate(-.35deg);box-shadow:0 26px 60px -20px rgba(255,90,90,.5)}
+  .opt-b:hover{box-shadow:0 26px 60px -20px rgba(90,120,255,.55);transform:translateY(-5px) rotate(.35deg)}
+  .opt:hover .opt-foot .arrow{transform:translateX(5px)}
+}
+.opt:active{transform:translateY(-1px) scale(.995)}
+.opt:disabled{cursor:default;filter:saturate(.85)}
+.opt-key{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:42px;height:42px;border-radius:13px;background:rgba(10,12,20,.72);
+  font-family:var(--font-display);font-weight:900;font-size:1.15rem;color:#fff;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.16);
+}
+.opt-txt{font-family:var(--font-display);font-size:clamp(1.05rem,2.1vw,1.28rem);font-weight:800;line-height:1.3;letter-spacing:-.01em;text-shadow:0 2px 10px rgba(0,0,0,.22)}
+.opt-foot{display:flex;align-items:center;gap:8px;font-size:.76rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;opacity:.9}
+.opt-foot .arrow{transition:transform .2s}
+.opt:hover .opt-foot .arrow{transform:translateX(5px)}
+.opt.picked{animation:pickPop .34s cubic-bezier(.2,.9,.3,1.3) both;box-shadow:0 0 0 4px var(--accent),0 26px 60px -18px rgba(255,209,102,.6)}
+.opt.dim{opacity:.45;filter:saturate(.6)}
+@keyframes pickPop{0%{transform:scale(1)}45%{transform:scale(1.025)}100%{transform:scale(1)}}
+
+/* consecuencia */
+.consequence{
+  margin-top:4px;background:linear-gradient(165deg,rgba(30,38,66,.96),rgba(17,22,40,.96));
+  border:1px solid var(--line-strong);border-radius:var(--radius-lg);padding:26px;
+  box-shadow:var(--shadow);animation:consIn .34s cubic-bezier(.2,.7,.3,1) both;
+}
+@keyframes consIn{from{opacity:0;transform:translateY(16px) scale(.985)}to{opacity:1;transform:none}}
+.cons-choice{display:flex;gap:12px;align-items:flex-start;padding-bottom:16px;border-bottom:1px dashed var(--line);margin-bottom:18px}
+.cons-badge{
+  flex:0 0 auto;width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
+  font-family:var(--font-display);font-weight:900;color:#151024;
+}
+.cons-badge.a{background:linear-gradient(140deg,var(--a-1),var(--a-2))}
+.cons-badge.b{background:linear-gradient(140deg,var(--b-1),var(--b-2));color:#fff}
+.cons-choice p{margin:0;font-size:.94rem;color:#dfe4f7}
+.cons-choice small{display:block;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-2);font-weight:800;margin-bottom:3px}
+.cons-title{font-family:var(--font-display);font-size:clamp(1.12rem,2.5vw,1.4rem);margin:0 0 10px;font-weight:800;letter-spacing:-.01em}
+.cons-text{font-size:clamp(1rem,2vw,1.1rem);color:#eaeefc;margin:0 0 16px;line-height:1.6}
+.cons-echo{
+  display:flex;gap:10px;align-items:flex-start;font-size:.9rem;color:var(--muted);
+  background:rgba(255,209,102,.07);border:1px solid rgba(255,209,102,.22);
+  border-radius:14px;padding:12px 14px;margin-bottom:18px;
+}
+.cons-echo b{color:var(--accent);font-weight:800}
+.deltas{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px}
+.delta{font-size:.8rem;font-weight:800;padding:6px 12px;border-radius:999px;border:1px solid;display:inline-flex;gap:6px;align-items:center}
+.delta.up{color:#7bf0c0;border-color:rgba(60,224,160,.34);background:rgba(60,224,160,.1)}
+.delta.down{color:#ff9db0;border-color:rgba(255,107,129,.34);background:rgba(255,107,129,.1)}
+.cons-actions{display:flex;flex-wrap:wrap;gap:12px}
+.cons-actions .btn{flex:1 1 200px}
+
+/* atributos */
+.attrs{margin-top:26px;background:rgba(255,255,255,.028);border:1px solid var(--line);border-radius:var(--radius-md);padding:16px 18px}
+.attrs-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.attrs-head h3{margin:0;font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted-2);font-weight:800}
+.attrs-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px 18px}
+@media (max-width:620px){.attrs-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px 12px}}
+.attr{min-width:0}
+.attr-top{display:flex;justify-content:space-between;gap:6px;font-size:.74rem;font-weight:700;color:var(--muted);margin-bottom:4px}
+.attr-top b{color:var(--txt);font-variant-numeric:tabular-nums}
+.attr-bar{height:6px;border-radius:999px;background:rgba(255,255,255,.1);overflow:hidden}
+.attr-bar > i{display:block;height:100%;border-radius:999px;transition:width .5s cubic-bezier(.2,.7,.3,1)}
+
+/* ---------- resultado ---------- */
+.result-hero{
+  position:relative;overflow:hidden;border-radius:var(--radius-lg);padding:30px;
+  border:1px solid var(--line-strong);box-shadow:var(--shadow);
+  background:linear-gradient(160deg,rgba(38,32,74,.95),rgba(16,20,38,.96));
+  margin-bottom:18px;
+}
+.result-hero::before{
+  content:"";position:absolute;inset:-40% -10% auto auto;width:420px;height:420px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,209,102,.22),transparent 65%);pointer-events:none;
+}
+.result-kicker{font-size:.72rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--muted-2);margin:0 0 10px}
+.ending-emoji{font-size:3.1rem;line-height:1;margin-bottom:6px;filter:drop-shadow(0 8px 20px rgba(0,0,0,.45))}
+.ending-name{font-family:var(--font-display);font-size:clamp(1.7rem,5vw,2.5rem);line-height:1.05;font-weight:900;letter-spacing:-.02em;margin:0 0 8px}
+.ending-tag{color:var(--accent);font-weight:700;font-size:1.02rem;margin:0 0 14px}
+.ending-desc{color:#dbe1f6;margin:0;font-size:.98rem;max-width:60ch}
+.result-quote{
+  margin:20px 0 0;padding:16px 18px;border-left:4px solid var(--accent);
+  background:rgba(255,255,255,.04);border-radius:0 14px 14px 0;
+  font-family:var(--font-display);font-size:1.05rem;font-weight:700;color:#f0f3ff;
+}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:10px;margin:16px 0 4px}
+.stat{background:rgba(255,255,255,.045);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.stat b{display:block;font-family:var(--font-display);font-size:1.4rem;line-height:1.15}
+.stat span{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted-2);font-weight:800}
+.result-block{margin-top:26px}
+.result-block h3{margin:0 0 12px;font-family:var(--font-display);font-size:1.05rem}
+.share-grid{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+.share-grid .btn{flex:1 1 210px}
+.result-foot{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px;padding-top:20px;border-top:1px solid var(--line)}
+.result-foot .btn{flex:1 1 200px}
+.result-note{font-size:.78rem;color:var(--muted-2);margin:12px 0 0}
+
+/* ---------- colección ---------- */
+.page-head{margin-bottom:22px}
+.page-head h2{font-family:var(--font-display);font-size:clamp(1.7rem,4.4vw,2.4rem);margin:0 0 6px;letter-spacing:-.02em}
+.page-head p{color:var(--muted);margin:0;max-width:65ch}
+.stat-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:20px 0 8px}
+.stat-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-md);padding:16px 18px}
+.stat-card b{display:block;font-family:var(--font-display);font-size:1.8rem;line-height:1.1}
+.stat-card span{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted-2);font-weight:800}
+.ends-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-top:12px}
+.end-card{position:relative;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:var(--radius-md);padding:16px;min-height:132px;display:flex;flex-direction:column;gap:4px}
+.end-card.unlocked{border-color:rgba(255,209,102,.34);background:linear-gradient(160deg,rgba(255,209,102,.09),rgba(124,92,255,.09))}
+.end-card .ec-emoji{font-size:1.6rem;line-height:1}
+.end-card .ec-name{font-family:var(--font-display);font-weight:800;font-size:.98rem;line-height:1.25}
+.end-card .ec-tag{font-size:.78rem;color:var(--muted);line-height:1.4}
+.end-card .ec-lock{font-size:.72rem;color:var(--muted-2);margin-top:auto;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.end-card.locked .ec-emoji{filter:grayscale(1);opacity:.5}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.chip{font-size:.78rem;font-weight:700;padding:5px 11px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--line);color:var(--muted)}
+.chip.on{color:var(--mint);border-color:rgba(60,224,160,.35);background:rgba(60,224,160,.1)}
+.history{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+.history li{display:flex;flex-wrap:wrap;align-items:center;gap:8px;justify-content:space-between;background:rgba(255,255,255,.035);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-size:.86rem}
+.history .h-main{display:flex;align-items:center;gap:8px;font-weight:700}
+.history .h-meta{font-size:.75rem;color:var(--muted-2)}
+.empty{color:var(--muted-2);font-size:.9rem;background:rgba(255,255,255,.03);border:1px dashed var(--line);border-radius:14px;padding:16px;text-align:center}
+.danger-zone{margin-top:26px;padding-top:20px;border-top:1px solid var(--line)}
+.btn-danger{background:rgba(255,107,129,.12);color:#ffb3bf;border:1px solid rgba(255,107,129,.4)}
+.btn-danger:hover{background:rgba(255,107,129,.2)}
+
+/* ---------- páginas de texto ---------- */
+.doc{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);padding:clamp(20px,4vw,34px);max-width:820px}
+.doc h2{font-family:var(--font-display);font-size:clamp(1.6rem,4vw,2.1rem);margin:0 0 6px;letter-spacing:-.02em}
+.doc .lead{color:var(--muted);margin:0 0 20px}
+.doc h3{font-family:var(--font-display);font-size:1.05rem;margin:24px 0 8px}
+.doc p,.doc li{color:#cdd4ea;font-size:.94rem}
+.doc ul{padding-left:20px}
+.doc li{margin-bottom:6px}
+.doc a{color:var(--accent)}
+.doc strong{color:#fff}
+.notice{border-radius:14px;padding:14px 16px;font-size:.88rem;margin:16px 0;border:1px solid}
+.notice.warn{background:rgba(255,209,102,.08);border-color:rgba(255,209,102,.3);color:#ffe6a8}
+.notice.info{background:rgba(124,92,255,.1);border-color:rgba(124,92,255,.32);color:#dcd4ff}
+.notice strong{color:inherit}
+.todo{background:rgba(255,107,129,.14);border:1px dashed rgba(255,107,129,.55);border-radius:8px;padding:1px 6px;font-weight:800;font-size:.85em;color:#ffc2cb}
+.doc code{background:rgba(255,255,255,.08);border-radius:6px;padding:1px 6px;font-size:.86em}
+.contact-card{display:flex;flex-direction:column;gap:12px;margin-top:8px}
+.contact-row{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;font-size:.92rem;color:#cdd4ea}
+.contact-row b{min-width:110px;font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted-2)}
+
+/* ---------- aviso legal / footer ---------- */
+.site-foot{border-top:1px solid var(--line);margin-top:40px;padding:26px 0 34px;color:var(--muted-2);font-size:.84rem;background:rgba(5,7,14,.4)}
+.foot-in{display:flex;flex-wrap:wrap;gap:18px;justify-content:space-between;align-items:flex-start}
+.foot-links{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:8px}
+.foot-links a,.foot-links button{color:var(--muted);text-decoration:none;background:none;border:0;font:inherit;font-size:.84rem;cursor:pointer;padding:2px 0}
+.foot-links a:hover,.foot-links button:hover{color:var(--txt);text-decoration:underline}
+.foot-brand{font-family:var(--font-display);font-weight:900;color:var(--txt);letter-spacing:.02em;text-transform:uppercase;font-size:.96rem}
+.foot-note{max-width:52ch;line-height:1.5}
+
+/* ---------- modales y avisos ---------- */
+.modal-backdrop{
+  position:fixed;inset:0;z-index:80;background:rgba(4,6,12,.72);
+  display:grid;place-items:center;padding:20px;backdrop-filter:blur(4px);
+  animation:fadeIn .18s ease both;
+}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal{
+  width:min(440px,100%);background:linear-gradient(165deg,#1b2140,#12162a);
+  border:1px solid var(--line-strong);border-radius:22px;padding:24px;box-shadow:var(--shadow);
+  animation:consIn .24s ease both;
+}
+.modal h3{font-family:var(--font-display);margin:0 0 8px;font-size:1.2rem}
+.modal p{color:var(--muted);font-size:.92rem;margin:0 0 18px}
+.modal-actions{display:flex;gap:10px;flex-wrap:wrap}
+.modal-actions .btn{flex:1 1 130px}
+#toast{
+  position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);
+  background:#f4f6ff;color:#12142a;font-weight:800;font-size:.9rem;
+  padding:12px 20px;border-radius:999px;box-shadow:0 18px 40px -12px rgba(0,0,0,.8);
+  opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:90;max-width:calc(100vw - 32px);text-align:center;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.err{background:#ffd9df;color:#5c0b1b}
+
+/* ---------- accesibilidad: movimiento reducido ---------- */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+  .opt:hover{transform:none}
+  .btn:hover{transform:none}
+}
+
+/* ---------- impresión ---------- */
+@media print{
+  body{background:#fff;color:#000}
+  .site-head,.site-foot,.ad-rail,.ad-mobile,.hero-actions,.share-grid,.result-foot,#toast{display:none!important}
+  .doc,.panel,.result-hero{background:#fff;border-color:#ddd;color:#000;box-shadow:none}
+}
+</style>
+</head>
+<body class="ads-off">
+<a class="skip-link" href="#main">Saltar al juego</a>
+<noscript>
+  <div class="wrap noscript-wrap">
+    <div class="notice warn u-m0">
+      <strong>Este juego necesita JavaScript.</strong> El contenido y el estilo son locales, sin servicios externos: si activas JavaScript en tu navegador, podrás jugar con normalidad.
+    </div>
+  </div>
+</noscript>
+
+<header class="site-head">
+  <div class="wrap head-in">
+    <a class="brand" href="#inicio" data-go="inicio" aria-label="ELIGE TU PROBLEMA — ir al inicio">
+      <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+        <rect width="64" height="64" rx="16" fill="#141a2e"/>
+        <rect x="9" y="13" width="21" height="38" rx="7" fill="#ff8a4c"/>
+        <rect x="34" y="13" width="21" height="38" rx="7" fill="#7c5cff"/>
+        <text x="19.5" y="40" font-family="Arial" font-size="18" font-weight="bold" fill="#1b1020" text-anchor="middle">A</text>
+        <text x="44.5" y="40" font-family="Arial" font-size="18" font-weight="bold" fill="#fff" text-anchor="middle">B</text>
+      </svg>
+      <span class="brand-name">Elige tu problema<span>Juego de dilemas</span></span>
+    </a>
+    <nav class="site-nav" aria-label="Navegación principal">
+      <button class="nav-link" type="button" data-go="inicio">Inicio</button>
+      <button class="nav-link" type="button" data-go="coleccion">Colección</button>
+      <button class="nav-link" type="button" data-go="acerca">Acerca de</button>
+      <button class="nav-link" type="button" data-go="privacidad">Privacidad</button>
+      <button class="nav-link" type="button" data-go="contacto">Contacto</button>
+      <button class="nav-link nav-cta" type="button" data-action="start" data-mode="normal">Jugar</button>
+    </nav>
+  </div>
+</header>
+
+<div class="layout">
+  <!-- ============================================================
+       ESPACIO PUBLICITARIO · RAÍL IZQUIERDO (escritorio)
+       Se activa sólo con AD_CONFIG.enabled = true y un ID real.
+       ============================================================ -->
+  <aside class="ad-rail" aria-label="Espacio publicitario izquierdo">
+    <div class="ad-box" data-ad-slot="left">
+      <span class="ad-tag">Publicidad</span>
+      <strong>Espacio publicitario</strong>
+      <span>170 × 600</span>
+      <span class="ad-tag">Sin anuncios activos</span>
+    </div>
+  </aside>
+
+  <main id="main">
+
+    <!-- ======================= INICIO ======================= -->
+    <section id="screen-home" class="screen" aria-labelledby="home-title">
+      <div class="hero">
+        <p class="eyebrow"><span class="dot" aria-hidden="true"></span>Gratis · sin registro · funciona sin conexión</p>
+        <h1 class="hero-title" id="home-title">
+          <span class="l1">Elige tu</span>
+          <span class="l2">Problema</span>
+        </h1>
+        <p class="hero-sub">Dos opciones. <b>Mil consecuencias absurdas.</b></p>
+        <p class="hero-copy">Elige el problema que prefieras sufrir y descubre en qué clase de caos te convierte. Sin registro, sin descargas y sin decisiones sensatas.</p>
+        <span class="sticker">66 dilemas · 10 finales · 0 decisiones sensatas</span>
+        <div class="hero-actions">
+          <button class="btn btn-primary" type="button" data-action="start" data-mode="normal">
+            Jugar ahora <span aria-hidden="true">▸</span>
+          </button>
+          <button class="btn btn-ghost" type="button" data-go="coleccion">Ver mi colección</button>
+        </div>
+      </div>
+
+      <div id="resume-slot" hidden></div>
+
+      <h2 class="sr-only" id="modes-label">Elige la duración de la partida</h2>
+      <div class="mode-grid" role="group" aria-labelledby="modes-label">
+        <button class="mode-card" type="button" data-action="start" data-mode="quick">
+          <span class="mc-emoji" aria-hidden="true">⚡</span>
+          <span class="mc-name">Partida rápida</span>
+          <span class="mc-desc">5 dilemas. Ideal para un café, una fila o una decisión que lamentarás igual.</span>
+        </button>
+        <button class="mode-card" type="button" data-action="start" data-mode="normal">
+          <span class="mc-tag">Recomendada</span>
+          <span class="mc-emoji" aria-hidden="true">🎯</span>
+          <span class="mc-name">Partida normal</span>
+          <span class="mc-desc">10 dilemas. El equilibrio perfecto entre diversión y daño emocional leve.</span>
+        </button>
+        <button class="mode-card" type="button" data-action="start" data-mode="long">
+          <span class="mc-emoji" aria-hidden="true">🌀</span>
+          <span class="mc-name">Partida larga</span>
+          <span class="mc-desc">20 dilemas. Para quien no tiene suficiente con un solo problema en la vida.</span>
+        </button>
+      </div>
+
+      <div class="panel panel--daily">
+        <div class="u-flex u-wrap u-gap14 u-between u-middle">
+          <div class="u-minw240">
+            <h2 class="u-mb4">🗓️ Reto del día</h2>
+            <p class="u-mb0">Una secuencia de 10 dilemas igual para todo el mundo durante el día de hoy. Sin ranking, sin presión y sin excusas.</p>
+            <div class="daily-line">
+              <span class="pill" id="daily-date">—</span>
+              <span class="pill" id="daily-state">Disponible</span>
+            </div>
+          </div>
+          <button class="btn btn-mint" type="button" data-action="start" data-mode="daily">Jugar el reto del día</button>
+        </div>
+      </div>
+
+      <div class="home-cols">
+        <div class="panel">
+          <h2>Cómo se juega</h2>
+          <p>No hay respuestas correctas. Hay consecuencias, y todas son culpa tuya.</p>
+          <ul>
+            <li><b>Elige A o B.</b> No puedes pedir un comodín ni consultar a tu madre.</li>
+            <li><b>Lee la consecuencia.</b> Cada decisión mueve seis atributos absurdos: caos, suerte, prestigio, inteligencia, vergüenza y supervivencia.</li>
+            <li><b>Llega al final.</b> Tus decisiones, y no la suerte, determinan qué tipo de leyenda del desastre eres.</li>
+            <li><b>Comparte el resultado.</b> Descarga la tarjeta o copia el resumen y úsalo como prueba en un juicio.</li>
+          </ul>
+        </div>
+        <div class="panel" id="home-stats-panel">
+          <h2>Tu historial</h2>
+          <p>Todo se guarda sólo en este navegador. Si borras los datos del sitio, tu leyenda desaparece con ellos.</p>
+          <div class="mini-stats" id="home-mini-stats">
+            <div class="mini-stat"><b id="hs-games">0</b><span>Partidas</span></div>
+            <div class="mini-stat"><b id="hs-answers">0</b><span>Dilemas</span></div>
+            <div class="mini-stat"><b id="hs-ends">0</b><span>Finales</span></div>
+            <div class="mini-stat"><b id="hs-streak">0</b><span>Mejor racha</span></div>
+          </div>
+          <button class="btn btn-ghost btn-sm u-mt12" type="button" data-go="coleccion">Abrir la colección</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================= PARTIDA ======================= -->
+    <section id="screen-game" class="screen" aria-labelledby="q-title" hidden>
+      <div class="game-top">
+        <span class="crumb" id="game-crumb">Partida normal</span>
+        <div class="u-flex u-gap8 u-middle u-wrap">
+          <span class="pill" id="game-count">Dilema 1 de 10</span>
+          <button class="icon-btn" type="button" data-action="quit">Salir</button>
+        </div>
+      </div>
+      <div class="progress" id="progress" role="progressbar" aria-valuemin="1" aria-valuemax="10" aria-valuenow="1" aria-label="Progreso de la partida">
+        <i id="progress-fill"></i>
+      </div>
+
+      <div id="dilemma-area">
+        <div class="q-head">
+          <span class="q-cat" id="q-cat">Vida cotidiana</span>
+          <h2 class="q-title" id="q-title">¿Qué prefieres sufrir?</h2>
+        </div>
+        <div class="options" id="options" role="group" aria-label="Elige un problema"></div>
+      </div>
+
+      <div id="consequence-area" aria-live="polite" hidden></div>
+
+      <div class="attrs" id="attrs-panel">
+        <div class="attrs-head">
+          <h3>Tus atributos</h3>
+          <span class="small muted" id="attrs-hint">Empiezan en 50</span>
+        </div>
+        <div class="attrs-grid" id="attrs-grid"></div>
+      </div>
+    </section>
+
+    <!-- ======================= RESULTADO ======================= -->
+    <section id="screen-result" class="screen" aria-labelledby="result-title" hidden>
+      <div class="result-hero" id="result-hero">
+        <p class="result-kicker" id="result-kicker">Resultado de la partida</p>
+        <div class="ending-emoji" id="result-emoji" aria-hidden="true">🌀</div>
+        <h2 class="ending-name" id="result-title">—</h2>
+        <p class="ending-tag" id="result-tagline">—</p>
+        <p class="ending-desc" id="result-desc">—</p>
+        <blockquote class="result-quote" id="result-quote">—</blockquote>
+      </div>
+
+      <div class="panel">
+        <h3 class="h-panel h-panel--top">Estadísticas de la partida</h3>
+        <div class="stats-grid" id="result-stats"></div>
+        <div class="attrs u-mt18">
+          <div class="attrs-head"><h3>Atributos finales</h3><span class="small muted" id="result-mode-label"></span></div>
+          <div class="attrs-grid" id="result-attrs"></div>
+        </div>
+      </div>
+
+      <div class="panel result-block">
+        <h3>Comparte tu desgracia</h3>
+        <p class="small muted u-mt0">La tarjeta se genera en tu dispositivo, sin subir nada a ningún servidor.</p>
+        <div class="share-grid">
+          <button class="btn btn-primary" type="button" data-action="share">Compartir</button>
+          <button class="btn btn-ghost" type="button" data-action="copy">Copiar resumen</button>
+          <button class="btn btn-ghost" type="button" data-action="download-card">Descargar tarjeta</button>
+        </div>
+        <p class="result-note" id="share-note">Si tu navegador no permite compartir, usa «Copiar resumen».</p>
+        <div class="result-foot">
+          <button class="btn btn-mint" type="button" data-action="replay">Jugar otra vez</button>
+          <button class="btn btn-ghost" type="button" data-go="coleccion">Ver colección</button>
+          <button class="btn btn-ghost" type="button" data-go="inicio">Volver al inicio</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================= COLECCIÓN ======================= -->
+    <section id="screen-collection" class="screen" aria-labelledby="col-title" hidden>
+      <div class="page-head">
+        <h2 id="col-title">Colección</h2>
+        <p>Tu legado absurdo, guardado únicamente en este navegador. Se actualiza solo a medida que juegas.</p>
+      </div>
+      <div class="stat-cards" id="col-stats"></div>
+
+      <div class="panel panel--mt18">
+        <h2 class="h-panel-sm">Finales descubiertos <span class="muted u-fw600" id="col-ends-count"></span></h2>
+        <p class="small">Los finales dependen de tus decisiones. Si repites el mismo estilo de vida, repetirás el mismo desastre.</p>
+        <div class="ends-grid" id="col-ends"></div>
+      </div>
+
+      <div class="panel panel--mt16">
+        <h2 class="h-panel-sm">Categorías exploradas</h2>
+        <p class="small">Cada dilema pertenece a un tema. Cuantos más temas, más difícil es explicarte en una reunión familiar.</p>
+        <div class="chips" id="col-cats"></div>
+      </div>
+
+      <div class="panel panel--mt16">
+        <h2 class="h-panel-sm">Últimas partidas</h2>
+        <p class="small">Se guardan las 12 más recientes. No se envía nada a ningún servidor.</p>
+        <ul class="history" id="col-history"></ul>
+      </div>
+
+      <div class="danger-zone">
+        <h3>Zona de riesgo</h3>
+        <p class="small muted">Borra finales, estadísticas e historial de este navegador. No se puede deshacer.</p>
+        <button class="btn btn-danger btn-sm" type="button" data-action="reset-progress">Borrar todo mi progreso</button>
+      </div>
+    </section>
+
+    <!-- ======================= ACERCA DE ======================= -->
+    <section id="screen-about" class="screen doc" aria-labelledby="about-title" hidden>
+      <h2 id="about-title">Acerca del proyecto</h2>
+      <p class="lead">ELIGE TU PROBLEMA es un juego web de dilemas absurdos: dos problemas, una elección y una consecuencia que no pediste.</p>
+
+      <h3>Qué es</h3>
+      <p>Un juego casual, gratuito y de partidas cortas. Cada dilema te obliga a comparar dos formas distintas de arruinar tu día, y cada elección mueve seis atributos ficticios que construyen tu final. No hay respuestas correctas, ni puntuaciones que valgan algo, ni forma de ganar. Sólo consecuencias.</p>
+
+      <h3>Cómo está hecho</h3>
+      <p>Un único archivo <code>index.html</code> con HTML, CSS y JavaScript nativos. Sin frameworks, sin sistema de compilación, sin servidores propios, sin cuentas y sin llamadas a servicios externos. Todo el contenido está en estructuras de datos editables dentro del propio archivo, y el progreso se guarda en el almacenamiento local del navegador.</p>
+
+      <h3>Contenido</h3>
+      <p>Los dilemas, consecuencias y finales son textos originales escritos para este proyecto. No hay contenido sexual explícito, violencia gráfica, humillaciones a personas reales ni retos que animen a hacer algo peligroso. El humor es absurdo, no cruento.</p>
+
+      <h3>Independencia y publicidad</h3>
+      <p>El juego no depende de la publicidad para funcionar y no bloquea ninguna partida para mostrar anuncios. Actualmente <strong>no hay anuncios activos</strong>: la estructura está preparada para incorporarlos más adelante de forma legítima, sin tapar el contenido y sin incitar a hacer clic. Puedes consultar el detalle en la <a href="#privacidad" data-go="privacidad">política de privacidad</a>.</p>
+
+      <div class="notice warn" id="pending-about">
+        <strong>Pendiente antes del lanzamiento:</strong> completar los datos del responsable del sitio (nombre o marca, país de residencia y correo de contacto) en <code>CONFIG</code> dentro de <code>index.html</code>. No se han inventado datos legales.
+      </div>
+
+      <h3>Código y mejoras</h3>
+      <p>Añadir dilemas es tan sencillo como duplicar un objeto del arreglo <code>DILEMMAS</code> con un identificador único, una categoría, dos opciones y sus consecuencias. La estructura del proyecto está documentada en el archivo <code>README.md</code> del repositorio.</p>
+    </section>
+
+    <!-- ======================= PRIVACIDAD ======================= -->
+    <section id="screen-privacy" class="screen doc" aria-labelledby="priv-title" hidden>
+      <h2 id="priv-title">Política de privacidad</h2>
+      <p class="lead">Última actualización: <span id="privacy-date">pendiente</span>. Esta página describe, sin adornos, qué guarda el juego y qué no.</p>
+
+      <div class="notice info">
+        <strong>Resumen:</strong> el juego no tiene cuentas, no pide datos personales y no envía información a ningún servidor. Tu progreso se guarda sólo en tu navegador. Actualmente no hay anuncios ni herramientas de analítica activas.
+      </div>
+
+      <h3>1. Qué datos se guardan y dónde</h3>
+      <p>El juego usa el almacenamiento local (<code>localStorage</code>) de tu navegador con la clave <code>etp:v1</code>. Se guarda únicamente:</p>
+      <ul>
+        <li>El progreso de la partida en curso y las decisiones tomadas dentro del juego.</li>
+        <li>Las estadísticas agregadas: partidas completadas, dilemas respondidos, finales descubiertos, categorías exploradas y mejor racha.</li>
+        <li>El historial de tus últimas 12 partidas (fecha, modalidad, final obtenido y atributos finales).</li>
+        <li>La fecha del último reto del día completado.</li>
+      </ul>
+      <p>No se guardan nombres, correos, direcciones, contraseñas ni ningún dato personal. No hay cookies propias ni identificadores de usuario. Estos datos no salen de tu dispositivo y no se pueden consultar desde otro navegador ni desde el sitio.</p>
+
+      <h3>2. Para qué se usan</h3>
+      <p>Exclusivamente para que el juego recuerde tu progreso, muestre tu colección de finales y no repita la partida desde cero al recargar la página. No hay perfilado ni publicidad personalizada por parte del juego.</p>
+
+      <h3>3. Cómo borrar tus datos</h3>
+      <p>Puedes usar el botón <strong>Borrar todo mi progreso</strong> en la sección Colección, o eliminar los datos del sitio desde la configuración de tu navegador. Al hacerlo se pierden finales, estadísticas e historial de forma irreversible.</p>
+
+      <h3>4. Almacenamiento no disponible</h3>
+      <p>Si tu navegador bloquea el almacenamiento local (por ejemplo, en navegación privada con restricciones), el juego sigue funcionando durante la sesión, pero el progreso no se conservará al cerrar la pestaña.</p>
+
+      <h3>5. Publicidad</h3>
+      <p><strong>Estado actual: sin anuncios.</strong> El sitio incluye espacios reservados y una configuración preparada para una futura integración con una red publicitaria legítima (por ejemplo, Google AdSense). Mientras esa configuración esté desactivada, no se carga ningún script publicitario ni se muestran anuncios.</p>
+      <p>Si en el futuro se activan anuncios de terceros, esos proveedores podrían usar cookies o tecnologías similares para medir o personalizar la publicidad, y sería obligatorio:</p>
+      <ul>
+        <li>Actualizar esta política indicando el proveedor, los tipos de cookies y su finalidad.</li>
+        <li>Mostrar un mecanismo de consentimiento válido cuando la normativa lo exija (por ejemplo, en el Espacio Económico Europeo, Reino Unido o Suiza).</li>
+        <li>Enlazar la política de privacidad del proveedor y permitir retirar el consentimiento.</li>
+      </ul>
+
+      <h3>6. Analítica y terceros</h3>
+      <p>El juego no incluye herramientas de analítica, píxeles de seguimiento, fuentes externas, mapas, vídeos incrustados ni ningún otro recurso de terceros. Todo el contenido visual es CSS, SVG o emoji del sistema.</p>
+
+      <h3>7. Menores</h3>
+      <p>El juego está pensado para público general y no recoge datos de ninguna persona, incluidos menores. No hay chat, comentarios ni formularios que envíen información.</p>
+
+      <h3>8. Responsable y contacto</h3>
+      <p>Este sitio es un proyecto independiente. Los datos del responsable legal están <span class="todo">pendientes de completar</span> antes de un lanzamiento público. Para cualquier consulta sobre privacidad, usa el canal indicado en la página de <a href="#contacto" data-go="contacto">Contacto</a>.</p>
+
+      <div class="notice warn" id="pending-privacy">
+        <strong>Antes de publicar:</strong> completa el nombre del responsable, el país y un correo de contacto real en <code>CONFIG</code>, y actualiza la fecha de esta política. Si activas anuncios o analítica, esta página debe actualizarse antes de hacerlo.
+      </div>
+    </section>
+
+    <!-- ======================= CONTACTO ======================= -->
+    <section id="screen-contact" class="screen doc" aria-labelledby="contact-title" hidden>
+      <h2 id="contact-title">Contacto</h2>
+      <p class="lead">¿Un dilema que se te ocurre, un error que encontraste o una sugerencia? Este es el canal disponible hoy.</p>
+
+      <div class="notice info">
+        <strong>Sin formularios:</strong> no hay formularios en este sitio porque no existe un servicio real que reciba los mensajes. Cualquier formulario sería decorativo y engañoso.
+      </div>
+
+      <h3>Canal disponible</h3>
+      <div class="contact-card">
+        <div class="contact-row">
+          <b>Repositorio</b>
+          <span>Puedes abrir una incidencia pública en el repositorio del proyecto:
+            <a href="https://github.com/shonakamura06-stack/aa/issues" target="_blank" rel="noopener noreferrer">github.com/shonakamura06-stack/aa/issues</a>
+          </span>
+        </div>
+        <div class="contact-row">
+          <b>Correo</b>
+          <span id="contact-email" class="todo">Pendiente de configurar</span>
+        </div>
+        <div class="contact-row">
+          <b>Responsable</b>
+          <span id="contact-owner" class="todo">Pendiente de completar</span>
+        </div>
+        <div class="contact-row">
+          <b>País</b>
+          <span id="contact-country" class="todo">Pendiente de completar</span>
+        </div>
+      </div>
+
+      <h3>Qué incluir si reportas un error</h3>
+      <ul>
+        <li>El dilema o la pantalla donde ocurrió.</li>
+        <li>El navegador y el dispositivo (por ejemplo, «Safari en iPhone 13»).</li>
+        <li>Qué esperabas que pasara y qué pasó en realidad.</li>
+      </ul>
+
+      <div class="notice warn" id="pending-contact">
+        <strong>Pendiente antes del lanzamiento:</strong> sustituir el canal temporal por un correo de contacto real y verificado. No se ha inventado ninguna dirección de correo ni empresa. Mientras no exista ese correo, el repositorio es el único canal operativo.
+      </div>
+
+      <h3>Sobre el contenido</h3>
+      <p>Las sugerencias de dilemas son bienvenidas, siempre que no incluyan humillaciones a personas reales, contenido sexual, violencia gráfica ni retos peligrosos. El juego es absurdo; la seguridad de quien juega no lo es.</p>
+    </section>
+
+    <!-- ======================= ESPACIO PUBLICITARIO MÓVIL ======================= -->
+    <aside class="ad-mobile" aria-label="Espacio publicitario inferior">
+      <div class="ad-box" data-ad-slot="bottom">
+        <span class="ad-tag">Publicidad</span>
+        <strong>Espacio publicitario</strong>
+        <span>Móvil · bajo el juego</span>
+        <span class="ad-tag">Sin anuncios activos</span>
+      </div>
+    </aside>
+  </main>
+
+  <!-- ============================================================
+       ESPACIO PUBLICITARIO · RAÍL DERECHO (escritorio)
+       ============================================================ -->
+  <aside class="ad-rail" aria-label="Espacio publicitario derecho">
+    <div class="ad-box" data-ad-slot="right">
+      <span class="ad-tag">Publicidad</span>
+      <strong>Espacio publicitario</strong>
+      <span>170 × 600</span>
+      <span class="ad-tag">Sin anuncios activos</span>
+    </div>
+  </aside>
+</div>
+
+<footer class="site-foot">
+  <div class="wrap foot-in">
+    <div>
+      <div class="foot-brand">Elige tu problema</div>
+      <div class="foot-links">
+        <button type="button" data-go="inicio">Inicio</button>
+        <button type="button" data-go="coleccion">Colección</button>
+        <button type="button" data-go="acerca">Acerca de</button>
+        <button type="button" data-go="privacidad">Privacidad</button>
+        <button type="button" data-go="contacto">Contacto</button>
+      </div>
+    </div>
+    <p class="foot-note u-m0">
+      Hecho con HTML, CSS y JavaScript, sin frameworks ni servidores. Tu progreso se guarda sólo en este navegador.<br>
+      <span id="foot-ads">Este sitio no muestra anuncios actualmente.</span>
+    </p>
+  </div>
+</footer>
+
+<div id="modal-root"></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<canvas id="share-canvas" width="1080" height="1350" hidden aria-hidden="true"></canvas>
+<script>
+/* ================================================================
+   ELIGE TU PROBLEMA — lógica completa (JS nativo, sin dependencias)
+   Secciones:
+     1. CONFIGURACIÓN
+     2. CATEGORÍAS Y ATRIBUTOS
+     3. CONTENIDO (DILEMMAS, FINALES, ECOS)
+     4. ALMACENAMIENTO Y ESTADO
+     5. UTILIDADES DE INTERFAZ
+     6. RUTAS Y PANTALLAS
+     7. MOTOR DE JUEGO
+     8. RESULTADO, COMPARTIR Y TARJETA
+     9. COLECCIÓN Y ESTADÍSTICAS
+    10. PUBLICIDAD
+    11. ARRANQUE
+   ================================================================ */
+(function () {
+  'use strict';
+
+  /* ---------------------------------------------------------------
+     1. CONFIGURACIÓN
+     Todo lo que hay que tocar antes de publicar está aquí.
+     --------------------------------------------------------------- */
+  const CONFIG = {
+    version: 1,
+    storageKey: 'etp:v1',
+    contactEmail: '',                 // ej. 'hola@tudominio.com' — dejar vacío si no existe
+    policyUpdated: '2026-10-29',      // fecha de la última revisión de la política de privacidad
+    siteUrl: '',                      // ej. 'https://tudominio.com' — vacío = usar la URL actual
+    owner: '',                        // nombre o marca del responsable legal
+    country: '',                      // país del responsable
+    showAdPlaceholders: true,         // marcadores honestos de «espacio publicitario»
+    ads: {
+      enabled: false,                 // NUNCA true sin una cuenta aprobada y un ID real
+      provider: 'adsense',
+      client: '',                     // formato real: 'ca-pub-0000000000000000'
+      slots: { left: '', right: '', bottom: '' },
+      scriptUrl: 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js'
+    }
+  };
+
+  /* ---------------------------------------------------------------
+     2. CATEGORÍAS Y ATRIBUTOS
+     --------------------------------------------------------------- */
+  const CATEGORIES = {
+    cotidiana:  { name: 'Vida cotidiana',             emoji: '🧺' },
+    trabajo:    { name: 'Escuela y trabajo',          emoji: '💼' },
+    tecnologia: { name: 'Tecnología',                 emoji: '📱' },
+    poder:      { name: 'Superpoderes inútiles',      emoji: '🦸' },
+    dinero:     { name: 'Dinero y objetos',           emoji: '💸' },
+    sociales:   { name: 'Situaciones sociales',       emoji: '🙃' },
+    cosmicos:   { name: 'Problemas cósmicos',         emoji: '🌌' },
+    animales:   { name: 'Animales y criaturas',       emoji: '🐙' },
+    imposibles: { name: 'Decisiones imposibles',      emoji: '🎲' },
+    caos:       { name: 'Caos absoluto',              emoji: '🌀' }
+  };
+
+  const ATTRS = {
+    chaos:    { name: 'Caos',          emoji: '🌀', color: '#ff5c7a' },
+    luck:     { name: 'Suerte',        emoji: '🍀', color: '#3ce0a0' },
+    prestige: { name: 'Prestigio',     emoji: '🏆', color: '#ffd166' },
+    wit:      { name: 'Inteligencia',  emoji: '🧠', color: '#7c5cff' },
+    shame:    { name: 'Vergüenza',     emoji: '😳', color: '#22d3ee' },
+    survival: { name: 'Supervivencia', emoji: '🛡️', color: '#ff9a3d' }
+  };
+  const ATTR_KEYS = Object.keys(ATTRS);
+  const START_ATTR = 50;
+
+  /* ---------------------------------------------------------------
+     3. CONTENIDO
+     Estructura de un dilema:
+       { id:'d01', cat:'cotidiana', abs:1,
+         a:{ t:'texto de la opción', d:{chaos:8,...},
+             c:{ title:'titular de la consecuencia', text:'consecuencia' } },
+         b:{ ... } }
+     Reglas: id único, cat existente, abs entre 1 y 3, ambas opciones
+     completas. Un test interno lo verifica al arrancar (consola).
+     --------------------------------------------------------------- */
+  const DILEMMAS = [];
+
+  DILEMMAS.push(
+  { id:'d01', cat:'cotidiana', abs:1,
+    a:{ t:'Tener que cantar todo lo que dices durante un año, sin poder desafinar.',
+        d:{ chaos:10, prestige:8, shame:6, wit:-2 },
+        c:{ title:'Contrato de ópera inesperado',
+            text:'Cantas tan bien que un vecino te graba desde el balcón. El vídeo tiene 400.000 visitas y el coro municipal te ofrece un contrato. El problema: el contrato incluye cantar también al dormir.' } },
+    b:{ t:'Cada vez que abras una puerta, tener que resolver una multiplicación de dos cifras.',
+        d:{ wit:12, chaos:6, survival:-4 },
+        c:{ title:'El pomo te examina',
+            text:'Tu cerebro se vuelve peligrosamente rápido con las tablas del 7. En tres meses resuelves puertas de banco antes de que el guardia diga «buenos días» y te mira como si estuvieras robando algo que no es tuyo.' } } },
+
+  { id:'d02', cat:'tecnologia', abs:2,
+    a:{ t:'Que tu teléfono muestre en voz alta el nombre real de cada archivo que guardes.',
+        d:{ chaos:12, shame:10, luck:-4 },
+        c:{ title:'La carpeta «no_abrir_nunca_final_v3»',
+            text:'Tu móvil anuncia «Planilla definitiva de verdad esta vez.xlsx» en el bus. Una señora mayor asiente con respeto. Tú tardas cuatro días en aprender a nombrar archivos con dignidad.' } },
+    b:{ t:'Tener que usar siempre una contraseña de 40 caracteres, incluso para la tostadora.',
+        d:{ wit:10, survival:8, luck:-6 },
+        c:{ title:'Seguridad de nivel tostadora',
+            text:'Nadie puede entrar en tus cuentas. Tampoco tú, cierto martes. La tostadora, sin embargo, reconoce tu voz y empieza a calentar pan cada vez que dices «hola».' } } },
+
+  { id:'d03', cat:'poder', abs:2,
+    a:{ t:'Poder teletransportarte sólo a lugares donde ya has estado, pero llegando siempre 6 segundos después de lo necesario.',
+        d:{ luck:10, chaos:8, prestige:-2 },
+        c:{ title:'Siempre seis segundos tarde',
+            text:'Las puertas del metro se cierran justo delante de ti. Los ascensores suben sin ti. Pero resuelves un atraco porque llegas exactamente cuando el ladrón está sujetando la bolsa, ni antes ni después.' } },
+    b:{ t:'Ser invisible, pero sólo cuando nadie está mirando.',
+        d:{ chaos:-2, shame:8, wit:4, luck:2 },
+        c:{ title:'Invisibilidad sin público',
+            text:'Descubres que tienes un talento perfecto para una sola cosa: robar la última galleta sin que nadie lo sepa. La fila de testigos posibles sigue vacía y tu reputación de galletófilo es irreprochable.' } } },
+
+  { id:'d04', cat:'dinero', abs:1,
+    a:{ t:'Encontrar un billete de 20 en la calle, pero sólo cuando estás con prisas.',
+        d:{ luck:8, prestige:2, chaos:2 },
+        c:{ title:'La fortuna de los tardones',
+            text:'Recoges veinte y pierdes el autobús. Pagas un taxi, llegas tarde y el billete termina cubriendo exactamente la multa por llegar tarde. Ganas, pierdes y firmas el papel con la cabeza gacha.' } },
+    b:{ t:'Recibir 100 cada mañana, pero no poder gastarlos en nada que desees.',
+        d:{ luck:-4, prestige:6, wit:6, chaos:6 },
+        c:{ title:'Limbo financiero',
+            text:'Duermes sobre un colchón de billetes y comes de un bote de arroz sospechoso. Un economista explica tu caso en la televisión como «el hombre más rico que no puede permitirse una idea».' } } },
+
+  { id:'d05', cat:'sociales', abs:2,
+    a:{ t:'Que cada vez que saludas, el otro tenga que repetir su nombre tres veces.',
+        d:{ shame:10, prestige:-4, wit:6 },
+        c:{ title:'Hola, hola, hola',
+            text:'Ya te llaman «el de los tres saludos». En las bodas te reservan tres sillas. Tu mejor amigo aparece en tu agenda con el nombre «Hola, hola, hola».' } },
+    b:{ t:'Decir siempre la verdad, pero con voz de dibujo animado.',
+        d:{ shame:6, prestige:-6, chaos:8, luck:4 },
+        c:{ title:'Sinceridad en tono agudo',
+            text:'Confiesas a tu jefe que su plan es «una idea de dos minutos en un cerebro de un minuto» con voz de ardilla. Se ríe, porque suena a dibujo animado, y te asciende por valentía malinterpretada.' } } },
+
+  { id:'d06', cat:'cosmicos', abs:3,
+    a:{ t:'Que la Luna desaparezca un fin de semana y nadie lo comente nunca.',
+        d:{ chaos:8, prestige:-2, wit:6, survival:-4 },
+        c:{ title:'El fin de semana del eclipse definitivo',
+            text:'Las mareas hacen huelga, los cantantes de relojes se quedan sin tema y las parejas ya no rompen mirando la Luna. El lunes todo vuelve, y tú eres la única persona del mundo que lo nota.' } },
+    b:{ t:'Que todos los semáforos del planeta te odien personalmente.',
+        d:{ chaos:14, luck:-10, survival:4 },
+        c:{ title:'Rojo eterno',
+            text:'Los semáforos esperan tu llegada para cambiar. Desarrollas la paciencia de un monje, la sonrisa de un segurata y una teoría: quizá los semáforos sólo necesitan un abrazo. No lo intentes.' } } },
+
+  { id:'d07', cat:'animales', abs:2,
+    a:{ t:'Entender perfectamente a las palomas, que no paran de quejarse.',
+        d:{ wit:10, shame:6, chaos:6, luck:-2 },
+        c:{ title:'Sindicato de palomas',
+            text:'Te enteras de que las palomas tienen un comité de quejas sobre el estado de los bancos de plaza y sobre ti en particular. Presentan una denuncia colectiva. Un juez la admite, por error administrativo.' } },
+    b:{ t:'Ser adoptado oficialmente por una gaviota.',
+        d:{ chaos:10, prestige:2, survival:6, shame:-4 },
+        c:{ title:'Hijo adoptivo del puerto',
+            text:'La gaviota te llama por un nombre que suena a pescado. Te trae objetos robados a diario: una llave, dos tapones, un billete de lotería. Un día trae una joya. Nadie se cree tu cara de inocente.' } } },
+
+  { id:'d08', cat:'trabajo', abs:1,
+    a:{ t:'Que en cada reunión se escuche tu voz, aunque tú no hayas dicho nada.',
+        d:{ shame:12, prestige:-6, chaos:6, wit:2 },
+        c:{ title:'Testigo de tu propio micrófono',
+            text:'«Caballeros, necesitamos más compromiso», dice tu voz mientras tú bebes agua. Te asignan más trabajo por iniciativa. Intentas contradecirte en voz alta y la gente aplaude tu sinceridad.' } },
+    b:{ t:'Tener siempre preparada la respuesta perfecta, pero exactamente 24 horas tarde.',
+        d:{ wit:12, prestige:-4, luck:6 },
+        c:{ title:'El genio del día siguiente',
+            text:'A las 10:03 del día siguiente encuentras la respuesta brillante que necesitabas a las 10:00. La anotas en un cuaderno que ya tiene 300 páginas de respuestas perfectas sin interlocutor.' } } },
+
+  { id:'d09', cat:'imposibles', abs:3,
+    a:{ t:'Saber la fecha exacta de tu muerte, pero en formato de trabalenguas.',
+        d:{ chaos:12, wit:6, survival:-6, prestige:2 },
+        c:{ title:'«Tres tristes trompetas»',
+            text:'Vives varios años repitiendo «tres tristes trompetas» con la esperanza de entenderlo. Un día lo descifras en la panadería y el panadero se lleva tal susto que cierra el local tres semanas.' } },
+    b:{ t:'Olvidar el nombre de las sillas, para siempre.',
+        d:{ chaos:8, shame:6, wit:-4, luck:2 },
+        c:{ title:'Aquello en lo que te sientas',
+            text:'Pides «una silla» en una tienda y el dependiente te entiende. Dos horas después no recuerdas cómo pedir una silla y entras a la tienda señalando los objetos con la boca abierta. Compra dos.' } } },
+
+  { id:'d10', cat:'caos', abs:3,
+    a:{ t:'Que cada vez que estornudes, alguien en el mundo gane un concurso de baile.',
+        d:{ chaos:8, prestige:6, luck:4, shame:-4 },
+        c:{ title:'El estornudo benefactor',
+            text:'Te haces alérgico a propósito. Cinco estornudos por mañana mantienen a diez campeones de baile en forma. Una organización internacional te envía flores y un paquete de antihistamínicos con instrucciones muy claras.' } },
+    b:{ t:'Tener un pequeño agujero negro en el bolsillo del abrigo.',
+        d:{ chaos:16, survival:-8, prestige:4, luck:-4 },
+        c:{ title:'Bolsillo de gravedad moderada',
+            text:'Se traga llaves, monedas y una empanada entera. Aprendes a organizar tu vida con los bolsillos que quedan. En el examen de física tu respuesta «mi abrigo se lo comió» obtiene una nota sorprendentemente alta.' } } }
+  );
+
+  DILEMMAS.push(
+  { id:'d11', cat:'cotidiana', abs:1,
+    a:{ t:'Que todos tus calcetines desaparezcan y sólo queden los que tienen un agujero en el dedo.',
+        d:{ chaos:4, shame:4, luck:-6, survival:2 },
+        c:{ title:'Moda de dedo libre',
+            text:'Desarrollas una técnica para disimular agujeros en reuniones, cenas y funerales. Alguien funda un club de fans. Tú eres el presidente y el único socio con los dedos al aire.' } },
+    b:{ t:'Que la nevera emita un pitido cada vez que alguien miente cerca.',
+        d:{ chaos:8, prestige:4, shame:-2, wit:6 },
+        c:{ title:'Electrodoméstico justiciero',
+            text:'Tu casa se convierte en el lugar más honesto del barrio. Nadie quiere entrar. Tu tía confiesa un secreto de 1987 delante de trece personas y la nevera hace un pitido de satisfacción casi humano.' } } },
+
+  { id:'d12', cat:'tecnologia', abs:2,
+    a:{ t:'Que tu historial de búsquedas se proyecte en tu frente cada vez que mientes.',
+        d:{ shame:14, chaos:6, luck:-6, prestige:-4 },
+        c:{ title:'Frente con pantalla táctil',
+            text:'«Estoy bien», dices. En tu frente aparece «cómo fingir estar bien». Tu jefe, tu pareja y el del kiosco leen a la vez. Nadie vuelve a preguntarte cómo estás. Es triste y eficiente.' } },
+    b:{ t:'Recibir un correo al día de tu yo del futuro, pero siempre con consejos obvios.',
+        d:{ wit:8, luck:4, chaos:2, prestige:-2 },
+        c:{ title:'«No te metas en esa piscina»',
+            text:'Los mensajes dicen «lleva paraguas», «no discutas con tu cuñado», «compra leche». Un día llega uno distinto: «no abras el número 47». El número 47 es un dilema y ya lo estás leyendo.' } } },
+
+  { id:'d13', cat:'poder', abs:2,
+    a:{ t:'Poder volar a 3 centímetros del suelo.',
+        d:{ luck:6, prestige:-4, chaos:4, survival:4 },
+        c:{ title:'Vuelo de alfombra muy cansada',
+            text:'Pasas por los charcos sin mojarte y por las escaleras sin dignidad. La gente cree que patinas. Te contratan para una película de terror de bajo presupuesto y no necesitan efectos especiales.' } },
+    b:{ t:'Tener fuerza sobrehumana sólo al abrir tarros de mermelada.',
+        d:{ prestige:10, wit:-2, chaos:4, survival:6 },
+        c:{ title:'El héroe del desayuno',
+            text:'Cada tarro se rinde ante ti en 0,3 segundos. En tu barrio te llaman «el Abridor». Una marca industrial intenta secuestrarte con un contrato de exclusividad y una cesta de mermeladas.' } } },
+
+  { id:'d14', cat:'trabajo', abs:1,
+    a:{ t:'Que cada presentación que prepares gane una vida propia y se presente por su cuenta.',
+        d:{ chaos:10, prestige:6, wit:4, shame:6 },
+        c:{ title:'La presentación que se independizó',
+            text:'Tu presentación aparece en una reunión sin ti, usando tu nombre y una plantilla mejor. El jefe aplaude. Recibes un ascenso por un trabajo que ni siquiera sabes que hiciste. La presentación pide su propio contrato.' } },
+    b:{ t:'Tener siempre un bolígrafo, pero nunca poder escribir con él dos frases seguidas.',
+        d:{ wit:-6, chaos:6, luck:2, survival:2 },
+        c:{ title:'Tinta con ideas propias',
+            text:'El bolígrafo deja de escribir justo antes de la firma del contrato, en la línea del nombre, en la línea del sueldo, en la línea del divorcio. Aprendes a firmar con una uña y un poco de orgullo.' } } },
+
+  { id:'d15', cat:'dinero', abs:2,
+    a:{ t:'Que tu cartera genere dinero cada vez que alguien te insulta.',
+        d:{ luck:10, prestige:-4, chaos:6, shame:-2 },
+        c:{ title:'Billetera de insultos',
+            text:'Descubres que Internet es una mina de oro. Tu aguante explota, tu cuenta crece y tu paciencia desaparece. Consideras contratar a un enemigo profesional sólo para pagar el alquiler.' } },
+    b:{ t:'Ser propietario de un edificio que sólo existe en los planos.',
+        d:{ prestige:6, luck:-6, chaos:8, wit:4 },
+        c:{ title:'Propietario de un dibujo',
+            text:'Pagas impuestos, comunidad y una derrama por un edificio que no tiene muros ni vecinos. Un día llega la carta: tus inquilinos imaginarios exigen una reforma del portal. Firmas, por educación.' } } },
+
+  { id:'d16', cat:'sociales', abs:2,
+    a:{ t:'Que cada vez que te presenten a alguien, esa persona adopte tu mismo peinado al día siguiente.',
+        d:{ prestige:6, chaos:6, shame:6, luck:2 },
+        c:{ title:'El peinado viral',
+            text:'En tu oficina hay 14 personas con tu peinado. Nadie sabe por qué. Una marca de gel te ofrece un patrocinio y luego se arruina porque ya nadie necesita productos: el pelo se copia solo.' } },
+    b:{ t:'Terminar todas tus frases con «y eso es todo lo que tengo que decir sobre las focas».',
+        d:{ shame:14, prestige:-8, chaos:8, wit:-4 },
+        c:{ title:'Cierre inesperado',
+            text:'Lo dices en una boda, en un juicio y en tu propia boda. La fotógrafa capta el momento exacto en que el abuelo de tu pareja se levanta para irse. Nadie recuerda lo que habías dicho antes.' } } },
+
+  { id:'d17', cat:'cosmicos', abs:3,
+    a:{ t:'Que tu sombra se independice y tenga mejor vida social que tú.',
+        d:{ chaos:6, shame:10, prestige:-2, luck:4 },
+        c:{ title:'Sombra con agenda',
+            text:'Tu sombra aparece en fotos de fiestas a las que no fuiste. Tiene 2.000 contactos y una opinión firme sobre tu postura al caminar. Te invita a su cumpleaños por compromiso.' } },
+    b:{ t:'Que el cambio de hora ocurra sólo para ti, dos veces al día.',
+        d:{ chaos:12, wit:6, survival:-4, luck:-2 },
+        c:{ title:'Hora propia y doble',
+            text:'Desayunas dos veces y cenas en dos husos distintos. Tu cuerpo firma un convenio de paz y aun así se despierta a las 3:40 creyendo que es médiodía. Tu jefe acepta que a veces llegas antes de salir.' } } },
+
+  { id:'d18', cat:'animales', abs:2,
+    a:{ t:'Que los mosquitos te consideren su abogado.',
+        d:{ shame:8, chaos:6, survival:-6, wit:4 },
+        c:{ title:'Picaduras procesales',
+            text:'Los mosquitos te consultan antes de picar: «¿es legal este tobillo?». Cobras en monedas de chocolate y estableces un protocolo de tres consultas por noche. Tu caso llega al tribunal de las mascotas.' } },
+    b:{ t:'Tener una jirafa invisible que te sigue a todas partes.',
+        d:{ prestige:4, chaos:6, luck:2, survival:-2 },
+        c:{ title:'Cuello invisible en la ciudad',
+            text:'Chocas con la jirafa cinco veces al día. Ella no puede entrar en ascensores y llora en silencio. La gente cree que haces gestos raros a la nada. Un niño del barrio, sin embargo, sí la ve y te saluda con respeto.' } } },
+
+  { id:'d19', cat:'imposibles', abs:3,
+    a:{ t:'Saber exactamente lo que piensan los perros de ti, en tiempo real.',
+        d:{ wit:8, shame:10, chaos:4 },
+        c:{ title:'Dictamen canino',
+            text:'El perro de tu vecina te comunica, con una mirada sostenida, que hueles a tostada y a decisiones dudosas. Cambias de perfume, de casa y de barrio. Los perros siguen opinando lo mismo.' } },
+    b:{ t:'Tener que aplaudir cada vez que alguien dice «la verdad es que».',
+        d:{ shame:8, chaos:10, luck:-4, survival:2 },
+        c:{ title:'Aplausos de oficio',
+            text:'En las reuniones aplaudes a los cuatro segundos de empezar. Te despiden por entusiasmo y te contratan como animador de conferencias. Es el primer trabajo en el que ser raro es un requisito.' } } },
+
+  { id:'d20', cat:'caos', abs:3,
+    a:{ t:'Que todos los relojes del mundo se retrasen 11 minutos cada vez que tengas hambre.',
+        d:{ chaos:12, prestige:-6, luck:4, survival:-2 },
+        c:{ title:'Hambre con efecto global',
+            text:'Los mercados abren tarde, los trenes llegan con hambre y un país entero inventa la siesta obligatoria. Nadie sabe que la causa eres tú, hasta que alguien te ve comiendo tres sándwiches a la vez.' } },
+    b:{ t:'Que cada palabra que digas aparezca escrita en el cielo durante 30 segundos.',
+        d:{ prestige:12, shame:12, chaos:8 },
+        c:{ title:'Firmamento con subtítulos',
+            text:'Un día dices «esto no puede ir a peor» y toda una región lo lee al mismo tiempo. Al día siguiente dices una grosería pequeña. La limpias con un trapo y con una disculpa publicada en un periódico local.' } } },
+
+  { id:'d21', cat:'cotidiana', abs:1,
+    a:{ t:'Que cada ascensor que uses te cuente su vida.',
+        d:{ shame:6, chaos:4, wit:4, survival:2 },
+        c:{ title:'Ascensor con pasado',
+            text:'Subes del primero al tercero y te enteras de la infancia del ascensor, de su miedo a los sótanos y de su rivalidad con el de la escalera B. Llegas tarde a todo, pero con información privilegiada.' } },
+    b:{ t:'Que el semáforo peatonal haga sonar tu canción favorita, siempre unos segundos antes de cerrar.',
+        d:{ luck:6, chaos:8, prestige:2, survival:-2 },
+        c:{ title:'Bailar en el paso de cebra',
+            text:'Todos los días bailas cinco segundos y sales corriendo. Los coches te aplauden, los peatones te imitan y un coreógrafo te presencia por casualidad: te ofrece un espectáculo callejero con 200 espectadores.' } } },
+
+  { id:'d22', cat:'tecnologia', abs:2,
+    a:{ t:'Que tu buscador responda con la verdad, pero con voz de abuela preocupada.',
+        d:{ wit:10, prestige:-2, shame:4, chaos:2 },
+        c:{ title:'«Ay, hijo, ¿y eso para qué?»',
+            text:'Buscas «cómo invertir» y te responde: «cariño, con lo que cuesta la calefacción». Tus decisiones mejoran levemente y tu autoestima financiera revisa su infancia con lupa.' } },
+    b:{ t:'Que tu identidad digital se fusione con la de una tortuga famosa.',
+        d:{ prestige:8, chaos:8, shame:6, luck:2 },
+        c:{ title:'Verificación tortuguil',
+            text:'El periódico anuncia «la tortuga en la que se basa esta cuenta deseó buena suerte a sus rivales». Tus amigos se ríen. La tortuga, desde el estanque, te manda un mensaje privado que dice «ya veremos».' } } },
+
+  { id:'d23', cat:'poder', abs:2,
+    a:{ t:'Poder parar el tiempo, pero sólo cuando estás solo.',
+        d:{ chaos:2, wit:6, shame:4, survival:6 },
+        c:{ title:'Pausa sin testigos',
+            text:'El mundo se detiene y sólo tú te mueves. Nadie te cree. Un día aprovechas para robar una silla de una terraza y el camarero, al reanudarse el tiempo, te ve alejándote con ella.' } },
+    b:{ t:'Poder hablar con las plantas, que sólo quieren hablar de sus problemas de riego.',
+        d:{ wit:8, shame:4, survival:4, chaos:-2 },
+        c:{ title:'Terapia de macetas',
+            text:'Tu casa se convierte en una consulta botánica abierta 24 horas. Escuchas durante 3 años la queja de un poto y una noche, sin querer, lo trasplantas a una maceta gigante. El poto no vuelve a quejarse nunca más.' } } },
+
+  { id:'d24', cat:'trabajo', abs:2,
+    a:{ t:'Que tus correos se envíen con una firma que incluya tu comida favorita del día anterior.',
+        d:{ shame:12, prestige:-6, chaos:6, luck:2 },
+        c:{ title:'Firma con menú',
+            text:'«Atentamente, Marc — judías con chorizo». Un cliente entiende que es un código secreto y firma el contrato pensando que eres un espía. Tú no te atreves a corregirlo y compras judías para la semana.' } },
+    b:{ t:'Tener un compañero de trabajo imaginario que te quite el mérito de todo.',
+        d:{ prestige:-10, chaos:4, wit:6, survival:2 },
+        c:{ title:'El tal Luis',
+            text:'«Eso lo hicimos con Luis», dices por costumbre. Recursos Humanos busca a Luis durante seis meses. Un día aparece en la nómina, con sueldo, y empieza a mandar correos pidiendo actualizaciones sobre tu trabajo.' } } },
+
+  { id:'d25', cat:'dinero', abs:1,
+    a:{ t:'Que cada moneda que encuentres en el suelo tenga una maldición menor.',
+        d:{ luck:-6, chaos:8, prestige:2, survival:4 },
+        c:{ title:'Monedas con maldición menor',
+            text:'La maldición consiste en que te pica la nariz exactamente cuando tienes las manos ocupadas. Llevas 12 monedas y un récord personal de estornudos en la cola del banco. Todos te guardan sitio, por pena.' } },
+    b:{ t:'Poder comprar todo una vez y devolverlo, pero sólo si explicas en voz alta por qué.',
+        d:{ prestige:-4, chaos:6, wit:8, luck:4 },
+        c:{ title:'Devoluciones confesionales',
+            text:'Explicas a la cajera que devuelves una televisión porque querías sentirte dueño durante 40 minutos. Ella te aplaude. El centro comercial te pone una placa, por sinceridad y por no volver nunca más.' } } },
+
+  { id:'d26', cat:'sociales', abs:2,
+    a:{ t:'Que en cada grupo de mensajes tú seas siempre la persona a la que todos responden «jaja» sin leer.',
+        d:{ shame:8, prestige:-4, chaos:4, luck:-2 },
+        c:{ title:'Rey del «jaja»',
+            text:'Escribes una noticia tristísima y recibes tres «jaja». Propones un plan y recibe cuatro. Un día escribes «me voy a vivir al monte» y te contestan «jaja, qué bueno». Tienes la libertad que necesitabas.' } },
+    b:{ t:'Que tu cara cambie de expresión según tu puntuación en tu juego favorito.',
+        d:{ shame:10, prestige:-2, chaos:8, wit:2 },
+        c:{ title:'Póker de puntuación',
+            text:'Vas perdiendo y tu boca dibuja un 3-0. En el metro te pide dinero un desconocido porque pareces al borde de la ruina. Ganas y sonríes como quien firma un tratado. Te pierdes tres direcciones.' } } },
+
+  { id:'d27', cat:'cosmicos', abs:3,
+    a:{ t:'Que llueva sólo sobre tu coche, en un radio de dos metros.',
+        d:{ luck:-6, chaos:6, prestige:2, survival:4 },
+        c:{ title:'Microclima de propiedad privada',
+            text:'Tu coche es un chubasco con ruedas. Aparcas bajo techo, dentro de un garaje, y aun así hay tormenta. La comunidad de vecinos contrata a un meteorólogo para opinar; el meteorólogo llama a un cura.' } },
+    b:{ t:'Que cada vez que estornudes se reinicie una pequeña parte del universo.',
+        d:{ chaos:16, survival:-8, wit:6, prestige:-2 },
+        c:{ title:'Reinicio selectivo',
+            text:'Estornudas y la gaveta de los cubiertos vuelve a estar descolocada. Otra vez. Estornudas y la planta del vecino vuelve a ser una semilla. Aprendes a estornudar con el brazo bien pegado al cuerpo.' } } },
+
+  { id:'d28', cat:'animales', abs:2,
+    a:{ t:'Que un pingüino te siga a todas partes y opine sobre tu vida amorosa.',
+        d:{ prestige:6, shame:8, chaos:4, luck:4 },
+        c:{ title:'Pingüino consejero',
+            text:'En la primera cita te dice, mirándote fijamente, que hables menos de tu trabajo. Funciona. En la cuarta te informa de que esa persona no te merece y se va caminando solo hacia el mar. Te quedas con las palabras.' } },
+    b:{ t:'Que los pulpos te consideren un objeto de colección.',
+        d:{ shame:6, survival:6, chaos:6, luck:-2 },
+        c:{ title:'Objeto de colección',
+            text:'Un pulpo elegante te ofrece por un pulpo desconocido dos conchas y una cuchara. Te niegas. Llegas tarde a todos lados porque los de tu especie son muy de negociar en la entrada. Un día te cambian por un tenedor.' } } },
+
+  { id:'d29', cat:'imposibles', abs:3,
+    a:{ t:'Poder vivir en dos casas a la vez sin recordar nunca en cuál estás.',
+        d:{ chaos:12, survival:-4, prestige:4, luck:2 },
+        c:{ title:'Dirección aproximada',
+            text:'Te preparas un té en una cocina mientras tu cuerpo discute en otra. Aprendes a vivir con dos trenes de pensamiento y una sola cuenta de la luz. Un día se cruzan los correos. Los dos firmáis igual.' } },
+    b:{ t:'Tener que agradecer en voz alta cada semáforo que se pone en verde.',
+        d:{ shame:10, prestige:-4, chaos:2, luck:8 },
+        c:{ title:'Gracias, verde',
+            text:'Te descubren en una entrevista de trabajo hablando con un semáforo y aun así te contratan: dicen que necesitan a alguien agradecido. Cinco meses después, te nombran coordinador de clima laboral.' } } },
+
+  { id:'d30', cat:'caos', abs:3,
+    a:{ t:'Que todos los letreros del mundo se corrijan delante de ti, aunque su ortografía sea perfecta.',
+        d:{ wit:10, prestige:-8, chaos:10, shame:6 },
+        c:{ title:'Correcto, pero en rojo',
+            text:'Te ven pasar y los carteles se corrigen solos. Cientos de comercios te culpan de tres paros de obra. Una tienda pone un cartel que dice «bienvenidos» y, al verte, se convierte en «bienvenides», con una nota al pie y una silla para esperarte.' } },
+    b:{ t:'Que tu risa se transmita por radio a 20 kilómetros a la redonda.',
+        d:{ prestige:6, chaos:12, shame:8, luck:2 },
+        c:{ title:'Risa en frecuencia modulada',
+            text:'Se oye en coches, radios de viejas cocinas y en el fisioterapeuta del barrio. Un día te ríes de una anécdota y una carretera entera reduce la velocidad. Ganas el premio municipal de seguridad vial.' } } },
+
+  { id:'d31', cat:'cotidiana', abs:1,
+    a:{ t:'Que tu ropa se planche sola, pero sólo cuando llegas tarde.',
+        d:{ luck:2, survival:4, chaos:2, prestige:2 },
+        c:{ title:'Alta costura a velocidad',
+            text:'Tanto que el traje se plancha en el trayecto, con vapor y una canción. Llegas perfecto a todas partes, con la respiración de alguien que ha corrido una maratón y un aroma ligeramente tostado.' } },
+    b:{ t:'Tener que pagar una moneda de alquiler cada vez que uses una puerta giratoria.',
+        d:{ luck:-4, chaos:6, wit:4, prestige:-2 },
+        c:{ title:'Peaje sin retorno',
+            text:'Descubres que las puertas giratorias son un negocio y tú eres su cliente favorito. Empiezas a dar vueltas de más para amortizar el pago. La vecina del barrio te ve dando tres vueltas y te recomienda un médico y un abogado.' } } }
+  );
+
+  DILEMMAS.push(
+  { id:'d32', cat:'trabajo', abs:1,
+    a:{ t:'Que tu jefe crea que eres un experto en todo, aunque tú no sepas nada.',
+        d:{ prestige:12, survival:-6, chaos:8, shame:6 },
+        c:{ title:'Experto universal certificado',
+            text:'Te preguntan de presupuestos, de fontanería y de cría de alpacas. Contestas con una seguridad que impresiona. Funciona hasta que te piden arreglar un grifo delante de 30 personas y una alpaca.' } },
+    b:{ t:'Que tus vacaciones se concedan siempre en una fecha que aún no existe.',
+        d:{ luck:-8, chaos:8, wit:4, survival:2 },
+        c:{ title:'Vacaciones del 32 de febrero',
+            text:'Recursos Humanos aprueba tus vacaciones para el 32 de febrero. Cuando protestas, te explican que es una fecha con mucho potencial. Llevas tres años esperando y ya tienes la maleta junto a la puerta.' } } },
+
+  { id:'d33', cat:'tecnologia', abs:2,
+    a:{ t:'Que tu teléfono se quede sin batería cada vez que alguien importante te habla.',
+        d:{ shame:10, luck:-6, chaos:6, prestige:-4 },
+        c:{ title:'Silencio de alta gama',
+            text:'Tu jefe te llama y el móvil muere con un suspiro elegante. Tu madre también. La única persona que siempre consigue hablar contigo es una empresa de seguros que te llama los domingos a las 8.' } },
+    b:{ t:'Tener que escribir todos tus mensajes con el corrector automático activado y sin revisar.',
+        d:{ chaos:10, shame:8, luck:2, prestige:2 },
+        c:{ title:'Mensajes involuntariamente literarios',
+            text:'Quieres decir «te espero abajo» y envías «te espero abajo del deseo». La otra persona llega con una vela. Descubres que tu corrector tiene más imaginación que tú y una vida sentimental propia.' } } },
+
+  { id:'d34', cat:'sociales', abs:2,
+    a:{ t:'Que cada vez que alguien te cuente un problema, tu cara muestre lo que realmente piensas.',
+        d:{ shame:12, prestige:-6, wit:6, luck:-2 },
+        c:{ title:'Transparencia facial total',
+            text:'Tu cara muestra «esto ya me lo contaste» con una nitidez de cine. La gente deja de contarte cosas. Ganas tiempo, pierdes amistades y te contratan como jurado de un concurso de excusas.' } },
+    b:{ t:'Que todo el mundo recuerde tu peor anécdota con una precisión asombrosa.',
+        d:{ shame:14, prestige:-8, chaos:4, luck:2 },
+        c:{ title:'Archivo nacional de tu ridículo',
+            text:'En cada boda, cada cena y cada entrevista de trabajo, alguien dice: «¿Y aquella vez que...?». Lo cuentan mejor que tú, con pausas dramáticas. Un día lo cuentas tú primero y nadie te cree.' } } },
+
+  { id:'d35', cat:'poder', abs:3,
+    a:{ t:'Poder convertir el agua en refresco, pero sólo en el mar.',
+        d:{ prestige:8, chaos:6, luck:4, survival:-2 },
+        c:{ title:'Refresco a escala oceánica',
+            text:'Cambias 40 litros antes de que te pille un socorrista. Un influencer prueba el agua y se hace viral. Te buscan 60 países, una marca de bebidas y doscientas personas con sed y muchas preguntas.' } },
+    b:{ t:'Poder leer la mente, pero sólo los pensamientos de las personas que están calculando propinas.',
+        d:{ wit:10, prestige:-6, shame:6, luck:2 },
+        c:{ title:'Camarero de pensamientos',
+            text:'Sabes con precisión quién va a dejar unas monedas y quién lanzará una de otro país. Cambias de profesión, ganas poco y duermes mal por la cantidad de gente que piensa «no tengo cambio, que se fastidie».' } } },
+
+  { id:'d36', cat:'cosmicos', abs:3,
+    a:{ t:'Que las estrellas se pongan de acuerdo para no aparecer los martes.',
+        d:{ chaos:8, prestige:-2, wit:6, survival:2 },
+        c:{ title:'Martes sin constelaciones',
+            text:'Las constelaciones piden asamblea y deciden hacer huelga los martes. Los astrónomos hablan de «microcrisis celestial». Tú sabes la verdad y no puedes contarla porque el cielo empezó a hablarte en sueños.' } },
+    b:{ t:'Tener que pagar 12,50 cada vez que quieras respirar profundamente.',
+        d:{ survival:-12, prestige:-4, chaos:6, wit:2 },
+        c:{ title:'Aire premium',
+            text:'Aprendes a respirar en corto como un señor enfadado. Un día suspiras hondo por sorpresa y el banco te manda un aviso. Descubres que hay quien paga por ti: tu hermano te patrocina tres suspiros al mes.' } } },
+
+  { id:'d37', cat:'animales', abs:2,
+    a:{ t:'Que un grupo de loros repita en tu barrio todas tus frases vergonzosas.',
+        d:{ shame:16, prestige:-6, chaos:6, luck:2 },
+        c:{ title:'Radio loro comunitaria',
+            text:'Los loros repiten «no era lo que parecía», «ya voy» y una confesión que hiciste a los 15 años. Los vecinos empiezan a saludarte con tus frases. Cambias de barrio y descubres que los loros se mudaron antes.' } },
+    b:{ t:'Ser el único humano capaz de negociar con las ardillas.',
+        d:{ wit:10, prestige:6, chaos:8, survival:2 },
+        c:{ title:'Tratado de nueces',
+            text:'Cierras un pacto por cuatro nueces y un trozo de pan. Las ardillas te devuelven objetos robados y una dirección de un tesoro, pero siempre colocan la nuez fuera de tu alcance. El tratado tiene 40 páginas.' } } },
+
+  { id:'d38', cat:'imposibles', abs:3,
+    a:{ t:'Tener un botón en la cabeza que te reinicie, pero no saber qué era tu vida antes.',
+        d:{ chaos:14, wit:-8, shame:4, survival:6 },
+        c:{ title:'Reinicio voluntario',
+            text:'Cada mañana descubres un mundo, un trabajo y una familia con nombres escritos en post-its. Funcionas bien, aunque los cafés te saben siempre a nuevo. Un día alguien dice «ya me lo contaste» y tiemblas.' } },
+    b:{ t:'Que cada decisión que tomes aparezca en un periódico local con fecha adelantada.',
+        d:{ prestige:6, chaos:8, shame:6, luck:4 },
+        c:{ title:'Portada anticipada',
+            text:'El periódico publica «vecino compra una sandía gigante» antes de que decidas ir al mercado. Tú compras la sandía por no complicar la literatura. La portada del jueves dice algo peor y la esperas, resignado.' } } },
+
+  { id:'d39', cat:'dinero', abs:2,
+    a:{ t:'Que tu sueldo llegue en forma de productos de la competencia.',
+        d:{ prestige:-4, chaos:8, survival:4, luck:6 },
+        c:{ title:'Nómina de 40 kilos',
+            text:'Cobras en cajas de cinta adhesiva, dos mil lápices y una cabeza de ajo grande. Vendes de puerta en puerta, aprendes a negociar y descubres que el género de las cintas es de mejor calidad que tu antiguo trabajo.' } },
+    b:{ t:'Que te cobren una moneda cada vez que digas «te lo dije».',
+        d:{ prestige:4, wit:6, luck:-4, shame:-2 },
+        c:{ title:'Cuota de aciertos',
+            text:'Tu contador refleja la fortuna de tu intuición. Vas por 214. Decides moderar el placer de tener razón, lo cual es buena educación y mejor salud. Solo pagas una vez al mes, al recordarlo en voz alta.' } } },
+
+  { id:'d40', cat:'cotidiana', abs:1,
+    a:{ t:'Que todas tus sillas tengan una pata más corta, pero distinta cada día.',
+        d:{ survival:4, chaos:6, wit:2, prestige:-2 },
+        c:{ title:'Silla con opinión',
+            text:'Desarrollas un equilibrio de persona que ha vivido en barcos. En el restaurante, tu silla se balancea. El camarero trae un salvavidas de decoración. Tú le das al arroz sin derramar un grano.' } },
+    b:{ t:'Que cada lavado de ropa reduce tu guardarropa a la mitad.',
+        d:{ chaos:10, shame:6, luck:-6, prestige:2 },
+        c:{ title:'Lavadora devoradora',
+            text:'Llegas a tener una camiseta, un calcetín y una corbata. Haces de ello una marca personal. Una revista de moda llama a tu estilo «la montaña vacía». Vas descalzo a la entrevista.' } } },
+
+  { id:'d41', cat:'caos', abs:3,
+    a:{ t:'Que cada foto que te hagas salga con un desconocido en el fondo burlándose.',
+        d:{ shame:10, chaos:8, prestige:-4, luck:-2 },
+        c:{ title:'Fondo con crítica',
+            text:'Aparece el mismo señor calvo en todas tus fotos, señalando y riéndose. Se llama Fernando. Fernando no existe en ninguna base de datos. Empiezas a posar para él y las fotos mejoran muchísimo.' } },
+    b:{ t:'Que las máquinas expendedoras te den siempre lo que no has pedido, pero mejor.',
+        d:{ luck:10, chaos:6, prestige:2, survival:2 },
+        c:{ title:'Expendedora generosa',
+            text:'Pides sopa y te da un billete. Pides agua y te da una toalla caliente. Nunca falla, en ningún país. Un día pides «una sorpresa» y la máquina hace una pausa de cuatro segundos, como si pensara en ti.' } } },
+
+  { id:'d42', cat:'trabajo', abs:2,
+    a:{ t:'Que cada vez que digas «no» en el trabajo, suene una pequeña trompeta.',
+        d:{ prestige:6, chaos:10, shame:6, survival:4 },
+        c:{ title:'Trompeta del límite',
+            text:'Aprendes a decir «no» con dignidad y música. Te despiden por el ruido y te contratan en otro lugar para decir «no» en reuniones difíciles. Eres el empleado más tranquilo de la empresa.' } },
+    b:{ t:'Que tu currículum se reescriba solo cada noche, añadiendo cosas peligrosas.',
+        d:{ prestige:12, survival:-6, chaos:8, wit:2 },
+        c:{ title:'Currículum con iniciativa',
+            text:'Un martes tu currículum dice «domador de avestruces». Te llaman para un trabajo que no existe y del que, veinte meses después, eres director regional. Sigues sin haber visto una avestruz de cerca.' } } },
+
+  { id:'d43', cat:'tecnologia', abs:2,
+    a:{ t:'Que todo lo que busques en Internet aparezca impreso en un objeto de tu casa.',
+        d:{ chaos:10, shame:6, prestige:2, survival:-2 },
+        c:{ title:'Casa impresa',
+            text:'Buscas síntomas de dolor de espalda y tu tostadora imprime el diagnóstico con una tostada. La familia lee cosas que no debería. Aprendes a buscar tonterías para no fabricar literatura médica.' } },
+    b:{ t:'Que cada notificación te llegue con 8 horas de retraso y en otro idioma.',
+        d:{ luck:-6, chaos:6, wit:6, survival:4 },
+        c:{ title:'Noticias de ayer, aún calientes',
+            text:'Asistes al acto cuando ya ha terminado, celebras cumpleaños dos veces y pierdes tres trenes con elegancia. Un día la notificación está en tu idioma y dice «hoy no vayas». Vas, naturalmente.' } } },
+
+  { id:'d44', cat:'sociales', abs:2,
+    a:{ t:'Que cada vez que des un abrazo, se oiga un sonido de robot.',
+        d:{ shame:8, chaos:6, prestige:-4, luck:2 },
+        c:{ title:'Afecto con procesador',
+            text:'Los abrazos suenan a puerta de nave espacial. Tu abuela se ríe, tu jefe se asusta y tu perro se esconde. Aun así recibes y das más abrazos que nunca, porque el ridículo también se abraza.' } },
+    b:{ t:'Tener que empezar cada conversación hablando del tiempo con muchísimo entusiasmo.',
+        d:{ prestige:-6, wit:4, luck:4, chaos:4 },
+        c:{ title:'Entusiasmo meteorológico',
+            text:'Entras a una entrevista y hablas cinco minutos del viento. Te contratan en una cadena de frío y un día, ya sin querer, presentas el tiempo en la televisión local. La agenda de tu barrio te lo agradece.' } } },
+
+  { id:'d45', cat:'poder', abs:2,
+    a:{ t:'Poder correr a 200 km/h, pero sólo durante tres pasos.',
+        d:{ prestige:6, survival:8, chaos:4, wit:-2 },
+        c:{ title:'Tres pasos legendarios',
+            text:'Alcanzas cualquier lado en tres zancadas y llegas con el pelo hacia atrás y las gafas torcidas. Las puertas no están preparadas. En 8 meses rompes 14 puertas, 3 cristales y el récord de velocidad de un aparcamiento.' } },
+    b:{ t:'Tener una memoria prodigiosa, pero sólo para los números de matrículas ajenas.',
+        d:{ wit:10, prestige:-4, shame:6, luck:2 },
+        c:{ title:'Archivo de matrículas',
+            text:'Recuerdas 3.400 matrículas y no el nombre de la persona con la que hablas. En el juicio, como testigo, recitas la matrícula del coche de 2019 y el juez te pide que te sientes, impresionado y algo incómodo.' } } },
+
+  { id:'d46', cat:'cosmicos', abs:3,
+    a:{ t:'Que la Tierra gire un poco más rápido cada vez que te aburras.',
+        d:{ chaos:14, survival:-6, prestige:4, luck:2 },
+        c:{ title:'Aburrimiento planetario',
+            text:'Un domingo cualquiera, la Tierra da un día extra en 19 horas. Los relojes se ponen de acuerdo en no estar de acuerdo. Nadie sabe por qué, salvo tú, que estás aburridísimo en el sofá.' } },
+    b:{ t:'Poder hablar con los satélites, que están muy solos.',
+        d:{ wit:10, prestige:8, chaos:6, shame:-4 },
+        c:{ title:'Llamada orbital',
+            text:'Un satélite te cuenta chismes de otros satélites. Descubres que uno de ellos lleva 12 años sin recibir una respuesta y escribe poemas. Te haces amigo de él y luego te pide que le recomiendes a un conocido.' } } },
+
+  { id:'d47', cat:'animales', abs:2,
+    a:{ t:'Que todos los perros del barrio te consideren su alcalde.',
+        d:{ prestige:10, survival:6, chaos:6, shame:-4 },
+        c:{ title:'Alcalde de los perros',
+            text:'Te reúnen en el parque para consultarte temas de pipí y fronteras. Un día deberás resolver el conflicto del banco de madera y no te dejarán ir hasta que todos muevan la cola a la vez.' } },
+    b:{ t:'Tener una nube personal que llueva sólo cuando estés contento.',
+        d:{ luck:-4, chaos:6, prestige:2, survival:2 },
+        c:{ title:'Lluvia de alegría',
+            text:'Aprendes a celebrar en silencio y a encadenar tristezas productivas. En tu cumpleaños se forma una tormenta de 40 minutos. Los invitados se van con ropa prestada y una historia para siempre.' } } },
+
+  { id:'d48', cat:'imposibles', abs:3,
+    a:{ t:'Que cada mentira que digas suene con eco.',
+        d:{ shame:12, chaos:8, prestige:-4, wit:4 },
+        c:{ title:'Eco de verdades tristes',
+            text:'«Estoy bien», y el eco repite «bien, bien, b i e n». Descubres un talento inesperado: decir sólo cosas verdaderas y pequeñas. Tu vida se llena de «no me apetece» y de invitaciones canceladas.' } },
+    b:{ t:'Que todas las puertas que toques te pidan el documento de identidad.',
+        d:{ chaos:10, shame:6, prestige:-2 },
+        c:{ title:'Frontera de la cocina',
+            text:'La puerta de tu casa exige documento, bellezas y una firma. Llegas tarde a todo por razones administrativas. La puerta del baño empieza a poner multas y tienes que declararte incompetente.' } } },
+
+  { id:'d49', cat:'dinero', abs:2,
+    a:{ t:'Que cada vez que te rías, alguien te ingrese cinco monedas y te llame por teléfono.',
+        d:{ survival:-6, prestige:-2, chaos:6, luck:6 },
+        c:{ title:'Risa con llamada',
+            text:'Te ríes, suena el teléfono, alguien pregunta por una tal Rosa. Recibes cinco monedas, te desvelas y desarrollas una risa profesional de tres segundos. En seis meses no soportas la comedia ni la sociabilidad.' } },
+    b:{ t:'Tener una lámpara mágica, pero con un genio que sólo levanta actas.',
+        d:{ wit:8, prestige:2, chaos:4, luck:-2 },
+        c:{ title:'Genio notarial',
+            text:'Pides un deseo y el genio redacta un acta de tres páginas donde se refleja que el deseo se pidió con prisa. Archiva los deseos por carpetas. Tu vida no mejora, pero está impecablemente documentada.' } } },
+
+  { id:'d50', cat:'cotidiana', abs:1,
+    a:{ t:'Que cada vez que te duermas tarde, el mundo tenga 40 minutos de silencio obligatorio.',
+        d:{ luck:8, survival:6, chaos:2, prestige:2 },
+        c:{ title:'Cuarentena acústica',
+            text:'Se detienen los autobuses y los grillos por orden universal. Nadie sabe por qué, pero todos duermen mejor. Te nombran patrono del descanso, sin embargo tú nunca consigues dormirte antes de las 2.' } },
+    b:{ t:'Que tu nevera te dé consejos financieros más acertados que los tuyos.',
+        d:{ wit:10, luck:6, prestige:-2, chaos:2 },
+        c:{ title:'Nevera con máster',
+            text:'La nevera te prohíbe comprar otra salsa. Acierta siempre. Su consejo más famoso: «no te metas en una reforma en agosto». Al final, ganas dinero, pero no puedes tapar su luz sin sentirte culpable.' } } },
+
+  { id:'d51', cat:'trabajo', abs:2,
+    a:{ t:'Que en cada entrevista de trabajo te pregunten qué harías si tuvieras que pelear con una morsa.',
+        d:{ prestige:8, chaos:6, survival:6, shame:2 },
+        c:{ title:'Pregunta de recursos marinos',
+            text:'Te preparas la respuesta durante dos meses. La das con seriedad total y te contratan. En la empresa nadie sabe por qué existe esa pregunta, pero todos la hacen y todos la responden.' } },
+    b:{ t:'Que todas tus reuniones empiecen 20 minutos antes de lo que dice la invitación.',
+        d:{ shame:8, chaos:8, prestige:-4, luck:4 },
+        c:{ title:'Puntualidad imposible',
+            text:'Llegas tarde a reuniones que empezaron antes de existir. Desarrollas una intuición excepcional del futuro inmediato. Te nombran responsable de planificación y no sabes si es una promoción o una broma.' } } },
+
+  { id:'d52', cat:'tecnologia', abs:2,
+    a:{ t:'Que tu reloj inteligente mida tus emociones y las publique en un muro del barrio.',
+        d:{ shame:14, prestige:-6, chaos:8, wit:2 },
+        c:{ title:'Muro de emociones',
+            text:'El muro del barrio anuncia: «vecino de la 3ª: furia leve por la tostadora». Los vecinos te traen tés y discursos. Aprendes a no sentir nada en público y tu reloj a publicar «paz interior moderada».' } },
+    b:{ t:'Que cada vez que hagas una foto, salga un pequeño dinosaurio en el fondo.',
+        d:{ prestige:8, chaos:6, luck:2, survival:2 },
+        c:{ title:'Dinosaurio de las fotos',
+            text:'Aparece en el bautizo, en la graduación, en las bodas. Nadie lo menciona por educación. Un día sale saludando al lado de tu abuela y tu abuela le devuelve el saludo. Ahí empieza todo.' } } },
+
+  { id:'d53', cat:'sociales', abs:2,
+    a:{ t:'Que en toda reunión familiar alguien saque tu peor corte de pelo de hace 15 años.',
+        d:{ shame:12, prestige:-4, chaos:4, luck:2 },
+        c:{ title:'El corte inmortal',
+            text:'La foto pasa de mano en mano, vestida de anécdota. Acabas diciendo que el corte fue experimental. Tu tía te pide el nombre del peluquero. El peluquero existe y quiere demandarte por publicidad peligrosa.' } },
+    b:{ t:'Tener que saludar de beso a todo el mundo, incluidos los desconocidos, los perros y las estatuas.',
+        d:{ shame:8, prestige:-6, chaos:8, luck:4 },
+        c:{ title:'Saludo universal',
+            text:'Besas la estatua del parque delante de una escuela entera. Los niños lo cuentan en casa. Un periódico lo llama «tradición local» y de repente no puedes dejar de hacerlo, con un toque de dignidad y un poco de laca.' } } },
+
+  { id:'d54', cat:'poder', abs:3,
+    a:{ t:'Poder hablar diez idiomas, pero sólo con acento de televenta.',
+        d:{ prestige:8, wit:10, shame:6, chaos:2 },
+        c:{ title:'Idiomas con oferta',
+            text:'Hablas japonés impecable y suena a «llame ahora y llévese dos». Te contratan como traductora de ofertas internacionales. Un embajador cuelga, ofendido por la urgencia de tus verbos.' } },
+    b:{ t:'Ser invisible una hora al día, pero no elegir cuál.',
+        d:{ chaos:10, shame:4, prestige:-2, survival:6 },
+        c:{ title:'La hora fantasma',
+            text:'Desapareces siempre en el peor momento: una entrega, una boda, una cita. La gente asume que eres una persona misteriosa. Un día te vuelves invisible en una entrevista y te contratan por tener «un aura distinta».' } } },
+
+  { id:'d55', cat:'imposibles', abs:3,
+    a:{ t:'Que cada vez que digas tu nombre, una persona al azar olvide su tarea más importante.',
+        d:{ chaos:12, prestige:-6, shame:6, luck:-2 },
+        c:{ title:'Nombre con efectos',
+            text:'Presentarte en una reunión hace que alguien olvide apagar el horno. Te dan un micrófono en un evento y la ciudad entera olvida pagar la luz. Ahora te presentas con iniciales y una cinta en la boca.' } },
+    b:{ t:'Tener que negociar en voz alta con tu despertador cada mañana.',
+        d:{ wit:8, chaos:6, survival:2, prestige:2 },
+        c:{ title:'Sindicato de despertares',
+            text:'El despertador pide cinco minutos y luego exige café. Llegas tarde con argumentos impecables. Un día ganas la negociación y te despierta a la hora exacta: pero ya no sabes qué hacer con la victoria.' } } }
+  );
+
+  DILEMMAS.push(
+  { id:'d56', cat:'cotidiana', abs:1,
+    a:{ t:'Que cada bolsa de la compra pese 12 kilos más de lo normal.',
+        d:{ survival:6, prestige:-2, chaos:4, luck:-2 },
+        c:{ title:'Entrenamiento obligatorio',
+            text:'Tras seis meses, tu espalda tiene opiniones sindicales y tus brazos, currículum. Llegas a casa con dos bolsas y la sensación de haber ganado una competición que nadie organizó.' } },
+    b:{ t:'Que las llaves se te caigan siempre al suelo, pero nunca se pierdan.',
+        d:{ chaos:6, luck:4, shame:4, survival:2 },
+        c:{ title:'Llaves con retorno',
+            text:'Veinte veces al día recoges llaves del suelo. Desarrollas una flexibilidad de gimnasta y una teoría sobre el destino. Un día se te caen en una alcantarilla y vuelven solas por la puerta, secas y orgullosas.' } } },
+
+  { id:'d57', cat:'trabajo', abs:2,
+    a:{ t:'Que cada informe que escribas se convierta automáticamente en una canción.',
+        d:{ prestige:8, chaos:8, shame:6, wit:2 },
+        c:{ title:'Informe con estribillo',
+            text:'Presentas resultados y la sala tararea el estribillo del tercer trimestre. El consejo directivo te pide una versión bailable. Tu próximo informe trata de recortes y aun así es un éxito: dicen que tiene ritmo.' } },
+    b:{ t:'Que en cada pausa de café aparezca un asesor personal de estilo de vida.',
+        d:{ prestige:-4, chaos:6, survival:8, luck:2 },
+        c:{ title:'Café con coach',
+            text:'Aparece un señor con chaleco y te pregunta por tus objetivos a cinco años. Intentas beber el café caliente y él te sugiere una respiración. Al mes haces estiramientos en la oficina y odias que funcionen.' } } },
+
+  { id:'d58', cat:'tecnologia', abs:2,
+    a:{ t:'Que tu cuenta de correo te responda a ti mismo las preguntas antes de que las escribas.',
+        d:{ wit:12, prestige:4, chaos:8, shame:4 },
+        c:{ title:'Autocorreo premonitorio',
+            text:'Escribes «¿me puedes...?» y ya tienes la respuesta: «no». Ahorras tiempo y pierdes la esperanza. Descubres que la respuesta más frecuente es «visto bueno del jefe» y decides no volver a preguntar.' } },
+    b:{ t:'Que el cajero automático te felicite como si fueras un atleta.',
+        d:{ prestige:10, shame:6, luck:2, chaos:2 },
+        c:{ title:'Atletismo financiero',
+            text:'Sacas un billete pequeño y te lo celebra con un «¡espectacular!». Un día sacas muy poco y te dicen con ternura «lo importante es participar». Los jubilados de la cola te piden la receta del éxito.' } } },
+
+  { id:'d59', cat:'poder', abs:2,
+    a:{ t:'Poder hipnotizar a cualquiera, pero sólo para convencerlo de que tiene sueño.',
+        d:{ prestige:6, chaos:6, shame:4, survival:4 },
+        c:{ title:'Poder de la siesta',
+            text:'Una reunión acaba con cuatro directivos dormidos y un acuerdo firmado por inercia. Te contratan para cerrar negociaciones difíciles. Todo el mundo te agradece la conversación más relajante de su vida.' } },
+    b:{ t:'Tener un don para encontrar objetos perdidos, pero sólo ajenos.',
+        d:{ luck:10, prestige:6, wit:4, chaos:2 },
+        c:{ title:'Buscador de lo ajeno',
+            text:'Encuentras 200 pendientes, 14 llaves, un diente de leche y una tortuga. Lo tuyo nunca aparece. Un día buscas algo tuyo y encuentras la tortuga otra vez, y por fin entiendes que la tortuga es tuya.' } } },
+
+  { id:'d60', cat:'sociales', abs:3,
+    a:{ t:'Que todo el mundo te cuente secretos justo antes de presentarte a alguien importante.',
+        d:{ shame:10, prestige:-4, chaos:8, wit:4 },
+        c:{ title:'Archivo confidencial involuntario',
+            text:'Te cuentan de todo y luego te presentan a la persona afectada. Sonríes de una forma muy rara. Ganas fama de misterioso y un alto riesgo de ruina social por una sola frase mal colocada.' } },
+    b:{ t:'Que cada vez que digas «buenos días», la otra persona responda con una pregunta personal profunda.',
+        d:{ shame:6, prestige:6, chaos:4, luck:2 },
+        c:{ title:'Buenos días, ¿y tú?',
+            text:'Saludas al portero y acabas hablando de su infancia. En una panadería descubres el secreto familiar del panadero. Consigues pan gratis, amigos nuevos y una media de 50 minutos para salir de casa.' } } },
+
+  { id:'d61', cat:'dinero', abs:2,
+    a:{ t:'Que tu tarjeta bancaria sólo funcione si cantas el importe.',
+        d:{ shame:12, prestige:-4, chaos:6, luck:4 },
+        c:{ title:'Pago lírico',
+            text:'Cantas «cuarenta con veinte» en la cola del supermercado con dignidad total. La cajera te hace los coros. Un día pagas algo caro y la canción es tan larga que alguien pide autógrafos.' } },
+    b:{ t:'Tener una tarjeta con límite de 30, pero sin techo real de felicidad.',
+        d:{ prestige:-2, chaos:4, luck:8, survival:2 },
+        c:{ title:'Lujo de tres compras',
+            text:'Te organizas la vida en tres compras al mes. Descubres que el último euro puede ser un billete de tren, un café o una victoria moral. Un día te sobra algo y no sabes dónde ponerlo.' } } },
+
+  { id:'d62', cat:'cosmicos', abs:3,
+    a:{ t:'Que tu casa sea técnicamente más antiguo que el universo.',
+        d:{ prestige:10, chaos:8, wit:4, survival:-2 },
+        c:{ title:'Edificio ancestral',
+            text:'Los astrónomos visitan tu piso para discutir el origen del tiempo. La comunidad de vecinos sube la derrama por una reforma de la anterior existencia. Se niegan a pagar, argumentando que ya existía antes.' } },
+    b:{ t:'Que cada vez que bostezes, alguien en otro país cambie de opinión política.',
+        d:{ chaos:14, prestige:6, survival:-4, luck:2 },
+        c:{ title:'Bostezo con consecuencias',
+            text:'Sin saberlo, has decidido elecciones en cuatro países. Duermes poco, bostezas mucho y un analista habla de «un giro inexplicable». Te contratan como consultor y no puedes explicar de qué.' } } },
+
+  { id:'d63', cat:'animales', abs:2,
+    a:{ t:'Que un caracol te acompañe a todas partes y te dé consejos de inversión.',
+        d:{ prestige:-2, chaos:6, wit:8, luck:6 },
+        c:{ title:'Caracol con cartera',
+            text:'El caracol tarda tres días en decir «vende». Cuando lo dice, ya es tarde. Aun así, su otro consejo, «no corras», mejora tu vida de forma sorprendente. Le construyes un despacho con hoja de lechuga.' } },
+    b:{ t:'Que las abejas te consideren su representante legal.',
+        d:{ prestige:8, survival:-4, chaos:8, wit:4 },
+        c:{ title:'Representante apícola',
+            text:'Negocias con un parque municipal por dos flores y una fuente. Las abejas te rodean en la calle para informarte de los avances. Un día te piden permiso para picar a alguien y tienes que decidir.' } } },
+
+  { id:'d64', cat:'caos', abs:3,
+    a:{ t:'Que cada vez que aplaudas, caiga una ligera lluvia de confeti sobre tu cabeza.',
+        d:{ shame:8, chaos:10, prestige:4, luck:2 },
+        c:{ title:'Confeti personal',
+            text:'Aplaudes el discurso del jefe y una lluvia de confeti te cubre. La oficina te considera el alma de la fiesta. En el aeropuerto te detienen por el confeti. En casa recoges confeti todos los días.' } },
+    b:{ t:'Que las sillas te sigan por la habitación, expectantes.',
+        d:{ chaos:8, prestige:-4, survival:2, shame:6 },
+        c:{ title:'Sillas con apego',
+            text:'Te levantas y cinco sillas se acercan a la vez. Duermes con una invasión de muebles alrededor. Un día te sientas en el suelo por dignidad y las sillas forman un círculo, como si esperaran una intervención.' } } },
+
+  { id:'d65', cat:'caos', abs:3,
+    a:{ t:'Que todo lo que digas en voz baja lo grite un altavoz a 200 metros.',
+        d:{ shame:16, prestige:-6, chaos:12, luck:2 },
+        c:{ title:'Altavoz de barrio',
+            text:'Dices «qué cansancio» y 200 metros de vecinos lo oyen. Aprendes a hablar casi sin aire. La ciudad te usa para anunciar cosas, porque nadie sabe desenchufar el altavoz, y tú tienes que subir los lunes a leer la farmacia.' } },
+    b:{ t:'Que tu nevera te pida perdón cada vez que abres la puerta.',
+        d:{ prestige:-2, chaos:6, wit:4, luck:4 },
+        c:{ title:'Nevera arrepentida',
+            text:'Cada apertura incluye una disculpa de 40 segundos. Nunca sabes por qué se disculpa. Un día abres la puerta y la nevera dice «lo he intentado» y le contestas «lo sé». La relación más compleja de tu vida.' } } },
+
+  { id:'d66', cat:'imposibles', abs:3,
+    a:{ t:'Que cada vez que te rías, olvides una palabra para siempre.',
+        d:{ prestige:4, chaos:10, wit:4, luck:-4 },
+        c:{ title:'Vocabulario con precio',
+            text:'Has perdido «melancolía», «cuchara» y un insulto muy útil. Te ríes cada vez menos y hablas cada vez más claro. Un día te ríes sin querer y pierdes «agua», y tienes que pedirla con gestos y una reverencia.' } },
+    b:{ t:'Tener que explicar todas tus decisiones a un loro invisible que toma notas.',
+        d:{ wit:8, shame:8, prestige:2, chaos:4 },
+        c:{ title:'Acta con pluma invisible',
+            text:'Explicas al loro por qué compraste tres sombreros iguales. El loro repite «justificación insuficiente» en voz alta. Meses después, tu capacidad de argumentar es legendaria y nadie sabe por qué.' } } }
+  );
+
+  /* ---------------- FINALES ----------------
+     El final se calcula con los atributos finales y con las categorías
+     visitadas. Las mismas decisiones dan el mismo final; decisiones
+     distintas pueden dar finales distintos. */
+  const ENDINGS = [
+    { id:'leyenda', name:'Leyenda de lo absurdo', emoji:'🌪️',
+      tagline:'El caos te adoptó y tú firmaste los papeles.',
+      desc:'No resolviste nada, pero lo hiciste con un estilo que la gente contará mal en las cenas. Los historiadores del futuro discutirán si exististe o si fuiste un rumor colectivo.',
+      quotes:['Nunca tomaste una decisión normal, y eso, técnicamente, también es una estrategia.','Tu biografía se vendería como ficción y habría que rebajar el absurdo para que pareciera creíble.','Dejaste un legado: nadie sabe qué es, pero es tuyo.'],
+      weights:{ chaos:1.35, prestige:0.5, survival:0.1, wit:-0.2 }, cats:{ caos:1.1, imposibles:0.6, poder:0.35 } },
+
+    { id:'genio', name:'Genio de las malas decisiones', emoji:'🧠',
+      tagline:'Brillante, impecable y absolutamente desaconsejable.',
+      desc:'Tu cerebro resolvió problemas que nadie tenía con una elegancia que asusta. Cada solución creó dos problemas nuevos, y esos dos son ahora tus amigos.',
+      quotes:['Sabías exactamente lo que hacías. Ese es el problema.','Tu plan era perfecto salvo por un detalle: la realidad.','Piensas tan rápido que a veces llegas antes que la idea.'],
+      weights:{ wit:1.3, chaos:0.45, prestige:0.3, survival:0.1 }, cats:{ tecnologia:0.9, trabajo:0.7, imposibles:0.5 } },
+
+    { id:'superviviente', name:'Superviviente del caos', emoji:'🛡️',
+      tagline:'Sobreviviste. Nadie sabe muy bien cómo.',
+      desc:'Cada desastre te roza y sigue de largo. Tienes la estrategia de quien esquiva muebles en la oscuridad: no hay plan, pero funciona. Ya casi puedes dormir sin revisar la puerta.',
+      quotes:['Estás entero, que en tu caso es una hazaña estadística.','No ganaste, pero sigues aquí, y eso puntúa.','Tu cuerpo ha aprendido a esquivar problemas antes que tú.'],
+      weights:{ survival:1.35, luck:0.55, chaos:0.35, prestige:-0.1 }, cats:{ caos:0.6, imposibles:0.5, cosmicos:0.35 } },
+
+    { id:'burocracia', name:'Víctima de la burocracia cósmica', emoji:'📋',
+      tagline:'Firmaste algo que no debías y ahora el universo te lo cobra.',
+      desc:'En algún momento diste un dato de más y el sistema decidió incluirte en un expediente que nadie sabe cerrar. Tu vida es ahora un trámite con ventanilla y número.',
+      quotes:['Tu expediente cósmico tiene 340 páginas y una sola falta de ortografía: tu nombre.','Tienes cita para solucionar el problema en 2031.','Todo era negociable menos el formulario.'],
+      weights:{ shame:1.1, prestige:-0.6, luck:-0.5, wit:0.3 }, cats:{ trabajo:0.8, cotidiana:0.7, sociales:0.4 } },
+
+    { id:'villano', name:'Villano de bajo presupuesto', emoji:'😈',
+      tagline:'Malvado, sí. Convincente, todavía no.',
+      desc:'Intentaste dominar algo, probablemente una reunión de vecinos. Tu guarida es un trastero y tus secuaces cobran por horas. Aun así, hay quien te teme: la administradora de la finca.',
+      quotes:['Tu monólogo de villano fue interrumpido por el repartidor.','El mundo no está en peligro, pero tu fianza podría estar en juego.','Nadie respeta a un villano que pide permiso.'],
+      weights:{ prestige:0.85, chaos:0.75, wit:0.2, shame:-0.4 }, cats:{ dinero:0.8, sociales:0.6, poder:0.5 } },
+
+    { id:'afortunado', name:'Persona sospechosamente afortunada', emoji:'🍀',
+      tagline:'La suerte te sigue y algunas personas ya han puesto una denuncia.',
+      desc:'Todo se te resolvió antes de que pudieras preocuparte. Eso, en lugar de tranquilizarte, te ha vuelto una persona que mira el cielo con desconfianza y las monedas con cariño.',
+      quotes:['Ganaste tanto por casualidad que ahora te piden explicaciones.','No sabes si eres afortunado o el favorito de una entidad con muy mal gusto.','Te salvaste por accidente, tres veces, en el mismo martes.'],
+      weights:{ luck:1.4, survival:0.45, prestige:0.2, chaos:0.1 }, cats:{ imposibles:0.7, cosmicos:0.5, dinero:0.4 } },
+
+    { id:'diplomatico', name:'Diplomático de emergencia', emoji:'🤝',
+      tagline:'Resolviste conflictos que ni siquiera eran tuyos.',
+      desc:'Donde había una cena familiar complicada, ahora hay un tratado. Donde había dos vecinos enfadados, hay dos vecinos que hablan de ti. Tienes prestigio social y cero vacaciones.',
+      quotes:['Negociaste la paz en una cola del supermercado y nadie te lo agradeció.','Tu superpoder es escuchar. Tu maldición, también.','Podrías mediar entre dos huracanes, y probablemente lo has intentado.'],
+      weights:{ prestige:0.9, wit:0.7, shame:0.45, chaos:-0.15 }, cats:{ sociales:1.15, trabajo:0.45 } },
+
+    { id:'astronauta', name:'Astronauta por error', emoji:'🚀',
+      tagline:'Llegaste al espacio por una confusión administrativa.',
+      desc:'Miraste demasiado arriba y algo te miró de vuelta. Ahora tienes opiniones firmes sobre la gravedad y una mochila que nadie sabe cómo se cerró. La Tierra te parece un buen sitio, aunque algo ruidoso.',
+      quotes:['No sabes cómo funcionan los cohetes, pero ya estás en uno.','La vista era mejor desde allí, sobre todo sin tus decisiones.','Solicitaste un curso de cocina y acabaste en órbita.'],
+      weights:{ luck:0.6, wit:0.5, chaos:0.5, prestige:0.5 }, cats:{ cosmicos:1.3, tecnologia:0.35 } },
+
+    { id:'veterinario', name:'Leyenda del reino animal', emoji:'🐾',
+      tagline:'Los bichos te consideran su representante sindical.',
+      desc:'Tienes una agenda llena de negociaciones con palomas, gaviotas y algún caracol con cartera. No hablas su idioma, pero te escuchan. Eso debería preocuparte un poco.',
+      quotes:['Fuiste el único humano en una huelga de gaviotas.','Los animales te votaron y tú no podías votar en contra.','Tu currículum incluye «mediador de ardillas».'],
+      weights:{ prestige:0.45, survival:0.55, wit:0.5, shame:0.3 }, cats:{ animales:1.5 } },
+
+    { id:'influencer', name:'Influencer de catástrofe', emoji:'📱',
+      tagline:'Tu desgracia tiene más seguidores que tú.',
+      desc:'Todo lo que te pasó terminó en una historia compartida, y lo peor es que funcionó. Tienes comunidad, comentarios y una reputación que se actualiza cada mañana con notificaciones.',
+      quotes:['Tu peor momento tiene 40.000 «me gusta» y una canción famosa.','No eres famoso por algo: eres famoso por todo a la vez.','Tu comunidad te quiere; tu tranquilidad presentó la renuncia.'],
+      weights:{ prestige:0.8, shame:0.6, chaos:0.6, wit:0.2 }, cats:{ tecnologia:0.8, sociales:0.8, caos:0.4 } }
+  ];
+
+  const ENDINGS_BY_ID = {};
+  ENDINGS.forEach(function (e) { ENDINGS_BY_ID[e.id] = e; });
+
+  const CATEGORY_TOTALS = {};
+  DILEMMAS.forEach(function (d) { CATEGORY_TOTALS[d.cat] = (CATEGORY_TOTALS[d.cat] || 0) + 1; });
+
+  /* ---------------- ECOS: frases que reaccionan a los atributos ---------------- */
+  const ECHO_RULES = [
+    { test: function (a) { return a.shame >= 80; }, text:'Tu vergüenza alcanzó tal nivel que ahora se te llama «carácter».' },
+    { test: function (a) { return a.chaos >= 80; }, text:'El caos ya no te sigue: te adelanta y te espera sentado.' },
+    { test: function (a) { return a.luck >= 80; }, text:'Tu suerte empieza a ser estadísticamente sospechosa.' },
+    { test: function (a) { return a.luck <= 25; }, text:'La suerte no te abandonó: nunca llegó a presentarse.' },
+    { test: function (a) { return a.survival <= 28; }, text:'Tu supervivencia está en números rojos. Literalmente: hay números rojos en tu chaqueta.' },
+    { test: function (a) { return a.wit >= 78; }, text:'Tu inteligencia sube. Tu capacidad de usarla para bien, no.' },
+    { test: function (a) { return a.prestige >= 78; }, text:'El prestigio te queda como un traje prestado: brillante y dos tallas grande.' },
+    { test: function (a) { return a.prestige <= 25; }, text:'Tu reputación acaba de pedir el traslado a otra persona.' },
+    { test: function (a, r) { return r.streak >= 3; }, text:'Tu racha de caos es considerable. No la sueltes ahora, que se nota.' }
+  ];
+  const ECHO_FALLBACK = [
+    'Cada decisión te acerca a un final que aún no tiene nombre, pero sí abogado.',
+    'El universo toma nota. Usa una libreta muy pequeña.',
+    'Nadie te pidió que fueras tan coherente con el desastre.',
+    'Sigues vivo, lo cual es una opinión, no un hecho garantizado.',
+    'Tu hoja de vida acaba de ganar un párrafo que nadie va a creer.'
+  ];
+
+  /* ---------------------------------------------------------------
+     4. ALMACENAMIENTO Y ESTADO
+     Todo va envuelto en try/catch: si localStorage falla, el juego
+     sigue funcionando en memoria durante la sesión.
+     --------------------------------------------------------------- */
+  const storage = (function () {
+    let available = false;
+    let warned = false;
+    try {
+      const probe = '__etp_probe__';
+      window.localStorage.setItem(probe, '1');
+      window.localStorage.removeItem(probe);
+      available = true;
+    } catch (err) { available = false; }
+    return {
+      isAvailable: function () { return available; },
+      read: function () {
+        if (!available) return null;
+        try { return window.localStorage.getItem(CONFIG.storageKey); } catch (err) { return null; }
+      },
+      write: function (value) {
+        if (!available) return false;
+        try { window.localStorage.setItem(CONFIG.storageKey, value); return true; }
+        catch (err) {
+          available = false;
+          if (!warned && typeof window.__etpStorageWarning === 'function') { warned = true; window.__etpStorageWarning(); }
+          return false;
+        }
+      },
+      clear: function () {
+        if (!available) return false;
+        try { window.localStorage.removeItem(CONFIG.storageKey); return true; } catch (err) { return false; }
+      }
+    };
+  })();
+
+  function defaultState() {
+    return {
+      v: CONFIG.version,
+      stats: { games: 0, answers: 0, ends: {}, cats: {}, bestStreak: 0, dailies: 0 },
+      history: [],
+      daily: { lastKey: null },
+      run: null
+    };
+  }
+
+  function num(value, fallback) {
+    const n = Number(value);
+    return Number.isFinite(n) ? n : fallback;
+  }
+
+  function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
+
+  const DILEMMA_BY_ID = {};
+  DILEMMAS.forEach(function (d) { DILEMMA_BY_ID[d.id] = d; });
+
+  function sanitizeState(raw) {
+    const clean = defaultState();
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return { state: clean, repaired: raw !== null && raw !== undefined };
+    let repaired = false;
+    const stats = raw.stats && typeof raw.stats === 'object' ? raw.stats : {};
+    clean.stats.games = Math.max(0, Math.floor(num(stats.games, 0)));
+    clean.stats.answers = Math.max(0, Math.floor(num(stats.answers, 0)));
+    clean.stats.bestStreak = Math.max(0, Math.floor(num(stats.bestStreak, 0)));
+    clean.stats.dailies = Math.max(0, Math.floor(num(stats.dailies, 0)));
+    if (stats.ends && typeof stats.ends === 'object') {
+      Object.keys(stats.ends).forEach(function (id) {
+        if (ENDINGS_BY_ID[id]) {
+          const n = Math.floor(num(stats.ends[id], 0));
+          if (n > 0) clean.stats.ends[id] = n;
+        }
+      });
+    }
+    if (stats.cats && typeof stats.cats === 'object') {
+      Object.keys(stats.cats).forEach(function (id) {
+        if (CATEGORIES[id]) {
+          const n = Math.floor(num(stats.cats[id], 0));
+          if (n > 0) clean.stats.cats[id] = n;
+        }
+      });
+    }
+    if (Array.isArray(raw.history)) {
+      raw.history.slice(0, 12).forEach(function (h) {
+        if (!h || typeof h !== 'object' || !ENDINGS_BY_ID[h.endingId]) { repaired = true; return; }
+        clean.history.push({
+          date: typeof h.date === 'string' ? h.date.slice(0, 40) : '',
+          mode: typeof h.mode === 'string' && /^[a-z]{3,10}$/.test(h.mode) ? h.mode : 'normal',
+          endingId: h.endingId,
+          attrs: sanitizeAttrs(h.attrs),
+          total: clamp(Math.floor(num(h.total, 0)), 0, 50)
+        });
+      });
+      if (raw.history.length > 12) repaired = true;
+    }
+    if (raw.daily && typeof raw.daily === 'object' && typeof raw.daily.lastKey === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(raw.daily.lastKey)) {
+      clean.daily.lastKey = raw.daily.lastKey;
+    }
+    const run = sanitizeRun(raw.run);
+    if (raw.run && !run) repaired = true;
+    clean.run = run;
+    return { state: clean, repaired: repaired };
+  }
+
+  function sanitizeAttrs(raw) {
+    const out = {};
+    ATTR_KEYS.forEach(function (k) { out[k] = clamp(Math.round(num(raw && raw[k], START_ATTR)), 0, 100); });
+    return out;
+  }
+
+  function sanitizeRun(raw) {
+    if (!raw || typeof raw !== 'object') return null;
+    if (!MODES[raw.mode]) return null;
+    if (!Array.isArray(raw.order) || raw.order.length === 0 || raw.order.length > 30) return null;
+    const order = raw.order.filter(function (id) { return !!DILEMMA_BY_ID[id]; });
+    if (order.length !== raw.order.length) return null;
+    const idx = Math.floor(num(raw.idx, 0));
+    if (idx < 0 || idx > order.length) return null;
+    const answers = [];
+    if (Array.isArray(raw.answers)) {
+      raw.answers.forEach(function (ans) {
+        if (!ans || typeof ans !== 'object' || !DILEMMA_BY_ID[ans.id] || (ans.choice !== 'a' && ans.choice !== 'b')) return;
+        answers.push({ id: ans.id, choice: ans.choice });
+      });
+    }
+    if (answers.length > order.length) return null;
+    const safeIdx = Math.min(idx, answers.length);
+    const completed = raw.completed === true && answers.length === order.length;
+    return {
+      id: typeof raw.id === 'string' ? raw.id.slice(0, 40) : 'r' + Date.now(),
+      mode: raw.mode,
+      order: order,
+      idx: safeIdx,
+      answers: answers,
+      attrs: sanitizeAttrs(raw.attrs),
+      streak: Math.max(0, Math.floor(num(raw.streak, 0))),
+      bestStreak: Math.max(0, Math.floor(num(raw.bestStreak, 0))),
+      startedAt: typeof raw.startedAt === 'string' ? raw.startedAt : new Date().toISOString(),
+      dayKey: typeof raw.dayKey === 'string' ? raw.dayKey.slice(0, 10) : null,
+      completed: completed,
+      endingId: completed && ENDINGS_BY_ID[raw.endingId] ? raw.endingId : null,
+      counted: raw.counted === true
+    };
+  }
+
+  let state = defaultState();
+  let storageWarningShown = false;
+
+  function loadState() {
+    const rawText = storage.read();
+    if (!rawText) { state = defaultState(); return; }
+    let parsed;
+    try { parsed = JSON.parse(rawText); }
+    catch (err) {
+      state = defaultState();
+      storage.clear();
+      queueToast('Los datos guardados estaban dañados. Hemos empezado de cero.', true);
+      return;
+    }
+    const result = sanitizeState(parsed);
+    state = result.state;
+    if (result.repaired) {
+      saveState();
+      queueToast('Algunos datos guardados no eran válidos y se han descartado.', true);
+    }
+  }
+
+  function saveState() {
+    const ok = storage.write(JSON.stringify(state));
+    if (!ok) notifyStorageProblem();
+    return ok;
+  }
+
+  function notifyStorageProblem() {
+    if (storageWarningShown) return;
+    storageWarningShown = true;
+    queueToast('No se puede guardar en este navegador. Puedes jugar, pero el progreso no se conservará.', true);
+  }
+  window.__etpStorageWarning = notifyStorageProblem;
+
+  function todayKey(date) {
+    const d = date || new Date();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return d.getFullYear() + '-' + m + '-' + day;
+  }
+
+  /* ---------------------------------------------------------------
+     5. UTILIDADES DE INTERFAZ
+     --------------------------------------------------------------- */
+  const $ = function (sel, root) { return (root || document).querySelector(sel); };
+  const $$ = function (sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); };
+
+  const MODES = {
+    quick:  { count: 5,  label: 'Partida rápida', emoji: '⚡' },
+    normal: { count: 10, label: 'Partida normal', emoji: '🎯' },
+    long:   { count: 20, label: 'Partida larga',  emoji: '🌀' },
+    daily:  { count: 10, label: 'Reto del día',   emoji: '🗓️' }
+  };
+
+  let toastTimer = null;
+  let pendingToast = null;
+
+  function queueToast(message, isError) {
+    pendingToast = { message: message, isError: !!isError };
+    requestAnimationFrame(function () {
+      if (pendingToast) { toast(pendingToast.message, pendingToast.isError); pendingToast = null; }
+    });
+  }
+
+  function toast(message, isError) {
+    const node = $('#toast');
+    if (!node) return;
+    node.textContent = message;
+    node.className = isError ? 'show err' : 'show';
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { node.className = ''; }, 4600);
+  }
+
+  function modeLabel(mode) { return (MODES[mode] && MODES[mode].label) || 'Partida'; }
+
+  function formatDate(iso) {
+    if (!iso) return '';
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return '';
+    try {
+      return d.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
+    } catch (err) {
+      return d.toISOString().slice(0, 10);
+    }
+  }
+
+  function prettyDailyKey(key) {
+    const parts = key.split('-');
+    const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+    try {
+      return d.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
+    } catch (err) { return key; }
+  }
+
+  /* Aleatoriedad determinista (reto del día y órdenes reproducibles) */
+  function xmur3(str) {
+    let h = 1779033703 ^ str.length;
+    for (let i = 0; i < str.length; i++) {
+      h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
+      h = (h << 13) | (h >>> 19);
+    }
+    return function () {
+      h = Math.imul(h ^ (h >>> 16), 2246822507);
+      h = Math.imul(h ^ (h >>> 13), 3266489909);
+      h ^= h >>> 16;
+      return h >>> 0;
+    };
+  }
+
+  function mulberry32(seed) {
+    let a = seed >>> 0;
+    return function () {
+      a = (a + 0x6D2B79F5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function seededShuffle(list, seedText) {
+    const rand = mulberry32(xmur3(seedText)());
+    const arr = list.slice();
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(rand() * (i + 1));
+      const tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+    }
+    return arr;
+  }
+
+  function dailySequence(dayKey) {
+    const ids = DILEMMAS.map(function (d) { return d.id; });
+    return seededShuffle(ids, 'etp-daily-' + dayKey).slice(0, MODES.daily.count);
+  }
+
+  function hashText(str) {
+    let h = 0;
+    for (let i = 0; i < str.length; i++) { h = (Math.imul(h, 31) + str.charCodeAt(i)) | 0; }
+    return Math.abs(h);
+  }
+
+  /* ---------------------------------------------------------------
+     6. MODAL, RUTAS Y PANTALLAS
+     --------------------------------------------------------------- */
+  let modalCleanup = null;
+
+  function closeModal() {
+    const root = $('#modal-root');
+    if (root) root.innerHTML = '';
+    if (modalCleanup) { modalCleanup(); modalCleanup = null; }
+  }
+
+  function openModal(options) {
+    closeModal();
+    const root = $('#modal-root');
+    if (!root) return;
+    const backdrop = document.createElement('div');
+    backdrop.className = 'modal-backdrop';
+    backdrop.setAttribute('role', 'dialog');
+    backdrop.setAttribute('aria-modal', 'true');
+    backdrop.setAttribute('aria-labelledby', 'modal-title');
+
+    const box = document.createElement('div');
+    box.className = 'modal';
+    const title = document.createElement('h3');
+    title.id = 'modal-title';
+    title.textContent = options.title || '';
+    box.appendChild(title);
+    if (options.text) {
+      const p = document.createElement('p');
+      p.textContent = options.text;
+      box.appendChild(p);
+    }
+    const actions = document.createElement('div');
+    actions.className = 'modal-actions';
+    (options.actions || []).forEach(function (action) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn ' + (action.className || 'btn-ghost');
+      btn.textContent = action.label;
+      btn.addEventListener('click', function () {
+        closeModal();
+        if (typeof action.onClick === 'function') action.onClick();
+      });
+      actions.appendChild(btn);
+    });
+    box.appendChild(actions);
+    backdrop.appendChild(box);
+    backdrop.addEventListener('click', function (event) { if (event.target === backdrop) closeModal(); });
+    root.appendChild(backdrop);
+    const first = $('.btn', box);
+    if (first) first.focus({ preventScroll: true });
+    const onKey = function (event) {
+      if (event.key === 'Escape') { closeModal(); }
+      if (event.key === 'Tab') {
+        const focusables = $$('button', box);
+        if (!focusables.length) return;
+        const firstEl = focusables[0];
+        const lastEl = focusables[focusables.length - 1];
+        if (event.shiftKey && document.activeElement === firstEl) { event.preventDefault(); lastEl.focus(); }
+        else if (!event.shiftKey && document.activeElement === lastEl) { event.preventDefault(); firstEl.focus(); }
+      }
+    };
+    document.addEventListener('keydown', onKey);
+    modalCleanup = function () { document.removeEventListener('keydown', onKey); };
+  }
+
+  const PAGES = {
+    inicio: { screen: 'screen-home', title: 'ELIGE TU PROBLEMA — Dilemas absurdos', nav: 'inicio' },
+    jugar: { screen: 'screen-game', title: 'Partida en curso — ELIGE TU PROBLEMA', nav: null },
+    resultado: { screen: 'screen-result', title: 'Tu resultado — ELIGE TU PROBLEMA', nav: null },
+    coleccion: { screen: 'screen-collection', title: 'Colección — ELIGE TU PROBLEMA', nav: 'coleccion' },
+    acerca: { screen: 'screen-about', title: 'Acerca de — ELIGE TU PROBLEMA', nav: 'acerca' },
+    privacidad: { screen: 'screen-privacy', title: 'Privacidad — ELIGE TU PROBLEMA', nav: 'privacidad' },
+    contacto: { screen: 'screen-contact', title: 'Contacto — ELIGE TU PROBLEMA', nav: 'contacto' }
+  };
+  let currentPage = 'inicio';
+
+  function pageFromHash() {
+    const raw = (window.location.hash || '').replace(/^#/, '').trim().toLowerCase();
+    return PAGES[raw] ? raw : 'inicio';
+  }
+
+  function go(page, push) {
+    if (!PAGES[page]) page = 'inicio';
+    if (page === 'jugar' && (!state.run || state.run.completed)) page = state.run && state.run.completed ? 'resultado' : 'inicio';
+    if (page === 'resultado' && (!state.run || !state.run.completed)) page = 'inicio';
+    if (push !== false) {
+      if (window.location.hash !== '#' + page) {
+        try { window.history.pushState(null, '', '#' + page); } catch (err) { window.location.hash = page; }
+      }
+    }
+    renderPage(page);
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    try {
+      window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+    } catch (err) { /* navegadores antiguos */ }
+  }
+
+  function renderPage(page) {
+    currentPage = page;
+    closeModal();
+    Object.keys(PAGES).forEach(function (key) {
+      const node = document.getElementById(PAGES[key].screen);
+      if (node) node.hidden = key !== page;
+    });
+    $$('.nav-link[data-go]').forEach(function (btn) {
+      if (PAGES[page].nav && btn.getAttribute('data-go') === PAGES[page].nav) btn.setAttribute('aria-current', 'page');
+      else btn.removeAttribute('aria-current');
+    });
+    document.title = PAGES[page].title;
+
+    if (page === 'inicio') { renderHome(); }
+    else if (page === 'jugar') { renderGame(); }
+    else if (page === 'resultado') { renderResult(); }
+    else if (page === 'coleccion') { renderCollection(); }
+    else { renderStaticPage(page); }
+  }
+
+  function applyConfigToPages() {
+    const emailNode = $('#contact-email');
+    if (emailNode && CONFIG.contactEmail) {
+      emailNode.classList.remove('todo');
+      emailNode.innerHTML = '';
+      const a = document.createElement('a');
+      a.href = 'mailto:' + CONFIG.contactEmail;
+      a.textContent = CONFIG.contactEmail;
+      emailNode.appendChild(a);
+    }
+    const ownerNode = $('#contact-owner');
+    if (ownerNode && CONFIG.owner) { ownerNode.classList.remove('todo'); ownerNode.textContent = CONFIG.owner; }
+    const countryNode = $('#contact-country');
+    if (countryNode && CONFIG.country) { countryNode.classList.remove('todo'); countryNode.textContent = CONFIG.country; }
+    const complete = !!(CONFIG.contactEmail && CONFIG.owner && CONFIG.country);
+    ['pending-about', 'pending-privacy', 'pending-contact'].forEach(function (id) {
+      const node = document.getElementById(id);
+      if (node && complete) node.hidden = true;
+    });
+  }
+
+  function renderStaticPage(page) {
+    if (page === 'privacidad') {
+      const node = $('#privacy-date');
+      if (node) node.textContent = CONFIG.policyUpdated ? formatDate(CONFIG.policyUpdated) : 'pendiente de fecha definitiva';
+    }
+    applyConfigToPages();
+  }
+
+  /* ---------------------------------------------------------------
+     7. MOTOR DE JUEGO
+     --------------------------------------------------------------- */
+  let busy = false;
+  const prefersReduced = function () {
+    return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  };
+
+  function newRun(mode) {
+    const config = MODES[mode] || MODES.normal;
+    const dayKey = todayKey();
+    let order;
+    if (mode === 'daily') {
+      order = dailySequence(dayKey);
+    } else {
+      const ids = DILEMMAS.map(function (d) { return d.id; });
+      const seed = 'run-' + Date.now() + '-' + Math.random().toString(36).slice(2);
+      order = seededShuffle(ids, seed).slice(0, Math.min(config.count, ids.length));
+    }
+    const attrs = {};
+    ATTR_KEYS.forEach(function (k) { attrs[k] = START_ATTR; });
+    return {
+      id: 'r' + Date.now().toString(36),
+      mode: mode,
+      order: order,
+      idx: 0,
+      answers: [],
+      attrs: attrs,
+      streak: 0,
+      bestStreak: 0,
+      startedAt: new Date().toISOString(),
+      dayKey: mode === 'daily' ? dayKey : null,
+      completed: false,
+      endingId: null,
+      counted: false
+    };
+  }
+
+  function startGame(mode, force) {
+    if (!MODES[mode]) mode = 'normal';
+    if (state.run && !state.run.completed && !force) {
+      openModal({
+        title: 'Tienes una partida sin terminar',
+        text: 'Puedes continuar donde lo dejaste o empezar de cero y perder estas decisiones para siempre (como en la vida real).',
+        actions: [
+          { label: 'Continuar', className: 'btn-primary', onClick: function () { go('jugar'); } },
+          { label: 'Empezar de cero', className: 'btn-ghost', onClick: function () { startGame(mode, true); } }
+        ]
+      });
+      return;
+    }
+    state.run = newRun(mode);
+    busy = false;
+    saveState();
+    go('jugar');
+  }
+
+  function renderGame() {
+    const run = state.run;
+    if (!run) { go('inicio', false); return; }
+    if (run.completed) { go('resultado', false); return; }
+    busy = false;
+
+    const total = run.order.length;
+    const idx = run.idx;
+    const dilemma = DILEMMA_BY_ID[run.order[idx]];
+    if (!dilemma) { go('inicio', false); return; }
+
+    const crumb = $('#game-crumb');
+    if (crumb) {
+      crumb.textContent = modeLabel(run.mode) + (run.mode === 'daily' && run.dayKey ? ' · ' + prettyDailyKey(run.dayKey) : '');
+    }
+    const counter = $('#game-count');
+    if (counter) counter.textContent = 'Dilema ' + Math.min(idx + 1, total) + ' de ' + total;
+
+    const progress = $('#progress');
+    const fill = $('#progress-fill');
+    const answeredNow = run.answers.length > idx;
+    const ratio = answeredNow ? (idx + 1) / total : idx / total;
+    if (fill) fill.style.width = Math.round(ratio * 100) + '%';
+    if (progress) {
+      progress.setAttribute('aria-valuemax', String(total));
+      progress.setAttribute('aria-valuenow', String(Math.min(idx + 1, total)));
+      progress.setAttribute('aria-valuetext', 'Dilema ' + Math.min(idx + 1, total) + ' de ' + total);
+    }
+
+    const cat = CATEGORIES[dilemma.cat];
+    const catNode = $('#q-cat');
+    if (catNode) catNode.textContent = (cat ? cat.emoji + ' ' + cat.name : 'Dilema') + ' · Absurdo ' + '●'.repeat(dilemma.abs) + '○'.repeat(3 - dilemma.abs);
+    const title = $('#q-title');
+    if (title) title.textContent = '¿Qué prefieres sufrir?';
+
+    if (answeredNow) {
+      const last = run.answers[run.answers.length - 1];
+      renderConsequence(dilemma, last.choice, true);
+    } else {
+      renderOptions(dilemma);
+      const qTitle = $('#q-title');
+      if (qTitle) {
+        qTitle.setAttribute('tabindex', '-1');
+        try { qTitle.focus({ preventScroll: true }); } catch (err) { /* ignorar */ }
+      }
+    }
+    renderAttrs($('#attrs-grid'), run.attrs);
+    const hint = $('#attrs-hint');
+    if (hint) {
+      hint.textContent = 'Racha de caos: ' + run.streak + ' · récord personal: ' + Math.max(state.stats.bestStreak, run.bestStreak);
+    }
+  }
+
+  function renderOptions(dilemma) {
+    const area = $('#dilemma-area');
+    const cons = $('#consequence-area');
+    const wrap = $('#options');
+    if (!wrap) return;
+    if (area) area.hidden = false;
+    if (cons) { cons.hidden = true; cons.innerHTML = ''; }
+    wrap.innerHTML = '';
+
+    ['a', 'b'].forEach(function (key) {
+      const opt = dilemma[key];
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'opt opt-' + key;
+      btn.setAttribute('data-choice', key);
+      btn.setAttribute('aria-label', 'Opción ' + key.toUpperCase() + ': ' + opt.t);
+
+      const keySpan = document.createElement('span');
+      keySpan.className = 'opt-key';
+      keySpan.setAttribute('aria-hidden', 'true');
+      keySpan.textContent = key.toUpperCase();
+
+      const txt = document.createElement('span');
+      txt.className = 'opt-txt';
+      txt.textContent = opt.t;
+
+      const foot = document.createElement('span');
+      foot.className = 'opt-foot';
+      foot.innerHTML = '<span>Elegir esto</span><span class="arrow" aria-hidden="true">→</span>';
+
+      btn.appendChild(keySpan);
+      btn.appendChild(txt);
+      btn.appendChild(foot);
+      wrap.appendChild(btn);
+    });
+  }
+
+  function choose(key, button) {
+    const run = state.run;
+    if (!run || run.completed || busy) return;
+    const dilemma = DILEMMA_BY_ID[run.order[run.idx]];
+    if (!dilemma) return;
+    if (run.answers.length > run.idx) return; /* ya respondido */
+    if (key !== 'a' && key !== 'b') return;
+
+    busy = true;
+    const buttons = $$('#options .opt');
+    buttons.forEach(function (btn) {
+      btn.disabled = true;
+      if (btn === button || btn.getAttribute('data-choice') === key) btn.classList.add('picked');
+      else btn.classList.add('dim');
+    });
+
+    applyChoice(run, dilemma, key);
+    saveState();
+
+    const delay = prefersReduced() ? 0 : 280;
+    setTimeout(function () {
+      if (state.run !== run || run.idx !== run.order.indexOf(dilemma.id)) return;
+      const el = button && button.isConnected ? button : null;
+      void el;
+      renderConsequence(dilemma, key, false);
+      renderAttrs($('#attrs-grid'), run.attrs);
+      const hint = $('#attrs-hint');
+      if (hint) hint.textContent = 'Racha de caos: ' + run.streak + ' · récord personal: ' + Math.max(state.stats.bestStreak, run.bestStreak);
+      busy = false;
+    }, delay);
+  }
+
+  function applyChoice(run, dilemma, key) {
+    const opt = dilemma[key];
+    const deltas = opt.d || {};
+    ATTR_KEYS.forEach(function (k) {
+      if (typeof deltas[k] === 'number') {
+        run.attrs[k] = clamp(Math.round(run.attrs[k] + deltas[k]), 0, 100);
+      }
+    });
+    run.answers.push({ id: dilemma.id, choice: key });
+    run.streak = (typeof deltas.chaos === 'number' && deltas.chaos > 0) ? run.streak + 1 : 0;
+    run.bestStreak = Math.max(run.bestStreak, run.streak);
+    state.stats.answers += 1;
+    state.stats.cats[dilemma.cat] = (state.stats.cats[dilemma.cat] || 0) + 1;
+    state.stats.bestStreak = Math.max(state.stats.bestStreak, run.bestStreak);
+  }
+
+  function buildEcho(run) {
+    for (let i = 0; i < ECHO_RULES.length; i++) {
+      let matches = false;
+      try { matches = ECHO_RULES[i].test(run.attrs, run); } catch (err) { matches = false; }
+      if (matches) return ECHO_RULES[i].text;
+    }
+    const seed = run.answers.map(function (a) { return a.id + a.choice; }).join('|') || 'vacio';
+    return ECHO_FALLBACK[hashText(seed) % ECHO_FALLBACK.length];
+  }
+
+  function renderConsequence(dilemma, key, restoring) {
+    const run = state.run;
+    if (!run) return;
+    const opt = dilemma[key];
+    const consArea = $('#consequence-area');
+    const dilemmaArea = $('#dilemma-area');
+    if (!consArea) return;
+    if (dilemmaArea) dilemmaArea.hidden = true;
+    consArea.hidden = false;
+    consArea.innerHTML = '';
+
+    const card = document.createElement('div');
+    card.className = 'consequence';
+
+    const choiceRow = document.createElement('div');
+    choiceRow.className = 'cons-choice';
+    const badge = document.createElement('span');
+    badge.className = 'cons-badge ' + key;
+    badge.textContent = key.toUpperCase();
+    badge.setAttribute('aria-hidden', 'true');
+    const choiceText = document.createElement('div');
+    const small = document.createElement('small');
+    small.textContent = restoring ? 'Tu elección' : 'Acabas de elegir';
+    const chosen = document.createElement('p');
+    chosen.textContent = opt.t;
+    choiceText.appendChild(small);
+    choiceText.appendChild(chosen);
+    choiceRow.appendChild(badge);
+    choiceRow.appendChild(choiceText);
+
+    const title = document.createElement('h3');
+    title.className = 'cons-title';
+    title.textContent = opt.c.title;
+    const text = document.createElement('p');
+    text.className = 'cons-text';
+    text.textContent = opt.c.text;
+
+    const echo = document.createElement('div');
+    echo.className = 'cons-echo';
+    const echoIcon = document.createElement('span');
+    echoIcon.setAttribute('aria-hidden', 'true');
+    echoIcon.textContent = '🌀';
+    const echoText = document.createElement('span');
+    const echoB = document.createElement('b');
+    echoB.textContent = 'Efecto acumulado: ';
+    echoText.appendChild(echoB);
+    echoText.appendChild(document.createTextNode(buildEcho(run)));
+    echo.appendChild(echoIcon);
+    echo.appendChild(echoText);
+
+    const deltas = document.createElement('div');
+    deltas.className = 'deltas';
+    ATTR_KEYS.forEach(function (k) {
+      const value = opt.d && opt.d[k];
+      if (typeof value !== 'number' || value === 0) return;
+      const chip = document.createElement('span');
+      chip.className = 'delta ' + (value > 0 ? 'up' : 'down');
+      chip.textContent = ATTRS[k].emoji + ' ' + ATTRS[k].name + ' ' + (value > 0 ? '+' : '') + value;
+      deltas.appendChild(chip);
+    });
+    if (!deltas.children.length) {
+      const chip = document.createElement('span');
+      chip.className = 'delta';
+      chip.textContent = 'Sin cambios. Sospechoso.';
+      deltas.appendChild(chip);
+    }
+
+    const isLast = run.idx >= run.order.length - 1;
+    const actions = document.createElement('div');
+    actions.className = 'cons-actions';
+    const nextBtn = document.createElement('button');
+    nextBtn.type = 'button';
+    nextBtn.className = 'btn btn-primary';
+    nextBtn.id = 'next-btn';
+    nextBtn.textContent = isLast ? 'Ver mi resultado 🏁' : 'Siguiente dilema ▸';
+    nextBtn.addEventListener('click', nextDilemma);
+    actions.appendChild(nextBtn);
+
+    const count = document.createElement('p');
+    count.className = 'result-note';
+    count.textContent = 'Decisión ' + run.answers.length + ' de ' + run.order.length + ' registrada' + (run.mode === 'daily' ? ' en el reto del día' : '') + '.';
+
+    card.appendChild(choiceRow);
+    card.appendChild(title);
+    card.appendChild(text);
+    card.appendChild(echo);
+    card.appendChild(deltas);
+    card.appendChild(actions);
+    card.appendChild(count);
+    consArea.appendChild(card);
+
+    if (!restoring) {
+      const focusTarget = title;
+      title.setAttribute('tabindex', '-1');
+      try { focusTarget.focus({ preventScroll: true }); } catch (err) { /* ignorar */ }
+    }
+  }
+
+  function nextDilemma() {
+    const run = state.run;
+    if (!run || run.completed) return;
+    if (run.answers.length !== run.idx + 1) return; /* evita dobles avances */
+    if (run.idx + 1 >= run.order.length) {
+      finishRun();
+      return;
+    }
+    run.idx += 1;
+    saveState();
+    renderGame();
+  }
+
+  function scoreEndings(run) {
+    const total = Math.max(1, run.answers.length);
+    const catCounts = {};
+    run.answers.forEach(function (ans) {
+      const d = DILEMMA_BY_ID[ans.id];
+      if (d) catCounts[d.cat] = (catCounts[d.cat] || 0) + 1;
+    });
+    const fingerprint = run.answers.map(function (a) { return a.id + a.choice; }).join('');
+    /* Similitud de perfil: medimos cuánto te has desviado de la media de las
+       dos opciones de cada dilema que te ha tocado. Así el resultado depende de
+       tus decisiones y no de los atributos que el contenido regala por defecto. */
+    const baseline = {};
+    const spread = {};
+    ATTR_KEYS.forEach(function (k) { baseline[k] = 0; spread[k] = 0; });
+    run.order.forEach(function (id) {
+      const d = DILEMMA_BY_ID[id];
+      if (!d) return;
+      ATTR_KEYS.forEach(function (k) {
+        const va = (d.a.d && d.a.d[k]) || 0;
+        const vb = (d.b.d && d.b.d[k]) || 0;
+        baseline[k] += (va + vb) / 2;
+        spread[k] += Math.abs(va - vb) / 2;
+      });
+    });
+    const profile = {};
+    let profileNorm = 0;
+    ATTR_KEYS.forEach(function (k) {
+      const scale = Math.max(8, spread[k] * 0.55);
+      profile[k] = (run.attrs[k] - 50 - baseline[k]) / scale;
+      profileNorm += profile[k] * profile[k];
+    });
+    profileNorm = Math.sqrt(profileNorm) || 0.0001;
+
+    const scored = ENDINGS.map(function (e) {
+      let dot = 0;
+      let sigNorm = 0;
+      Object.keys(e.weights || {}).forEach(function (k) {
+        const w = e.weights[k];
+        dot += profile[k] * w;
+        sigNorm += w * w;
+      });
+      sigNorm = Math.sqrt(sigNorm) || 0.0001;
+      let score = (dot / (profileNorm * sigNorm)) * 1.0;
+      Object.keys(e.cats || {}).forEach(function (c) {
+        /* Se premia explorar esa categoría más de lo que le toca por azar,
+           no simplemente que aparezca: así no hay finales con ventaja fija. */
+        const share = (catCounts[c] || 0) / total;
+        const globalShare = (CATEGORY_TOTALS[c] || 0) / Math.max(1, DILEMMAS.length);
+        score += (e.cats[c] || 0) * (share - globalShare) * 3.5;
+      });
+      score += (hashText(e.id + fingerprint) % 701) / 100000; /* desempate dependiente de las decisiones */
+      return { ending: e, score: score };
+    });
+    scored.sort(function (a, b) { return b.score - a.score; });
+    return scored;
+  }
+
+  function computeEnding(run) {
+    return scoreEndings(run)[0].ending;
+  }
+
+  function finishRun() {
+    const run = state.run;
+    if (!run || run.completed) return;
+    if (run.answers.length < run.order.length) return;
+    const ending = computeEnding(run);
+    run.completed = true;
+    run.endingId = ending.id;
+
+    if (!run.counted) {
+      run.counted = true;
+      state.stats.games += 1;
+      state.stats.ends[ending.id] = (state.stats.ends[ending.id] || 0) + 1;
+      if (run.mode === 'daily') {
+        state.daily.lastKey = run.dayKey || todayKey();
+        state.stats.dailies += 1;
+      }
+      state.stats.bestStreak = Math.max(state.stats.bestStreak, run.bestStreak);
+      state.history.unshift({
+        date: new Date().toISOString(),
+        mode: run.mode,
+        endingId: ending.id,
+        attrs: Object.assign({}, run.attrs),
+        total: run.order.length
+      });
+      state.history = state.history.slice(0, 12);
+    }
+    saveState();
+    go('resultado');
+  }
+
+  /* ---------------------------------------------------------------
+     8. RESULTADO, COMPARTIR Y TARJETA
+     --------------------------------------------------------------- */
+  function currentEnding(run) {
+    return ENDINGS_BY_ID[run.endingId] || computeEnding(run);
+  }
+
+  function currentQuote(run, ending) {
+    const fingerprint = run.answers.map(function (a) { return a.id + a.choice; }).join('|') || run.id;
+    return ending.quotes[hashText(fingerprint + ending.id) % ending.quotes.length];
+  }
+
+  function topAttr(attrs) {
+    let bestKey = ATTR_KEYS[0];
+    ATTR_KEYS.forEach(function (k) { if (attrs[k] > attrs[bestKey]) bestKey = k; });
+    return bestKey;
+  }
+
+  function renderAttrs(root, attrs) {
+    if (!root) return;
+    root.innerHTML = '';
+    ATTR_KEYS.forEach(function (k) {
+      const meta = ATTRS[k];
+      const value = clamp(Math.round(attrs[k]), 0, 100);
+      const row = document.createElement('div');
+      row.className = 'attr';
+      const top = document.createElement('div');
+      top.className = 'attr-top';
+      const label = document.createElement('span');
+      label.textContent = meta.emoji + ' ' + meta.name;
+      const val = document.createElement('b');
+      val.textContent = value;
+      top.appendChild(label);
+      top.appendChild(val);
+      const bar = document.createElement('div');
+      bar.className = 'attr-bar';
+      bar.setAttribute('role', 'meter');
+      bar.setAttribute('aria-label', meta.name);
+      bar.setAttribute('aria-valuemin', '0');
+      bar.setAttribute('aria-valuemax', '100');
+      bar.setAttribute('aria-valuenow', String(value));
+      const fill = document.createElement('i');
+      fill.style.width = value + '%';
+      fill.style.background = 'linear-gradient(90deg,' + meta.color + '99,' + meta.color + ')';
+      bar.appendChild(fill);
+      row.appendChild(top);
+      row.appendChild(bar);
+      root.appendChild(row);
+    });
+  }
+
+  function renderResult() {
+    const run = state.run;
+    if (!run || !run.completed) { go('inicio', false); return; }
+    const ending = currentEnding(run);
+    const quote = currentQuote(run, ending);
+    const as = run.answers.filter(function (a) { return a.choice === 'a'; }).length;
+    const bs = run.answers.length - as;
+    const cats = {};
+    run.answers.forEach(function (a) {
+      const d = DILEMMA_BY_ID[a.id];
+      if (d) cats[d.cat] = true;
+    });
+    const catCount = Object.keys(cats).length;
+    const best = topAttr(run.attrs);
+
+    $('#result-kicker').textContent = modeLabel(run.mode) + ' · ' + formatDate(run.startedAt) + (run.mode === 'daily' ? ' · ' + prettyDailyKey(run.dayKey || todayKey()) : '');
+    $('#result-emoji').textContent = ending.emoji;
+    $('#result-title').textContent = ending.name;
+    $('#result-tagline').textContent = ending.tagline;
+    $('#result-desc').textContent = ending.desc;
+    $('#result-quote').textContent = '«' + quote + '»';
+    $('#result-mode-label').textContent = run.order.length + ' decisiones · ' + catCount + ' categorías';
+    const resultTitle = $('#result-title');
+    if (resultTitle) {
+      resultTitle.setAttribute('tabindex', '-1');
+      try { resultTitle.focus({ preventScroll: true }); } catch (err) { /* ignorar */ }
+    }
+
+    const stats = [
+      { value: String(run.order.length), label: 'Dilemas' },
+      { value: String(as), label: 'Opciones A' },
+      { value: String(bs), label: 'Opciones B' },
+      { value: String(catCount), label: 'Categorías' },
+      { value: String(run.bestStreak), label: 'Racha de caos' },
+      { value: ATTRS[best].emoji + ' ' + ATTRS[best].name, label: 'Atributo estrella' }
+    ];
+    const statsRoot = $('#result-stats');
+    statsRoot.innerHTML = '';
+    stats.forEach(function (s) {
+      const card = document.createElement('div');
+      card.className = 'stat';
+      const b = document.createElement('b');
+      b.textContent = s.value;
+      const span = document.createElement('span');
+      span.textContent = s.label;
+      card.appendChild(b);
+      card.appendChild(span);
+      statsRoot.appendChild(card);
+    });
+
+    renderAttrs($('#result-attrs'), run.attrs);
+
+    const note = $('#share-note');
+    if (note) {
+      note.textContent = (navigator.share ? 'Se abrirá el menú de compartir de tu dispositivo. ' : 'Tu navegador no ofrece el menú nativo de compartir. ') +
+        'Si algo falla, usa «Copiar resumen» o «Descargar tarjeta».';
+    }
+  }
+
+  function siteUrl() {
+    if (CONFIG.siteUrl) return CONFIG.siteUrl;
+    try { return window.location.origin + window.location.pathname; }
+    catch (err) { return ''; }
+  }
+
+  function buildShareText() {
+    const run = state.run;
+    if (!run || !run.completed) return '';
+    const ending = currentEnding(run);
+    const quote = currentQuote(run, ending);
+    const cats = {};
+    run.answers.forEach(function (a) {
+      const d = DILEMMA_BY_ID[a.id];
+      if (d) cats[d.cat] = true;
+    });
+    const attrLine = ATTR_KEYS.map(function (k) { return ATTRS[k].emoji + ' ' + ATTRS[k].name + ' ' + run.attrs[k]; }).join(' · ');
+    const lines = [
+      '🌀 ELIGE TU PROBLEMA — ' + modeLabel(run.mode),
+      'Resultado: ' + ending.name + ' ' + ending.emoji,
+      '«' + quote + '»',
+      attrLine,
+      run.order.length + ' dilemas · ' + Object.keys(cats).length + ' categorías · racha de caos ' + run.bestStreak,
+      'Juega gratis: ' + siteUrl()
+    ];
+    return lines.join('\n');
+  }
+
+  function copyText(text) {
+    return new Promise(function (resolve) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () { resolve(true); }, function () { resolve(fallbackCopy(text)); });
+      } else {
+        resolve(fallbackCopy(text));
+      }
+    });
+  }
+
+  function fallbackCopy(text) {
+    try {
+      const area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.style.position = 'fixed';
+      area.style.top = '-1000px';
+      area.style.opacity = '0';
+      document.body.appendChild(area);
+      area.select();
+      area.setSelectionRange(0, area.value.length);
+      const ok = document.execCommand('copy');
+      document.body.removeChild(area);
+      return !!ok;
+    } catch (err) { return false; }
+  }
+
+  function shareNote(message, isError) {
+    const note = $('#share-note');
+    if (note) note.textContent = message;
+    toast(message, isError);
+  }
+
+  /* ---- tarjeta de resultado en canvas ---- */
+  function roundRect(ctx, x, y, w, h, r) {
+    const radius = Math.min(r, w / 2, h / 2);
+    ctx.beginPath();
+    if (typeof ctx.roundRect === 'function') {
+      ctx.roundRect(x, y, w, h, radius);
+      return;
+    }
+    ctx.moveTo(x + radius, y);
+    ctx.arcTo(x + w, y, x + w, y + h, radius);
+    ctx.arcTo(x + w, y + h, x, y + h, radius);
+    ctx.arcTo(x, y + h, x, y, radius);
+    ctx.arcTo(x, y, x + w, y, radius);
+    ctx.closePath();
+  }
+
+  function wrapLines(ctx, text, maxWidth) {
+    const words = String(text).split(/\s+/);
+    const lines = [];
+    let line = '';
+    words.forEach(function (word) {
+      const test = line ? line + ' ' + word : word;
+      if (ctx.measureText(test).width > maxWidth && line) {
+        lines.push(line);
+        line = word;
+      } else {
+        line = test;
+      }
+    });
+    if (line) lines.push(line);
+    return lines;
+  }
+
+  function drawShareCard() {
+    const canvas = $('#share-canvas');
+    if (!canvas || !canvas.getContext) return null;
+    const run = state.run;
+    if (!run || !run.completed) return null;
+    const ending = currentEnding(run);
+    const quote = currentQuote(run, ending);
+    let ctx = null;
+    try { ctx = canvas.getContext('2d'); } catch (err) { ctx = null; }
+    if (!ctx) return null;
+    const W = canvas.width, H = canvas.height;
+    const FONT = '"Segoe UI", system-ui, -apple-system, Arial, sans-serif';
+
+    const bg = ctx.createLinearGradient(0, 0, W, H);
+    bg.addColorStop(0, '#0b0e1a');
+    bg.addColorStop(0.55, '#161a33');
+    bg.addColorStop(1, '#241436');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
+
+    const glow = ctx.createRadialGradient(W * 0.15, 0, 40, W * 0.15, 0, 780);
+    glow.addColorStop(0, 'rgba(255,92,122,0.34)');
+    glow.addColorStop(1, 'rgba(255,92,122,0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, W, H);
+    const glow2 = ctx.createRadialGradient(W * 0.9, H * 0.1, 30, W * 0.9, H * 0.1, 700);
+    glow2.addColorStop(0, 'rgba(124,92,255,0.36)');
+    glow2.addColorStop(1, 'rgba(124,92,255,0)');
+    ctx.fillStyle = glow2;
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.strokeStyle = 'rgba(255,255,255,0.16)';
+    ctx.lineWidth = 2;
+    roundRect(ctx, 28, 28, W - 56, H - 56, 44);
+    ctx.stroke();
+
+    /* cabecera */
+    ctx.fillStyle = '#ffd166';
+    ctx.font = '700 26px ' + FONT;
+    ctx.textAlign = 'left';
+    ctx.fillText('ELIGE TU PROBLEMA', 74, 108);
+    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    ctx.font = '500 24px ' + FONT;
+    ctx.fillText('Dos opciones. Mil consecuencias absurdas.', 74, 146);
+
+    ctx.fillStyle = 'rgba(255,255,255,0.45)';
+    ctx.font = '700 21px ' + FONT;
+    ctx.textAlign = 'right';
+    ctx.fillText(modeLabel(run.mode).toUpperCase() + ' · ' + run.order.length + ' DILEMAS', W - 74, 108);
+    ctx.textAlign = 'left';
+
+    ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+    ctx.beginPath();
+    ctx.moveTo(74, 180);
+    ctx.lineTo(W - 74, 180);
+    ctx.stroke();
+
+    /* emoji y nombre */
+    ctx.textAlign = 'center';
+    ctx.font = '120px "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif';
+    ctx.fillText(ending.emoji, W / 2, 340);
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '900 62px ' + FONT;
+    const nameLines = wrapLines(ctx, ending.name, W - 180);
+    let y = 430;
+    nameLines.forEach(function (line) { ctx.fillText(line, W / 2, y); y += 72; });
+
+    ctx.fillStyle = '#ffd166';
+    ctx.font = '700 30px ' + FONT;
+    const tagLines = wrapLines(ctx, ending.tagline, W - 220);
+    y += 12;
+    tagLines.slice(0, 2).forEach(function (line) { ctx.fillText(line, W / 2, y); y += 42; });
+
+    /* cita */
+    y += 26;
+    const quoteBoxH = 220;
+    ctx.fillStyle = 'rgba(255,255,255,0.07)';
+    roundRect(ctx, 74, y, W - 148, quoteBoxH, 26);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.14)';
+    ctx.lineWidth = 2;
+    roundRect(ctx, 74, y, W - 148, quoteBoxH, 26);
+    ctx.stroke();
+    ctx.fillStyle = '#f2f5ff';
+    ctx.font = '600 30px ' + FONT;
+    const quoteLines = wrapLines(ctx, '«' + quote + '»', W - 220).slice(0, 4);
+    let qy = y + 58;
+    quoteLines.forEach(function (line) { ctx.fillText(line, W / 2, qy); qy += 40; });
+    y += quoteBoxH + 42;
+
+    /* estadísticas */
+    const best = topAttr(run.attrs);
+    const stats = [
+      { v: String(run.order.length), l: 'DILEMAS' },
+      { v: String(run.bestStreak), l: 'RACHA DE CAOS' },
+      { v: ATTRS[best].emoji + ' ' + run.attrs[best], l: ATTRS[best].name.toUpperCase() }
+    ];
+    const boxW = (W - 148 - 32) / 3;
+    stats.forEach(function (s, i) {
+      const bx = 74 + i * (boxW + 16);
+      ctx.fillStyle = 'rgba(255,255,255,0.06)';
+      roundRect(ctx, bx, y, boxW, 150, 22);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '800 42px ' + FONT;
+      ctx.fillText(s.v, bx + boxW / 2, y + 74);
+      ctx.fillStyle = 'rgba(255,255,255,0.55)';
+      ctx.font = '700 19px ' + FONT;
+      ctx.fillText(s.l, bx + boxW / 2, y + 112);
+    });
+    y += 196;
+
+    /* atributos en una línea */
+    ctx.font = '600 22px ' + FONT;
+    const attrLine = ATTR_KEYS.map(function (k) { return ATTRS[k].emoji + ' ' + ATTRS[k].name + ' ' + run.attrs[k]; }).join('   ·   ');
+    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+    const attrLines = wrapLines(ctx, attrLine, W - 170);
+    attrLines.slice(0, 2).forEach(function (line) { ctx.fillText(line, W / 2, y); y += 34; });
+
+    /* pie */
+    ctx.fillStyle = 'rgba(255,255,255,0.38)';
+    ctx.font = '500 22px ' + FONT;
+    ctx.fillText('Hecho con HTML, CSS y JavaScript · sin registro', W / 2, H - 104);
+    ctx.fillStyle = '#ffd166';
+    ctx.font = '700 24px ' + FONT;
+    const urlText = siteUrl().replace(/^https?:\/\//, '');
+    ctx.fillText(urlText || 'elige tu problema', W / 2, H - 64);
+    ctx.textAlign = 'left';
+    return canvas;
+  }
+
+  function canvasToBlob(canvas) {
+    return new Promise(function (resolve) {
+      try {
+        if (canvas.toBlob) {
+          canvas.toBlob(function (blob) { resolve(blob || null); }, 'image/png');
+        } else {
+          const data = canvas.toDataURL('image/png');
+          const bin = atob(data.split(',')[1]);
+          const arr = new Uint8Array(bin.length);
+          for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+          resolve(new Blob([arr], { type: 'image/png' }));
+        }
+      } catch (err) { resolve(null); }
+    });
+  }
+
+  function downloadCard() {
+    const canvas = drawShareCard();
+    if (!canvas) { shareNote('No se pudo preparar la tarjeta en este navegador.', true); return; }
+    canvasToBlob(canvas).then(function (blob) {
+      if (!blob) { shareNote('No se pudo generar la imagen. Usa una captura de pantalla.', true); return; }
+      try {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'elige-tu-problema-' + (state.run ? state.run.endingId : 'resultado') + '.png';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+        shareNote('Tarjeta descargada. Compártela donde quieras: no se ha subido a ningún servidor.', false);
+      } catch (err) {
+        shareNote('El navegador bloqueó la descarga. Prueba con «Copiar resumen».', true);
+      }
+    });
+  }
+
+  function shareResult() {
+    const text = buildShareText();
+    if (!text) return;
+    const okMessage = 'Compartido. Gracias por extender el caos.';
+    if (!navigator.share) {
+      copyText(text).then(function (ok) {
+        shareNote(ok
+          ? 'Tu navegador no tiene menú de compartir: el resumen está copiado al portapapeles.'
+          : 'No se pudo compartir ni copiar automáticamente. Usa «Copiar resumen».', !ok);
+      });
+      return;
+    }
+    const finish = function (message, isError) { shareNote(message, isError); };
+    const fallback = function () {
+      copyText(text).then(function (ok) {
+        finish(ok
+          ? 'No se pudo abrir el menú de compartir: el resumen está copiado al portapapeles.'
+          : 'No se pudo compartir. Prueba con «Copiar resumen» o descarga la tarjeta.', !ok);
+      });
+    };
+    try {
+      const canvas = drawShareCard();
+      const canFiles = !!(navigator.canShare && canvas);
+      if (canFiles) {
+        canvasToBlob(canvas).then(function (blob) {
+          if (blob && typeof File !== 'undefined') {
+            const file = new File([blob], 'elige-tu-problema.png', { type: 'image/png' });
+            if (navigator.canShare({ files: [file] })) {
+              navigator.share({ files: [file], title: 'ELIGE TU PROBLEMA', text: text }).then(function () {
+                finish(okMessage, false);
+              }, function (err) {
+                if (err && err.name === 'AbortError') { finish('Compartición cancelada. No se ha enviado nada.', false); }
+                else { fallback(); }
+              });
+              return;
+            }
+          }
+          textShare();
+        });
+      } else {
+        textShare();
+      }
+    } catch (err) {
+      fallback();
+    }
+
+    function textShare() {
+      navigator.share({ title: 'ELIGE TU PROBLEMA', text: text }).then(function () {
+        finish(okMessage, false);
+      }, function (err) {
+        if (err && err.name === 'AbortError') { finish('Compartición cancelada. No se ha enviado nada.', false); }
+        else { fallback(); }
+      });
+    }
+  }
+
+  /* ---------------------------------------------------------------
+     9. COLECCIÓN, INICIO Y ESTADÍSTICAS
+     --------------------------------------------------------------- */
+  function categoryCount() {
+    return Object.keys(state.stats.cats).filter(function (k) { return state.stats.cats[k] > 0; }).length;
+  }
+
+  function endingCount() {
+    return Object.keys(state.stats.ends).filter(function (k) { return state.stats.ends[k] > 0; }).length;
+  }
+
+  function renderHome() {
+    const g = $('#hs-games'), a = $('#hs-answers'), e = $('#hs-ends'), s = $('#hs-streak');
+    if (g) g.textContent = state.stats.games;
+    if (a) a.textContent = state.stats.answers;
+    if (e) e.textContent = endingCount() + '/' + ENDINGS.length;
+    if (s) s.textContent = state.stats.bestStreak;
+
+    const dateNode = $('#daily-date');
+    if (dateNode) dateNode.textContent = prettyDailyKey(todayKey());
+    const stateNode = $('#daily-state');
+    if (stateNode) {
+      const done = state.daily.lastKey === todayKey();
+      stateNode.textContent = done ? '✓ Completado hoy · puedes repetir' : 'Disponible · 10 dilemas';
+      stateNode.className = 'pill' + (done ? ' ok' : '');
+    }
+
+    const slot = $('#resume-slot');
+    if (!slot) return;
+    slot.innerHTML = '';
+    if (state.run && !state.run.completed) {
+      slot.hidden = false;
+      const box = document.createElement('div');
+      box.className = 'panel';
+      box.style.cssText = 'display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:16px;border-color:rgba(60,224,160,.34)';
+      const info = document.createElement('div');
+      const h = document.createElement('h2');
+      h.style.margin = '0 0 2px';
+      h.textContent = 'Tienes una partida a medias';
+      const p = document.createElement('p');
+      p.style.margin = '0';
+      p.textContent = modeLabel(state.run.mode) + ' · dilema ' + Math.min(state.run.idx + 1, state.run.order.length) + ' de ' + state.run.order.length + '. El progreso está guardado en este navegador.';
+      info.appendChild(h);
+      info.appendChild(p);
+      const actions = document.createElement('div');
+      actions.style.cssText = 'display:flex;gap:10px;flex-wrap:wrap';
+      const cont = document.createElement('button');
+      cont.type = 'button';
+      cont.className = 'btn btn-mint btn-sm';
+      cont.textContent = 'Continuar partida';
+      cont.addEventListener('click', function () { go('jugar'); });
+      const discard = document.createElement('button');
+      discard.type = 'button';
+      discard.className = 'btn btn-ghost btn-sm';
+      discard.textContent = 'Descartar';
+      discard.addEventListener('click', confirmDiscardRun);
+      actions.appendChild(cont);
+      actions.appendChild(discard);
+      box.appendChild(info);
+      box.appendChild(actions);
+      slot.appendChild(box);
+    } else {
+      slot.hidden = true;
+    }
+  }
+
+  function confirmDiscardRun() {
+    openModal({
+      title: '¿Descartar esta partida?',
+      text: 'Se perderán las decisiones de esta partida. Tu colección, tus finales y tus estadísticas se conservan.',
+      actions: [
+        { label: 'Cancelar', className: 'btn-ghost' },
+        { label: 'Descartar', className: 'btn-danger', onClick: function () { state.run = null; saveState(); go('inicio'); toast('Partida descartada.', false); } }
+      ]
+    });
+  }
+
+  function renderCollection() {
+    const cards = [
+      { v: String(state.stats.games), l: 'Partidas completadas' },
+      { v: String(state.stats.answers), l: 'Dilemas respondidos' },
+      { v: endingCount() + '/' + ENDINGS.length, l: 'Finales descubiertos' },
+      { v: String(state.stats.bestStreak), l: 'Mejor racha de caos' },
+      { v: categoryCount() + '/' + Object.keys(CATEGORIES).length, l: 'Categorías exploradas' },
+      { v: String(state.stats.dailies), l: 'Retos del día' }
+    ];
+    const root = $('#col-stats');
+    root.innerHTML = '';
+    cards.forEach(function (c) {
+      const card = document.createElement('div');
+      card.className = 'stat-card';
+      const b = document.createElement('b');
+      b.textContent = c.v;
+      const span = document.createElement('span');
+      span.textContent = c.l;
+      card.appendChild(b);
+      card.appendChild(span);
+      root.appendChild(card);
+    });
+
+    $('#col-ends-count').textContent = '(' + endingCount() + ' de ' + ENDINGS.length + ')';
+    const endsRoot = $('#col-ends');
+    endsRoot.innerHTML = '';
+    ENDINGS.forEach(function (e) {
+      const count = state.stats.ends[e.id] || 0;
+      const unlocked = count > 0;
+      const card = document.createElement('div');
+      card.className = 'end-card ' + (unlocked ? 'unlocked' : 'locked');
+      const emoji = document.createElement('div');
+      emoji.className = 'ec-emoji';
+      emoji.textContent = unlocked ? e.emoji : '🔒';
+      emoji.setAttribute('aria-hidden', 'true');
+      const name = document.createElement('div');
+      name.className = 'ec-name';
+      name.textContent = unlocked ? e.name : 'Final sin descubrir';
+      const tag = document.createElement('div');
+      tag.className = 'ec-tag';
+      tag.textContent = unlocked ? e.tagline : 'Sigue jugando para desbloquearlo.';
+      const lock = document.createElement('div');
+      lock.className = 'ec-lock';
+      lock.textContent = unlocked ? 'Descubierto ' + count + (count === 1 ? ' vez' : ' veces') : 'Bloqueado';
+      card.appendChild(emoji);
+      card.appendChild(name);
+      card.appendChild(tag);
+      card.appendChild(lock);
+      endsRoot.appendChild(card);
+    });
+
+    const catsRoot = $('#col-cats');
+    catsRoot.innerHTML = '';
+    Object.keys(CATEGORIES).forEach(function (key) {
+      const cat = CATEGORIES[key];
+      const chip = document.createElement('span');
+      const seen = state.stats.cats[key] || 0;
+      chip.className = 'chip' + (seen > 0 ? ' on' : '');
+      chip.textContent = cat.emoji + ' ' + cat.name + (seen > 0 ? ' · ' + seen : ' · sin explorar');
+      catsRoot.appendChild(chip);
+    });
+
+    const histRoot = $('#col-history');
+    histRoot.innerHTML = '';
+    if (!state.history.length) {
+      const empty = document.createElement('div');
+      empty.className = 'empty';
+      empty.textContent = 'Todavía no has terminado ninguna partida. Empieza por una rápida: son cinco decisiones y una consecuencia para contar.';
+      histRoot.appendChild(empty);
+    } else {
+      state.history.forEach(function (h) {
+        const ending = ENDINGS_BY_ID[h.endingId];
+        const li = document.createElement('li');
+        const main = document.createElement('span');
+        main.className = 'h-main';
+        main.textContent = (ending ? ending.emoji + ' ' + ending.name : 'Final desconocido');
+        const meta = document.createElement('span');
+        meta.className = 'h-meta';
+        meta.textContent = modeLabel(h.mode) + ' · ' + formatDate(h.date) + ' · ' + h.total + ' dilemas';
+        li.appendChild(main);
+        li.appendChild(meta);
+        histRoot.appendChild(li);
+      });
+    }
+  }
+
+  function confirmReset() {
+    openModal({
+      title: '¿Borrar todo el progreso?',
+      text: 'Se eliminarán los finales descubiertos, las estadísticas, el historial y la partida en curso de este navegador. No se puede deshacer.',
+      actions: [
+        { label: 'Cancelar', className: 'btn-ghost' },
+        {
+          label: 'Sí, borrar todo', className: 'btn-danger', onClick: function () {
+            state = defaultState();
+            storage.clear();
+            saveState();
+            go('inicio');
+            toast('Progreso borrado de este navegador.', false);
+          }
+        }
+      ]
+    });
+  }
+
+  /* ---------------------------------------------------------------
+     10. PUBLICIDAD
+     Estructura lista, sin anuncios activos por defecto.
+     --------------------------------------------------------------- */
+  function initAds() {
+    const body = document.body;
+    const ads = CONFIG.ads || {};
+    const hasRealConfig = ads.enabled === true && /^ca-pub-\d{10,20}$/.test(String(ads.client || ''));
+    if (hasRealConfig) {
+      body.classList.remove('ads-off');
+      mountRealAds();
+    } else if (CONFIG.showAdPlaceholders) {
+      body.classList.remove('ads-off');
+      if (ads.enabled && !hasRealConfig) {
+        console.warn('[ETP] La publicidad está marcada como activa pero falta un client válido de AdSense. Se muestran marcadores vacíos.');
+      }
+    } else {
+      body.classList.add('ads-off');
+    }
+    updateAdsFooter(hasRealConfig);
+  }
+
+  function updateAdsFooter(active) {
+    const node = $('#foot-ads');
+    if (!node) return;
+    if (active) node.textContent = 'Este sitio muestra anuncios de Google AdSense. Consulta la política de privacidad.';
+    else if (CONFIG.showAdPlaceholders) node.textContent = 'Los espacios marcados están vacíos: este sitio no muestra anuncios actualmente.';
+    else node.textContent = 'Este sitio no muestra anuncios actualmente.';
+  }
+
+  function mountRealAds() {
+    const ads = CONFIG.ads;
+    try {
+      if (!document.querySelector('script[data-etp-ads]')) {
+        const script = document.createElement('script');
+        script.async = true;
+        script.src = ads.scriptUrl;
+        script.crossOrigin = 'anonymous';
+        script.setAttribute('data-etp-ads', '1');
+        script.setAttribute('data-ad-client', ads.client);
+        script.onerror = function () { console.warn('[ETP] No se pudo cargar el script publicitario.'); };
+        document.head.appendChild(script);
+      }
+      $$('[data-ad-slot]').forEach(function (holder) {
+        const slotId = ads.slots[holder.getAttribute('data-ad-slot')];
+        if (!slotId) { console.warn('[ETP] Falta el ID del bloque publicitario para', holder.getAttribute('data-ad-slot')); return; }
+        const ins = document.createElement('ins');
+        ins.className = 'adsbygoogle';
+        ins.style.display = 'block';
+        ins.setAttribute('data-ad-client', ads.client);
+        ins.setAttribute('data-ad-slot', slotId);
+        ins.setAttribute('data-full-width-responsive', 'true');
+        holder.innerHTML = '';
+        holder.appendChild(ins);
+        try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch (err) { console.warn('[ETP] AdSense no está listo todavía.', err); }
+      });
+    } catch (err) {
+      console.warn('[ETP] Error montando la publicidad:', err);
+    }
+  }
+
+  /* ---------------------------------------------------------------
+     11. VALIDACIÓN, EVENTOS Y ARRANQUE
+     --------------------------------------------------------------- */
+  function validateContent() {
+    const problems = [];
+    const seen = {};
+    if (DILEMMAS.length < 60) problems.push('Hay menos de 60 dilemas (' + DILEMMAS.length + ').');
+    DILEMMAS.forEach(function (d) {
+      if (!d || typeof d.id !== 'string' || !/^d\d{2}$/.test(d.id)) { problems.push('Dilema con id inválido: ' + (d && d.id)); return; }
+      if (seen[d.id]) problems.push('Id duplicado: ' + d.id);
+      seen[d.id] = true;
+      if (!CATEGORIES[d.cat]) problems.push(d.id + ': categoría desconocida (' + d.cat + ').');
+      if (!(d.abs >= 1 && d.abs <= 3)) problems.push(d.id + ': nivel de absurdo inválido.');
+      ['a', 'b'].forEach(function (k) {
+        const opt = d[k];
+        if (!opt || typeof opt.t !== 'string' || opt.t.length < 15) { problems.push(d.id + '.' + k + ': falta el texto de la opción.'); return; }
+        if (!opt.c || typeof opt.c.title !== 'string' || typeof opt.c.text !== 'string' || opt.c.text.length < 40) {
+          problems.push(d.id + '.' + k + ': consecuencia incompleta.');
+        }
+        if (!opt.d || typeof opt.d !== 'object') { problems.push(d.id + '.' + k + ': faltan los atributos.'); return; }
+        Object.keys(opt.d).forEach(function (attr) {
+          if (ATTR_KEYS.indexOf(attr) === -1) problems.push(d.id + '.' + k + ': atributo desconocido (' + attr + ').');
+          else if (typeof opt.d[attr] !== 'number') problems.push(d.id + '.' + k + ': delta no numérico en ' + attr + '.');
+        });
+      });
+    });
+    const endingIds = {};
+    ENDINGS.forEach(function (e) {
+      if (endingIds[e.id]) problems.push('Final duplicado: ' + e.id);
+      endingIds[e.id] = true;
+      if (!e.quotes || !e.quotes.length) problems.push('Final sin frases: ' + e.id);
+      if (!e.weights || !Object.keys(e.weights).length) problems.push('Final sin pesos: ' + e.id);
+    });
+    const catsUsed = {};
+    DILEMMAS.forEach(function (d) { catsUsed[d.cat] = (catsUsed[d.cat] || 0) + 1; });
+    Object.keys(CATEGORIES).forEach(function (c) {
+      if (!catsUsed[c]) problems.push('Categoría sin dilemas: ' + c);
+    });
+    if (problems.length) console.warn('[ETP] Problemas de contenido (' + problems.length + '):\n' + problems.join('\n'));
+    else console.info('[ETP] Contenido validado: ' + DILEMMAS.length + ' dilemas, ' + ENDINGS.length + ' finales, ' + Object.keys(CATEGORIES).length + ' categorías.');
+    return problems;
+  }
+
+  function handleAction(el, event) {
+    const action = el.getAttribute('data-action');
+    if (!action) return;
+    if (action === 'start') {
+      event.preventDefault();
+      startGame(el.getAttribute('data-mode') || 'normal', false);
+    } else if (action === 'share') { shareResult(); }
+    else if (action === 'copy') {
+      copyText(buildShareText()).then(function (ok) {
+        shareNote(ok ? 'Resumen copiado al portapapeles.' : 'No se pudo copiar. Selecciona el texto y cópialo a mano.', !ok);
+      });
+    } else if (action === 'download-card') { downloadCard(); }
+    else if (action === 'replay') {
+      const mode = state.run ? state.run.mode : 'normal';
+      startGame(mode, true);
+    } else if (action === 'quit') {
+      openModal({
+        title: '¿Salir de la partida?',
+        text: 'Puedes guardar la partida y continuarla más tarde desde el inicio. Si la descartas, perderás estas decisiones.',
+        actions: [
+          { label: 'Seguir jugando', className: 'btn-primary' },
+          { label: 'Guardar y salir', className: 'btn-ghost', onClick: function () { go('inicio'); } },
+          { label: 'Descartar partida', className: 'btn-danger', onClick: function () { state.run = null; saveState(); go('inicio'); } }
+        ]
+      });
+    } else if (action === 'reset-progress') { confirmReset(); }
+  }
+
+  function bindEvents() {
+    document.addEventListener('click', function (event) {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+
+      const goEl = target.closest('[data-go]');
+      if (goEl) {
+        event.preventDefault();
+        const page = goEl.getAttribute('data-go');
+        if (page === 'coleccion') renderCollection();
+        go(page);
+        return;
+      }
+
+      const choiceEl = target.closest('[data-choice]');
+      if (choiceEl && currentPage === 'jugar') {
+        event.preventDefault();
+        choose(choiceEl.getAttribute('data-choice'), choiceEl);
+        return;
+      }
+
+      const actionEl = target.closest('[data-action]');
+      if (actionEl) { handleAction(actionEl, event); }
+    });
+
+    document.addEventListener('keydown', function (event) {
+      if ($('#modal-root').children.length) return;
+      if (currentPage !== 'jugar') return;
+      if (event.metaKey || event.ctrlKey || event.altKey) return;
+      const key = String(event.key || '').toLowerCase();
+      if (key === '1' || key === 'a') {
+        const btn = $('#options [data-choice="a"]');
+        if (btn && !btn.disabled) { btn.click(); }
+      } else if (key === '2' || key === 'b') {
+        const btn = $('#options [data-choice="b"]');
+        if (btn && !btn.disabled) { btn.click(); }
+      } else if (key === 'enter') {
+        const active = document.activeElement;
+        const next = $('#next-btn');
+        if (next && active && active.tagName !== 'BUTTON') { event.preventDefault(); next.click(); }
+      }
+    });
+
+    window.addEventListener('hashchange', function () {
+      const page = pageFromHash();
+      if (page !== currentPage) renderPage(page);
+    });
+
+    window.addEventListener('popstate', function () {
+      const page = pageFromHash();
+      if (page !== currentPage) renderPage(page);
+    });
+  }
+
+  function boot() {
+    loadState();
+    validateContent();
+    bindEvents();
+    initAds();
+    applyConfigToPages();
+    const page = pageFromHash();
+    if (page === 'jugar' && (!state.run || state.run.completed)) {
+      renderPage(state.run && state.run.completed ? 'resultado' : 'inicio');
+      if (window.location.hash !== '#' + currentPage) {
+        try { window.history.replaceState(null, '', '#' + currentPage); } catch (err) { /* ignorar */ }
+      }
+    } else {
+      renderPage(page);
+    }
+    /* Si el almacenamiento falla a mitad de partida, avisamos una vez. */
+    if (!storage.isAvailable()) {
+      setTimeout(function () { notifyStorageProblem(); }, 900);
+    }
+    /* Pequeño aviso honesto la primera vez que se juega en este navegador. */
+    if (state.stats.games === 0 && !storage.read()) {
+      setTimeout(function () { toast('Puedes jugar con teclado: A o 1 para la opción de la izquierda, B o 2 para la derecha.', false); }, 1500);
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
+
+  /* Superficie mínima para depuración y pruebas manuales desde la consola. */
+  window.ETP = {
+    version: CONFIG.version,
+    content: { dilemmas: DILEMMAS.length, endings: ENDINGS.length, categories: Object.keys(CATEGORIES).length },
+    validateContent: validateContent,
+    getState: function () { return JSON.parse(JSON.stringify(state)); },
+    computeEnding: computeEnding,
+    scoreEndings: scoreEndings,
+    data: {
+      dilemmas: DILEMMAS,
+      endings: ENDINGS,
+      categories: CATEGORIES,
+      attrs: ATTRS,
+      modes: MODES
+    },
+    config: CONFIG
+  };
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+# ============================================================
+# ELIGE TU PROBLEMA · configuración de Netlify
+# Sitio estático de un único archivo: no hay compilación.
+# Base directory recomendada al conectar el repositorio:
+#   elige-tu-problema
+# ============================================================
+
+[build]
+  command = ""
+  publish = "."
+
+# Cabeceras de seguridad básicas.
+# No se añade X-Frame-Options ni CSP con frame-ancestors para no bloquear
+# vistas previas incrustadas (Arena, paneles de Netlify, etc.).
+# Si más adelante activas AdSense, revisa la CSP antes de añadirla.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=()"
+    X-XSS-Protection = "0"
+
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/robots.txt"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
