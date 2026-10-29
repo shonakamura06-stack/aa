@@ -24,7 +24,7 @@ test('Servidor y dos teléfonos: reconexión, historia, aislamiento y desempate'
     browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH || undefined,headless:true,args:['--no-sandbox','--no-zygote','--single-process','--disable-dev-shm-usage']});
     const host=await browser.newPage({viewport:{width:1280,height:800}});
     host.on('pageerror',e=>errors.push('host: '+e.message));
-    await host.goto('http://127.0.0.1:8000/',{waitUntil:'domcontentloaded'});
+    await host.goto('http://127.0.0.1:8000/?entrada=off',{waitUntil:'domcontentloaded'});
     await host.waitForTimeout(1200);
     await host.evaluate(senalLocal,port);
     await host.evaluate(()=>{V14.settings.gameMode='servidor';V14.net.host()});
@@ -274,9 +274,9 @@ test('Servidor y dos teléfonos: reconexión, historia, aislamiento y desempate'
     await host.waitForFunction(()=>V14.precioState.phase==='revealed',null,{timeout:10000});
     const estimaciones=await host.evaluate(()=>V14.precioState.estimates.map(e=>[e.name,e.value]));
     assert.deepEqual(estimaciones,[['Ana','1000000000000000.25'],['Luis','20.1']]);
-    await ana.locator('#rm-actions .rm-precio-escala').waitFor({state:'visible',timeout:10000});
+    await ana.locator('#rm-actions .v75-escala').waitFor({state:'visible',timeout:10000});
     await ana.waitForFunction(()=>V14.net._debugRemote().lastSync?.scorePrecision===4,null,{timeout:10000});
-    assert.deepEqual(await host.evaluate(()=>V14.G().teams.map(t=>t.score)),[puntos[0],puntos[1]+2], 'solo el exacto recibe dos puntos');
+    assert.deepEqual(await host.evaluate(()=>V14.G().teams.map(t=>t.score)),[puntos[0],puntos[1]+5], 'solo el exacto recibe cinco puntos');
     assert.equal(await host.locator('#precio-stage [data-rule]').isDisabled(),true);
     await host.locator('#precio-stage [data-undo-auto]').click();
     assert.deepEqual(await host.evaluate(()=>V14.G().teams.map(t=>t.score)),puntos);
@@ -288,26 +288,26 @@ test('Servidor y dos teléfonos: reconexión, historia, aislamiento y desempate'
     await host.locator('#precio-stage [data-start]').click();
     for (const p of [ana,luis]) { await p.locator('#v36-enviar').waitFor({state:'visible',timeout:10000});await p.locator('#v36-capa [data-k="0"]').click();await p.locator('#v36-enviar').click(); }
     await host.waitForFunction(()=>V14.precioState.phase==='revealed',null,{timeout:10000});
-    assert.deepEqual(await host.evaluate(()=>V14.G().teams.map(t=>t.score)),[puntos[0]+1,puntos[1]+1]);
+    assert.deepEqual(await host.evaluate(()=>V14.G().teams.map(t=>t.score)),[puntos[0]+2.5,puntos[1]+2.5]);
     await host.locator('#precio-stage [data-undo-auto]').click();
     assert.deepEqual(await host.evaluate(()=>V14.G().teams.map(t=>t.score)),puntos,'deshacer revierte todo el empate');
     await host.locator('#precio-stage [data-next]').click();
     // El reparto manual también es atómico, con empate no exacto.
     await host.evaluate(()=>{V14.precioState.item.a='60';V14.settings.autoPoints=false});
     await host.locator('#precio-stage [data-start]').click();
-    for(const [p,valor] of [[ana,'40'],[luis,'80']]) { await p.locator('#v36-enviar').waitFor({state:'visible',timeout:10000});for(const c of valor)await p.locator('#v36-capa [data-k="'+c+'"]').click();await p.locator('#v36-enviar').click(); }
+    for(const [p,valor] of [[ana,'48'],[luis,'72']]) { await p.locator('#v36-enviar').waitFor({state:'visible',timeout:10000});for(const c of valor)await p.locator('#v36-capa [data-k="'+c+'"]').click();await p.locator('#v36-enviar').click(); }
     await host.waitForFunction(()=>V14.precioState.phase==='revealed',null,{timeout:10000});
     assert.deepEqual(await host.evaluate(()=>V14.G().teams.map(t=>t.score)),puntos);
     await host.locator('#precio-stage [data-award]').click();
-    assert.deepEqual(await host.evaluate(()=>V14.G().teams.map(t=>t.score)),[puntos[0]+.5,puntos[1]+.5]);
+    assert.deepEqual(await host.evaluate(()=>V14.G().teams.map(t=>t.score)),[puntos[0]+1,puntos[1]+1]);
     await host.evaluate(()=>V14.undo());
     assert.deepEqual(await host.evaluate(()=>V14.G().teams.map(t=>t.score)),puntos);
     // Sin pasarse: cero es válido y un número superior queda excluido.
     await host.evaluate(()=>{V14.precioState.item.a='60';V14.settings.autoPoints=true;let c=V14.precioConf();c.sinPasarse=true;V14.store.set('precio',c)});
     await host.locator('#precio-stage [data-start]').click();
-    for(const [p,valor] of [[ana,'0'],[luis,'100']]) { await p.locator('#v36-enviar').waitFor({state:'visible',timeout:10000});for(const c of valor)await p.locator('#v36-capa [data-k="'+c+'"]').click();await p.locator('#v36-enviar').click(); }
+    for(const [p,valor] of [[ana,'50'],[luis,'100']]) { await p.locator('#v36-enviar').waitFor({state:'visible',timeout:10000});for(const c of valor)await p.locator('#v36-capa [data-k="'+c+'"]').click();await p.locator('#v36-enviar').click(); }
     await host.waitForFunction(()=>V14.precioState.phase==='revealed',null,{timeout:10000});
-    assert.deepEqual(await host.evaluate(()=>V14.G().teams.map(t=>t.score)),[puntos[0]+1,puntos[1]]);
+    assert.deepEqual(await host.evaluate(()=>V14.G().teams.map(t=>t.score)),[puntos[0]+2,puntos[1]]);
     await host.locator('#precio-stage [data-undo-auto]').click();
     assert.deepEqual(await host.evaluate(()=>V14.G().teams.map(t=>t.score)),puntos);
     await host.locator('#precio-stage [data-next]').click();

@@ -16,7 +16,7 @@ test('Más probable recupera votos y resultado después de dos recargas del anfi
   try {
     browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||undefined,headless:true,args:['--no-sandbox','--no-zygote','--single-process','--disable-dev-shm-usage']});
     const host=await browser.newPage({viewport:{width:1280,height:800}});host.on('pageerror',e=>errores.push('PC: '+e.message));
-    await host.goto('http://127.0.0.1:8000/');await host.waitForTimeout(1200);await host.evaluate(senalLocal,port);
+    await host.goto('http://127.0.0.1:8000/?entrada=off');await host.waitForTimeout(1200);await host.evaluate(senalLocal,port);
     await host.evaluate(()=>{V14.settings.gameMode='servidor';V14.net.host()});
     await host.waitForFunction(()=>V14.net.status==='open',null,{timeout:10000});const code=await host.evaluate(()=>V14.net.code);
     async function conectar(nombre,hostname,codigo=code){
@@ -28,7 +28,7 @@ test('Más probable recupera votos y resultado después de dos recargas del anfi
       if(!await p.evaluate(()=>V14.net._debugRemote().joined))await p.locator('#rm-ready').click();
       await p.waitForFunction(()=>V14.net._debugRemote().joined,null,{timeout:10000});return p;
     }
-    const ana=await conectar('Ana','127.0.0.1'),luis=await conectar('Luis','localhost');
+    const ana=await conectar('Ana','127.0.0.2'),luis=await conectar('Luis','localhost');
     await host.waitForTimeout(1000);
     if(await host.locator('#v40-skip').isVisible())await host.locator('#v40-skip').click();
     const panel=host.locator('.modal-backdrop.open').filter({hasText:'Jugar con celulares'});
@@ -47,7 +47,7 @@ test('Más probable recupera votos y resultado después de dos recargas del anfi
     for(let i=0;i<2;i++){
       await host.reload({waitUntil:'domcontentloaded'});await host.evaluate(senalLocal,port);
       await host.waitForFunction(c=>V14.net.status==='open'&&V14.net.code===c,code,{timeout:20000});
-      assert.equal(await host.evaluate(()=>V14.gameOf()),'probable');
+      await host.waitForFunction(()=>V14.gameOf()==='probable',null,{timeout:10000});
       assert.deepEqual(await host.evaluate(()=>V14.__v63.estado()),inicial);
       await host.waitForFunction(()=>V14.__v55.jugadores().length===2,null,{timeout:20000});
       await ana.waitForFunction(()=>V14.net._debugRemote().joined && V14.net._debugRemote().conn?.open,null,{timeout:10000});
@@ -65,6 +65,7 @@ test('Más probable recupera votos y resultado después de dos recargas del anfi
     assert.equal(resultado.fase,'resultado');
     await host.reload({waitUntil:'domcontentloaded'});await host.evaluate(senalLocal,port);
     await host.waitForFunction(c=>V14.net.status==='open'&&V14.net.code===c,code,{timeout:20000});
+    await host.waitForFunction(()=>V14.gameOf()==='probable',null,{timeout:10000});
     assert.deepEqual(await host.evaluate(()=>V14.__v63.estado()),resultado,'también se recupera el resultado');
     await host.waitForFunction(()=>V14.__v55.jugadores().length===2,null,{timeout:20000});
     assert.deepEqual(await host.evaluate(()=>Object.fromEntries(V14.__v55.jugadores().map(p=>[p.nombre,V14.G().teams[p.slot].score]))),{Ana:3,Luis:7});

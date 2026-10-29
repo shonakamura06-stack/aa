@@ -2,11 +2,15 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const { chromium } = require(process.env.PLAYWRIGHT_CORE || 'playwright-core');
-async function abrir(viewport={width:1280,height:800}) {
-  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH || undefined, headless:true, args:['--no-sandbox','--no-zygote','--single-process','--disable-dev-shm-usage']});
+async function abrir(viewport={width:1280,height:800}, inicio=false) {
+  let browser;
+  for(let attempt=0;attempt<3;attempt++) {
+    try { browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH || undefined, headless:true, args:['--no-sandbox','--no-zygote','--single-process','--disable-dev-shm-usage']}); break; }
+    catch(e) { if(attempt===2 || !/SIGSEGV/.test(String(e))) throw e; console.warn('Chromium terminó con SIGSEGV al iniciar; reintentando lanzamiento',attempt+1); }
+  }
   const page=await browser.newPage({viewport});
   const errores=[]; page.on('pageerror', e=>errores.push(e.message));
-  await page.goto(process.env.SINTONIA_URL || 'http://127.0.0.1:8000/',{waitUntil:'domcontentloaded'});
+  await page.goto(process.env.SINTONIA_URL || ('http://127.0.0.1:8000/'+(inicio?'':'?entrada=off')),{waitUntil:'domcontentloaded'});
   await page.waitForTimeout(1400);
   return {browser,page,errores};
 }
@@ -228,7 +232,7 @@ test('Avisos conservan texto legible, fondo translúcido y dejan pasar el clic',
       assert.ok(alfa<=0.4,`${tipo}: ${resultado.fondo}`);
       assert.equal(resultado.puntero,'none');
       await page.waitForTimeout(350);
-      const centro=await page.locator('#v-toasts .v-toast').evaluate(e=>{const r=e.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}});
+      const centro=await page.locator('#v-toasts .v-toast').filter({hasText:'Aviso de prueba'}).evaluate(e=>{const r=e.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}});
       await page.mouse.click(centro.x,centro.y);
       assert.equal(await page.locator('#prueba-debajo').getAttribute('data-pulsado'),'si');
     }
@@ -263,15 +267,15 @@ test('Precio Justo no atribuye una referencia de otro mercado', async () => {
       escala:V14.__v75.escalaPrevia(100,[{name:'Ana',val:50},{name:'Luis',val:200}])
     }));
     assert.equal(r.es.documentado,true);assert.equal(r.us.documentado,false);assert.equal(r.distinto.documentado,false);
-    assert.equal(r.escala.max,200);assert.equal(r.escala.real,50);assert.deepEqual(r.escala.puntos.map(p=>p.pct),[25,100]);
+    assert.ok(r.escala.max>200);assert.ok(r.escala.real>r.escala.puntos[0].pct);assert.ok(r.escala.real<r.escala.puntos[1].pct);assert.ok(r.escala.puntos[1].pct<100);
     assert.deepEqual(errores,[]);
   } finally { await browser.close(); }
 });
-test('La entrada ofrece anfitrión o jugador, sin formar equipos automáticamente', async () => {
-  const {browser,page,errores}=await abrir();
+test('La entrada ofrece anfitrión, local y mando, sin formar equipos automáticamente', async () => {
+  const {browser,page,errores}=await abrir(undefined,true);
   try {
     const botones=await page.locator('#v40-welcome [data-v40]').evaluateAll(a=>a.map(x=>x.dataset.v40));
-    assert.deepEqual(botones,['servidor','mando']);
+    assert.deepEqual(botones,['servidor','local','solo','mando']);
     assert.equal(await page.locator('#v40-welcome [data-tipo="equipos"]').isVisible(),false);
     assert.deepEqual(errores,[]);
   } finally { await browser.close(); }
@@ -286,7 +290,7 @@ test('Precio Justo muestra la misma escala proporcional en PC y teléfono', asyn
       V14.RENDER_PRECIO();return V14.__v60.ajustar({screen:{}},0).screen.precio;
     });
     await page.waitForTimeout(900);
-    const pc=await page.locator('#precio-stage .v75-escala').evaluate(e=>({max:Number(e.dataset.max),real:Number(e.dataset.real),marcas:Array.from(e.querySelectorAll('.v75-marca')).map(x=>parseFloat(x.style.left))}));
+    const pc=await page.locator('#precio-stage .v75-escala').evaluate(e=>({max:Number(e.dataset.max),real:Number(e.dataset.real),marcas:Array.from(e.querySelectorAll('.v75-punto')).map(x=>parseFloat(x.style.left))}));
     assert.equal(await page.locator('#v22-regla').count(),0);
     assert.deepEqual(pc,{max:movil.max,real:movil.realPct,marcas:movil.filas.map(f=>f.pct)});
     assert.deepEqual(errores,[]);
@@ -300,15 +304,17 @@ test('Importador de Ranking valida y guarda una tarjeta objetiva desde la interf
     await page.locator('#im-game').selectOption('ranking',{timeout:5000});
     await page.locator('#im-text').fill('Longitud de prueba (km) | desc | Uno=1, Dos=2, Tres=3 | https://example.org/referencia');
     await page.locator('[data-im="run"]').click({timeout:5000});
+    await page.waitForFunction(()=>document.querySelector('#im-report')?.innerText.includes('1 válidas'),null,{timeout:5000});
     assert.match(await page.locator('#im-report').innerText(),/1 válidas/);
     await page.locator('#im-insert').click({timeout:5000});
     const guardado=await page.evaluate(()=>V14.__v67.importados('ranking:general:conjuntos'));
     const carta=guardado.find(x=>x.title.startsWith('Longitud de prueba'));
     assert.ok(carta);assert.deepEqual(carta.items,['Tres','Dos','Uno']);assert.deepEqual(carta.valores,[3,2,1]);
     assert.equal(carta.fuente,'https://example.org/referencia');
+    await page.locator('#v-imp2').locator('..').locator('..').locator('[data-close]').click();
     await page.evaluate(()=>openImporterModal());await page.locator('#im-game').selectOption('ranking');
     await page.locator('#im-text').fill('Dato incorrecto | asc | Uno=1, Dos=1, Tres=3 | https://example.org');
-    await page.locator('[data-im="run"]').click({timeout:5000});assert.equal(await page.locator('#im-insert').isDisabled(),true);
+    await page.locator('[data-im="run"]').click({timeout:5000});await page.waitForFunction(()=>document.querySelector('#im-status')?.textContent==='Listo para importar');assert.equal(await page.locator('#im-insert').isDisabled(),true);
     assert.deepEqual(errores,[]);
   } finally { await browser.close(); }
 });
@@ -363,8 +369,8 @@ test('Precio usa decimales exactos, seis categorías y empates configurables', {
     assert.deepEqual(r.niveles,[1,1,2,2,3,3,4,4,5,5,6]);
     assert.match(r.enorme,/123[.,]456[.,]789[.,]012[.,]345[.,]678[.,]901[.,]234[.,]567[.,]890[,.]25/);
     assert.equal(r.cercano,false);assert.equal(r.noExacto,false);assert.equal(r.exacto,true);assert.equal(r.gran,'Ana');
-    assert.deepEqual(r.ninguno,[0,0,0]);assert.ok(r.reparto.every(x=>Math.abs(x-2/3)<1e-12));assert.equal(r.segundo,false);
-    assert.deepEqual(r.deshacer,[0,0,0]);assert.deepEqual(r.nombresDuplicados,[1,1,0]);
+    assert.deepEqual(r.ninguno,[0,0,0]);assert.ok(r.reparto.every(x=>Math.abs(x-5/3)<1e-12));assert.equal(r.segundo,false);
+    assert.deepEqual(r.deshacer,[0,0,0]);assert.deepEqual(r.nombresDuplicados,[2.5,2.5,0]);
     assert.equal(r.conf.sinPasarse,false);assert.equal(r.conf.empate,'ninguno');
     await page.evaluate(()=>{V14.G().teams[0].score=2/3;V14.setScorePrecision(2);renderSharedScoreboard()});
     assert.equal(await page.evaluate(()=>V14.formatScore(V14.G().teams[0].score)),'0,67');
@@ -383,10 +389,12 @@ test('Precio importa cifras grandes sin perder decimales y permite configurar re
     const importe='123456789012345678901234567890.25';
     await page.locator('#im-text').fill('Una fortuna verificable | '+importe);
     await page.locator('[data-im="run"]').click({timeout:5000});
+    await page.waitForFunction(()=>document.querySelector('#im-report')?.innerText.includes('1 válidas'),null,{timeout:5000});
     assert.match(await page.locator('#im-report').innerText(),/1 válidas/);
     await page.locator('#im-insert').click({timeout:5000});
     const x=await page.evaluate(()=>V14.__v67.importados('precio:bo:general').find(v=>v.q==='Una fortuna verificable'));
     assert.equal(x.a,importe);assert.equal(x.t,6);
+    await page.locator('#v-imp2').locator('..').locator('..').locator('[data-close]').click();
     await page.evaluate(()=>{V14.settings.gameMode='pantalla';V14.G().teams=[{id:1,name:'Ana',score:0,members:[]},{id:2,name:'Luis',score:0,members:[]}];for(let i=0;i<2;i++)V14.net.conns.set('precio-test-'+i,{id:'precio-test-'+i,pid:'precio-pid-'+i,name:i?'Luis':'Ana',slot:i,online:true,conn:{open:true,send(){},on(){}}});V14.openGame('precio');});
     await page.waitForTimeout(1500);
     if (await page.locator('#v26-tour .v26-skip').isVisible()) await page.locator('#v26-tour .v26-skip').click({timeout:5000});
@@ -401,7 +409,22 @@ test('Precio importa cifras grandes sin perder decimales y permite configurar re
     await page.evaluate(val=>{const s=V14.precioState;s.item={q:'Una fortuna verificable',a:val,t:6};s.estimates=[{name:'Ana',value:val},{name:'Luis',value:'1'}];s.phase='revealed';s.awarded=false;s.auto=false;V14.RENDER_PRECIO()},importe);
     const real=await page.locator('#precio-stage .v-price-real').innerText({timeout:5000});
     assert.match(real,/123[.,]456[.,]789[.,]012[.,]345[.,]678[.,]901[.,]234[.,]567[.,]890[,.]25/);
-    assert.match(await page.locator('#precio-stage [data-award]').innerText({timeout:5000}),/Dar 2 pts/);
+    assert.match(await page.locator('#precio-stage [data-award]').innerText({timeout:5000}),/Dar 5 pts/);
+    assert.deepEqual(errores,[]);
+  } finally {await browser.close();}
+});
+test('Escala Precio mantiene márgenes y posiciones para decimales cercanos y enormes', async () => {
+  const {browser,page,errores}=await abrir();
+  try {
+    const casos=await page.evaluate(()=>[
+      V14.precioEscala('70',[{name:'A',val:'60'},{name:'B',val:'80'}]),
+      V14.precioEscala('0',[{name:'A',val:'0'}]),
+      V14.precioEscala('100000000000000000000000000000000000000000000000000.01',[{name:'A',val:'100000000000000000000000000000000000000000000000000.02'}]),
+      V14.precioEscala('0.000001',[{name:'A',val:'0.000002'},{name:'B',val:'0.000003'}])
+    ]);
+    for(const c of casos){assert.ok(c.real>=7&&c.real<=93);assert.ok(c.puntos.every(p=>p.pct>=7&&p.pct<=93));assert.ok(c.ticks.length>0&&c.ticks.length<=8);}
+    assert.ok(casos[0].puntos[0].pct<casos[0].real&&casos[0].real<casos[0].puntos[1].pct);
+    assert.ok(casos[2].real<casos[2].puntos[0].pct,'valores enormes cercanos conservan la posición relativa');
     assert.deepEqual(errores,[]);
   } finally {await browser.close();}
 });

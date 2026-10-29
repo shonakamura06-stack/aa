@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Sintonía · El Dial de las Mentes</title>
-<meta name="description" content="Hub de juegos de fiesta: El Dial de las Mentes, Verdad o Reto, El Impostor, Palabra Tabú y ocho juegos más. Funciona sin internet.">
+<meta name="description" content="Sintonía: juegos para compartir en un dispositivo o en una sala con mandos.">
 <meta name="theme-color" content="#F4F1EA">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -6867,12 +6867,6 @@ html.v21-cover-off::before{display:none;}
     </div>
   </header>
 
-  <div class="game-teams-strip">
-    <span class="strip-label">Equipo en turno:</span>
-    <select class="btn-action js-minigame-team-select" style="padding:3px 8px; font-size:10.5px; font-weight:900;" onchange="selectActiveTeam(parseInt(this.value,10))"></select>
-    <div class="strip-pills"></div>
-  </div>
-
   <div class="gv-body">
     <div class="stage-layout-grid" style="width:100%; max-width:1440px; margin:0 auto; flex:1; min-height:0;">
       <!-- COLUMNA 1: MODOS Y AUDIENCIA -->
@@ -7010,12 +7004,6 @@ html.v21-cover-off::before{display:none;}
     </div>
   </header>
 
-  <div class="game-teams-strip">
-    <span class="strip-label">Equipo en turno:</span>
-    <select class="btn-action js-minigame-team-select" style="padding:3px 8px; font-size:10.5px; font-weight:900;" onchange="selectActiveTeam(parseInt(this.value,10))"></select>
-    <div class="strip-pills"></div>
-  </div>
-
   <div class="gv-body">
     <div class="stage-layout-grid two-col">
       <div class="gv-stage">
@@ -7083,12 +7071,6 @@ html.v21-cover-off::before{display:none;}
       </div>
     </div>
   </header>
-
-  <div class="game-teams-strip">
-    <span class="strip-label">Equipo en turno:</span>
-    <select class="btn-action js-minigame-team-select" style="padding:3px 8px; font-size:10.5px; font-weight:900;" onchange="selectActiveTeam(parseInt(this.value,10))"></select>
-    <div class="strip-pills"></div>
-  </div>
 
   <div class="gv-body">
     <div class="stage-layout-grid two-col">
@@ -7168,20 +7150,6 @@ html.v21-cover-off::before{display:none;}
 
       <!-- COLUMNA 3: JUGADORES + MARCADOR -->
       <aside class="sidebar-scoreboard">
-        <div class="scoreboard-header">
-          <div class="panel-title-group">
-            <span class="panel-title">Jugadores en la mesa</span>
-            <span class="panel-subtitle">Toca un asiento para cambiar el turno</span>
-          </div>
-        </div>
-        <div style="display:flex; align-items:center; gap:6px; justify-content:space-between;">
-          <span style="font-size:10px; font-weight:800; color:var(--text-muted);">Jugadores:</span>
-          <select id="men-player-count" class="btn-action" style="padding:3px 8px; font-size:11px; font-weight:900;" onchange="menOnPlayersChange()">
-            <option value="2">2</option><option value="3">3</option><option value="4" selected>4</option>
-            <option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option>
-          </select>
-        </div>
-        <div class="men-players-list" id="men-players-list"></div>
         <div class="scoreboard-header" style="border-top:2px solid var(--border-light); padding-top:6px;">
           <div class="panel-title-group">
             <span class="panel-title">Marcador de equipos</span>
@@ -7214,12 +7182,6 @@ html.v21-cover-off::before{display:none;}
       </div>
     </div>
   </header>
-
-  <div class="game-teams-strip">
-    <span class="strip-label">Equipo en turno:</span>
-    <select class="btn-action js-minigame-team-select" style="padding:3px 8px; font-size:10.5px; font-weight:900;" onchange="selectActiveTeam(parseInt(this.value,10))"></select>
-    <div class="strip-pills"></div>
-  </div>
 
   <div class="gv-body">
     <div class="stage-layout-grid two-col">
@@ -8656,22 +8618,32 @@ const MATRIX_DB = BUNDLE_DB.topics;
 
       const currentTeam = state.teams[state.activeTeamIdx];
       if (!currentTeam) return;   /* sin equipos no hay a quién puntuar */
-      currentTeam.score = currentTeam.score + pts;
-
-      // Registra el punto en el historial por categoría (para el marcador por modo).
+      // En local cada asiento representa a una persona, no a una pareja.
+      // En servidor los asientos siguen representando equipos como antes.
+      const localPair = V14 && V14.settings.gameMode === 'local' && V14.__v66 && V14.__v66.parejaDe(state.activeTeamIdx);
       const catForScore = state.currentPrompt ? (state.currentPrompt.catId || 'custom') : 'custom';
-      recordCategoryScore(catForScore, currentTeam.name, pts, zone);
+      const partner = localPair && state.teams[localPair.a.slot === state.activeTeamIdx ? localPair.b.slot : localPair.a.slot];
+      if (partner && partner !== currentTeam) {
+        currentTeam.score += pts / 2; partner.score += pts / 2;
+        recordCategoryScore(catForScore, currentTeam.name, pts / 2, zone);
+        recordCategoryScore(catForScore, partner.name, pts / 2, zone);
+      } else {
+        currentTeam.score += pts;
+        recordCategoryScore(catForScore, currentTeam.name, pts, zone);
+      }
 
       renderTargetBand();
       renderSidebarActionDock();
       renderTeamsList();
 
-      showNotice(`¡${zone}! ${pts >= 0 ? '+' : ''}${pts} pts para ${currentTeam.name}`);
+      showNotice(partner ? `¡${zone}! ${pts / 2} pts para ${currentTeam.name} y ${partner.name}` : `¡${zone}! ${pts >= 0 ? '+' : ''}${pts} pts para ${currentTeam.name}`);
+      if (partner && V14.saveSessionNow) V14.saveSessionNow();
       if (V14 && V14.__v66) V14.__v66.completeReveal();
 
-      if (currentTeam.score >= state.winGoal) {
+      const winner = currentTeam.score >= state.winGoal ? currentTeam : partner && partner.score >= state.winGoal ? partner : null;
+      if (winner) {
         setTimeout(() => {
-          triggerVictoryCelebration(currentTeam);
+          triggerVictoryCelebration(winner);
         }, 600);
       }
     }
@@ -8679,7 +8651,10 @@ const MATRIX_DB = BUNDLE_DB.topics;
     function advanceTurn() {
       if (V14 && V14.__v66 && !V14.__v66.canAdvance()) return;
       if (!state.teams.length) return;   /* sin equipos no hay turno siguiente */
-      state.activeTeamIdx = (state.activeTeamIdx + 1) % state.teams.length;
+      // En local el turno avanza por parejas elegidas, no por cada asiento.
+      const pairs = V14 && V14.settings.gameMode === 'local' && V14.__v66 ? V14.__v66.parejas().filter(p => p.completa) : [];
+      const pairIdx = pairs.findIndex(p => p.a.slot === state.activeTeamIdx || p.b.slot === state.activeTeamIdx);
+      state.activeTeamIdx = pairIdx >= 0 ? pairs[(pairIdx + 1) % pairs.length].a.slot : (state.activeTeamIdx + 1) % state.teams.length;
       resetDialRound();
       scrollActiveTeamIntoView();
       showNotice(`Turno de ${state.teams[state.activeTeamIdx].name}`);
@@ -11861,6 +11836,7 @@ window.addEventListener('DOMContentLoaded', () => {
     };
     const close = () => {
       if (closed) return;
+      if (opts.beforeClose && opts.beforeClose() === false) return;
       closed = true;
       document.removeEventListener('keydown', onKey);
       bd.remove();
@@ -11943,13 +11919,14 @@ window.addEventListener('DOMContentLoaded', () => {
     return {
       at: Date.now(),
       teams: s.teams.map(t => ({ id: t.id, name: t.name, score: t.score, color: t.color || null, emoji: t.emoji || null, members: Array.isArray(t.members) ? t.members.slice() : [],
-        __v55pids: Array.isArray(t.__v55pids) ? t.__v55pids.slice() : [], __v55auto: t.__v55auto !== false })),
+        __v55pids: Array.isArray(t.__v55pids) ? t.__v55pids.slice() : [], __v55auto: t.__v55auto !== false, dialEquipo: Number.isInteger(t.dialEquipo) ? t.dialEquipo : null, tabuEquipo: Number.isInteger(t.tabuEquipo) ? t.tabuEquipo : null })),
       activeTeamIdx: s.activeTeamIdx,
       winGoal: s.winGoal,
       difficultyMode: s.difficultyMode,
       mainMode: s.mainMode,
       config: s.config,
       game: (V.gameOf() === 'hub' ? (V.activeGame || 'hub') : V.gameOf()),
+      vistaGuardada: V.gameOf(),
       rounds: V.rounds || 0,
       catScore: s.catScoreHistory || {},
       coins: V.coins || 0
@@ -12160,10 +12137,13 @@ window.addEventListener('DOMContentLoaded', () => {
     setInterval(() => V.saveSession(), 8000);
     window.addEventListener('beforeunload', () => { if (V.settings.autosave) V.saveSessionNow(); });
     // Restaurar sesión si existe
+    const previo = V.store.get('session', null);
     const restored = V.restoreSession();
     if (restored) {
       setTimeout(() => {
-        V.toast('Partida restaurada · ' + (V.sessionPayload() ? '' : ''), 'ok');
+        const local = ['local','solo'].includes(V.settings.gameMode);
+        const interrumpida = previo && previo.vistaGuardada && previo.vistaGuardada !== 'hub';
+        V.toast(local && interrumpida && !(previo.v63recuperacion && previo.v63recuperacion.tipo==='local') ? 'Participantes y marcador restaurados; la ronda interrumpida no se pudo recuperar.' : 'Participantes y marcador restaurados.', 'info', 6000);
       }, 2200);
     }
   };
@@ -13046,7 +13026,7 @@ window.addEventListener('DOMContentLoaded', () => {
     ranking: ['Se muestran cinco cosas para ordenar de mejor a peor.', 'Cada equipo da su orden y se comparan los aciertos.'],
     trivia: ['Diez preguntas con diez segundos cada una. Todos los teléfonos tienen las opciones a la vez: es un pulsador.', 'El PRIMERO que acierta se lleva el punto; después la PC puede darlo a mano a quien diga el anfitrión.', 'Comodines en la PC: quitar dos opciones, pedir diez segundos o saltar la pregunta.'],
     cadena: ['Cada jugador añade una frase a la historia.', 'Al final todos votan la historia más absurda.'],
-    precio: ['Cada jugador escribe su estimación en su teléfono y puede ver el número.', 'Por defecto gana la cifra más cercana. Antes de jugar puedes cambiar a «Sin pasarse» con el botón de la regla.', 'El más cercano gana 1 punto; un acierto exacto vale 2. Los empates se pueden configurar.'],
+    precio: ['Cada jugador escribe su estimación en su teléfono y puede ver el número.', 'Por defecto gana la cifra más cercana. Antes de jugar puedes cambiar a «Sin pasarse» con el botón de la regla.', 'Solo puntúa la estimación más cercana: exacta 5 puntos; hasta 10 % de error 3; hasta 20 % 2; hasta 30 % 1. Los empates se pueden configurar.'],
     personaje: ['Cinco pistas, de la más difícil a la más obvia.', 'Adivina con las mínimas pistas para llevarte más puntos.']
   };
 
@@ -13885,8 +13865,6 @@ window.addEventListener('DOMContentLoaded', () => {
           '<button class="btn-action v-keep" data-help>Cómo se juega</button>' +
         '</div>' +
       '</header>' +
-      '<div class="game-teams-strip"><span class="strip-label">Turno en</span>' +
-        '<div class="strip-pills"></div></div>' +
       '<div class="v-statusbar" style="position:static;background:transparent;border:none;padding:0 24px;margin-top:8px">' +
         '<span class="v-chip" data-phase>' + esc(meta.tag) + '</span><span class="v-spacer"></span>' +
         '<span id="' + id + '-hud"></span></div>' +
@@ -15279,29 +15257,53 @@ window.addEventListener('DOMContentLoaded', () => {
              valorRegistro: hit.a };
   }
 
-  /* escala proporcional: cada estimación y el precio real se colocan sobre la
-     misma recta, de 0 al mayor valor de la ronda. El cálculo es el porcentaje
-     del valor sobre el máximo (0–100), redondeado a un decimal. */
+  /* El cálculo del eje usa enteros escalados: incluso valores muy próximos y
+     precios de 100 dígitos mantienen su posición relativa sin perder precisión. */
   function escalaPrevia(price, rows) {
-    let maxValor = decimal(price) || '0';
-    rows.forEach(r => { if (comparar(r.val,maxValor)>0) maxValor = decimal(r.val); });
-    let max = Number(maxValor) || 1;
-    const pct = v => Math.round((Number(v) / max) * 1000) / 10;
-    return {
-      max, maxValor,
-      real: pct(price),
-      puntos: rows.map(r => ({ name: r.name, val: r.val, pct: pct(r.val) }))
-    };
+    const datos=[price].concat(rows.map(r=>r.val)).map(piezas);
+    if(datos.some(x=>!x)) throw new Error('Precio inválido para la escala');
+    const dec=Math.max(...datos.map(x=>x.escala));
+    const unidades=datos.map(x=>x.n*10n**BigInt(dec-x.escala));
+    const min=unidades.reduce((a,b)=>a<b?a:b),max=unidades.reduce((a,b)=>a>b?a:b);
+    const rango=max-min;
+    let margen=rango ? (rango+4n)/5n : (max ? (max+9n)/10n : 1n);
+    if(margen<1n)margen=1n;
+    const bajo=min>margen ? min-margen : 0n, alto=max+margen;
+    const ancho=alto-bajo;
+    const bruto=(ancho+5n)/6n;
+    let potencia=10n**BigInt(Math.max(0,bruto.toString().length-1));
+    let paso=[1n,2n,5n,10n].map(n=>n*potencia).find(n=>n>=bruto);
+    const texto=n=>{let d=n.toString();if(dec){d=d.padStart(dec+1,'0');d=d.slice(0,-dec)+'.'+d.slice(-dec);d=d.replace(/0+$/,'').replace(/\.$/,'');}return d;};
+    const pct=n=>7+Number((n-bajo)*860000n/ancho)/10000;
+    let ticks=[];
+    for(let n=((bajo+paso-1n)/paso)*paso;n<=alto;n+=paso) ticks.push({valor:texto(n),pct:pct(n)});
+    return {minValor:texto(bajo),maxValor:texto(alto),max:Number(texto(alto)),real:pct(unidades[0]),
+      puntos:rows.map((r,i)=>({name:r.name,val:r.val,pct:pct(unidades[i+1])})),ticks:ticks};
   }
+  V.precioEscala = escalaPrevia;
 
+  /* Los umbrales se comparan con enteros escalados: sin redondear precios. */
+  function puntosCercania(estimacion, precio) {
+    const par=alinear(estimacion,precio); if(!par)return 0;
+    const [estimado,real]=par, diferencia=estimado>real?estimado-real:real-estimado;
+    if(diferencia===0n)return 5;
+    if(real===0n)return 0;
+    if(diferencia*10n<=real)return 3;
+    if(diferencia*5n<=real)return 2;
+    if(diferencia*10n<=real*3n)return 1;
+    return 0;
+  }
+  V.precioDecimal.puntosCercania=puntosCercania;
   /* Ganador de la ronda según la regla activa */
   function winnerOf(c, rows, price) {
     const valid=rows.filter(r=>decimal(r.val)!==null && (!c.sinPasarse || comparar(r.val,price)<=0));
-    if(!valid.length) return {winner:null,winners:[],exact:false,nobody:!!c.sinPasarse,tie:false};
+    if(!valid.length) return {winner:null,winners:[],exact:false,nobody:true,reason:c.sinPasarse?'pasaron':'sinEstimaciones',tie:false,puntos:0};
     const escala=Math.max(piezas(price).escala,...valid.map(r=>piezas(r.val).escala));
     let menor=null, mejores=[];
     valid.forEach(r=>{const d=distancia(r.val,price,escala);if(menor===null||d<menor){menor=d;mejores=[r];}else if(d===menor)mejores.push(r);});
-    return {winner:mejores[0],winners:mejores,exact:menor===0n,nobody:false,tie:mejores.length>1};
+    const puntos=puntosCercania(mejores[0].val,price);
+    if(!puntos)return {winner:null,winners:[],exact:false,nobody:true,reason:'lejos',tie:false,puntos:0};
+    return {winner:mejores[0],winners:mejores,exact:menor===0n,nobody:false,tie:mejores.length>1,puntos};
   }
 
   function repartir(c,s,rows,price) {
@@ -15309,7 +15311,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const r=winnerOf(c,rows,price);
     st.awarded=true;
     if(!r.winners.length || (r.tie && c.empate!=='repartir')) return true;
-    const parte=(r.exact?2:1)/r.winners.length;
+    const parte=r.puntos/r.winners.length;
     // Una ronda, incluso con varios empatados, se deshace como una sola operación.
     V._diffScores && V._diffScores();
     V._batchPriceScore=true;
@@ -15356,7 +15358,7 @@ window.addEventListener('DOMContentLoaded', () => {
             '</button>' +
             '<button class="btn-action" data-skip style="flex:1;min-width:120px">Otro objeto</button>' +
           '</div>' +
-          '<p class="v-small v-muted v-mt3">Cada jugador ve lo que escribe en su teléfono. Las estimaciones se revelan al final.</p>' +
+          '<p class="v-small v-muted v-mt3">Cada persona ve su estimación. Exacto: 5 puntos; error hasta 10 %: 3, hasta 20 %: 2, hasta 30 %: 1. Más lejos: 0.</p>' +
         '</div>';
     } else {
       const price = st.item.a;
@@ -15377,30 +15379,30 @@ window.addEventListener('DOMContentLoaded', () => {
           '</div>' +
           (fuenteDe(st.item).documentado && fuenteDe(st.item).fuente
             ? '<div class="v-small v-muted v75-fuente">Fuente: ' + esc(fuenteDe(st.item).fuente) + '</div>' : '') +
-          '<div class="v-price-rule">' + (c.sinPasarse ? 'Gana el más cercano sin pasarse' : 'Gana el más cercano') + '</div>' +
+          '<div class="v-price-rule">' + (c.sinPasarse ? 'Más cercano sin pasarse' : 'Más cercano') + ' · exacto 5 pts · ≤10 % 3 · ≤20 % 2 · ≤30 % 1</div>' +
           escalaHtml(price, rows) +
           '<div class="v-price-results">' +
-            rows.map(r => {
+            rows.map((r, i) => {
               const isWin = outcome.winners.includes(r);
               return '<div class="v-price-row' + (isWin ? ' win' : '') + '">' +
-                '<span class="n">' + esc(r.name) + '</span>' +
+                '<span class="n">' + (i+1) + '. ' + esc(r.name) + '</span>' +
                 '<span class="v">' + esc(dinero(r.val, pack.currency)) + '</span>' +
                 (comparar(r.val,price)>0 && c.sinPasarse ? '<span class="tag over">se pasó</span>' : '') +
                 (isWin ? '<span class="tag win">' + (outcome.tie ? 'empate' : 'gana') + '</span>' : '') +
               '</div>';
             }).join('') +
           '</div>' +
-          (nobody ? '<p class="v-small" style="color:#B4453F;font-weight:800;margin-top:10px">Todos se pasaron: ronda sin puntos. Que nadie se lleve nada es también parte del juego.</p>' : '') +
+          (nobody ? '<p class="v-small" style="color:#B4453F;font-weight:800;margin-top:10px">' + (outcome.reason==='pasaron' ? 'Todos se pasaron: ronda sin puntos.' : 'Ninguna estimación está dentro del 30 %: ronda sin puntos.') + '</p>' : '') +
           (st.auto ? '<p class="v-auto-note v-mt2">' + (st.undoDone ? 'Reparto deshecho' : (outcome.tie && c.empate==='ninguno' ? 'Empate: sin puntos' : (nobody ? 'Ronda sin puntos' : 'Ronda cerrada y puntuación aplicada'))) + '</p>' : '') +
           '<div class="v-row v-mt4" style="gap:8px;flex-wrap:wrap">' +
             (winner && !st.auto
               ? '<button class="btn-action btn-teal-filled epic-big-btn" data-award="' + esc(winner.name) + '" style="flex:2;min-width:200px">' +
-                  (outcome.tie ? (c.empate==='repartir' ? 'Repartir puntos entre empatados' : 'Cerrar empate sin puntos') : ('Dar ' + (exact ? 2 : 1) + ' pts a ' + esc(winner.name))) + '</button>'
+                  (outcome.tie ? (c.empate==='repartir' ? 'Repartir puntos entre empatados' : 'Cerrar empate sin puntos') : ('Dar ' + outcome.puntos + ' pts a ' + esc(winner.name))) + '</button>'
               : '<button class="btn-action btn-primary-filled epic-big-btn" data-next style="flex:2;min-width:200px">Siguiente objeto</button>') +
             (winner && !st.auto ? '<button class="btn-action" data-next style="flex:1;min-width:110px">Siguiente</button>' : '') +
             (st.auto && st.undoEntry ? '<button class="btn-action" data-undo-auto style="flex:1;min-width:130px">Deshacer</button>' : '') +
           '</div>' +
-          (exact ? '<p class="v-small" style="color:var(--v-teal);font-weight:800;margin-top:10px">¡Clavado! El acierto exacto vale 2 puntos.</p>' : '') +
+          (exact ? '<p class="v-small" style="color:var(--v-teal);font-weight:800;margin-top:10px">¡Clavado! El acierto exacto vale 5 puntos.</p>' : '') +
         '</div>';
     }
 
@@ -15456,19 +15458,25 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   };
 
-  /* escala proporcional dibujada: una sola recta, marcas en su porcentaje */
+  /* Misma escala para pantalla y mandos; las etiquetas completas quedan en la lista. */
   function escalaHtml(price, rows) {
-    const e = escalaPrevia(price, rows);
-    const marcas = e.puntos.map((p, i) =>
-      '<span class="v75-marca" style="left:' + Math.max(0, Math.min(100, p.pct)) + '%" title="' +
-      esc(p.name) + ': ' + p.pct + '%">' +
-      '<i style="--i:' + i + '"></i><b>' + esc(p.name.slice(0, 12)) + '</b></span>').join('');
-    return '<div class="v75-escala" data-max="' + e.max + '" data-real="' + e.real + '">' +
-      '<div class="v75-riel"></div>' +
-      '<span class="v75-real" style="left:' + Math.max(0, Math.min(100, e.real)) + '%" title="Precio real">' +
-      '<em>real</em></span>' + marcas +
-      '<div class="v75-pie"><span>0</span><span>' + esc(e.maxValor) + '</span></div></div>';
+    const e=escalaPrevia(price,rows), grupos=[];
+    e.puntos.forEach((p,i)=>{let g=grupos.find(x=>Math.abs(x.pct-p.pct)<7);
+      if(!g){g={pct:p.pct,indices:[],nombres:[]};grupos.push(g);}
+      g.indices.push(i+1);g.nombres.push(p.name+': '+p.val);});
+    const corto=t=>t.length>14 ? t.slice(0,10)+'…' : t;
+    const ticks=e.ticks.map((t,i)=>{
+      const desplazamiento=t.pct<15?'translateX(0)':t.pct>85?'translateX(-100%)':'translateX(-50%)';
+      let menores='';
+      if(i<e.ticks.length-1){const siguiente=e.ticks[i+1].pct;for(let j=1;j<5;j++) menores+='<i class="v75-menor" style="left:'+(t.pct+(siguiente-t.pct)*j/5)+'%"></i>';}
+      return '<span class="v75-tick" style="left:'+t.pct+'%;transform:'+desplazamiento+'"><i></i><b title="'+esc(t.valor)+'">'+esc(corto(t.valor))+'</b></span>'+menores;
+    }).join('');
+    const puntos=e.puntos.map((p,i)=>'<i class="v75-punto" style="left:'+p.pct+'%" title="'+esc(p.name+': '+p.val)+'" aria-label="'+esc(p.name+': '+p.val)+'"></i>').join('');
+    const etiquetas=grupos.map(g=>'<span class="v75-grupo" style="left:'+g.pct+'%" title="'+esc(g.nombres.join(' · '))+'">'+g.indices.join(',')+'</span>').join('');
+    return '<div class="v75-escala" aria-label="Escala del resultado; las estimaciones se detallan debajo" data-max="'+esc(e.maxValor)+'" data-real="'+e.real+'">'+
+      '<div class="v75-riel"></div>'+ticks+'<span class="v75-real" style="left:'+e.real+'%" title="Precio real"><em>real</em></span>'+puntos+etiquetas+'</div>';
   }
+  V.precioGrafico=escalaHtml;
 
   /* ------------------------------------------------------------- RONDA SECRETA */
   function startRound() {
@@ -15572,7 +15580,7 @@ window.addEventListener('DOMContentLoaded', () => {
         ganador: out.winners.map(function(w){return w.name;}).join(', '),
         empate: out.tie, sinPuntos: out.tie && c.empate !== 'repartir',
         deshecho: !!st.undoDone, pendiente: !st.auto && !st.awarded,
-        puntos: out.winners.length ? (out.tie && c.empate !== 'repartir' ? 0 : (out.exact ? 2 : 1)/out.winners.length) : 0,
+        puntos: out.winners.length ? (out.tie && c.empate !== 'repartir' ? 0 : out.puntos/out.winners.length) : 0,
         exacto: !!out.exact,
         categoria: categoriaDe(st.item),
         nivel: nivel(st.item.a),
@@ -17299,30 +17307,34 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   /* --------------------------------------------------------- PARSEO SEGÚN JUEGO */
-  function parseLine(game, line) {
+  function parseLine(game, line, csvFields) {
     const raw = line;
-    const parts = line.split(/\s*[|;]\s*/).map(x => x.trim()).filter(Boolean);
+    const parts = csvFields ? csvFields.map(x => x.trim()) : line.split(/\s*[|;]\s*/).map(x => x.trim()).filter(Boolean);
+    if (csvFields && parts.some(x => !x)) return {err:'No se admiten campos vacíos en este formato CSV'};
+    if (csvFields && ['dial','verdad','reto','probable','yonunca','cadena'].includes(game)) {
+      return parts.length === 1 ? {value:parts[0],key:parts[0].toLowerCase()} : {err:'Este destino requiere una sola columna CSV'};
+    }
 
     if (game === 'tabu') {
       if (parts.length < 2) return { err: 'Formato: PALABRA | f1, f2, f3…' };
       const word = parts[0].toUpperCase();
-      const forb = parts.slice(1).join(',').split(',').map(x => x.trim()).filter(Boolean);
+      const forb = csvFields ? parts.slice(1) : parts.slice(1).join(',').split(',').map(x => x.trim()).filter(Boolean);
       if (forb.length !== 5) return { err: 'Necesita exactamente 5 palabras prohibidas' };
       return { value: { word, category: 'Importadas', forbidden: forb }, key: word };
     }
     if (game === 'palabras') {
-      if (parts.length < 2) return { err: 'Formato: PALABRA | Categoría | pista' };
+      if (parts.length < 2 || (csvFields && parts.length !== 3)) return { err: 'Formato: PALABRA | Categoría | pista' };
       return { value: { word: parts[0].toUpperCase(), category: parts[1] || 'General', clueHint: parts[2] || '' }, key: parts[0].toUpperCase() };
     }
     if (game === 'ranking') {
-      if (parts.length !== 4 || !/^(asc|desc)$/i.test(parts[1])) return { err: 'Formato: Criterio y unidad | asc o desc | elemento=valor, ... | URL de la fuente' };
+      if ((csvFields ? parts.length < 6 : parts.length !== 4) || !/^(asc|desc)$/i.test(parts[1])) return { err: 'Formato: Criterio y unidad | asc o desc | elemento=valor, ... | URL de la fuente' };
       const direccion=parts[1].toLowerCase();
-      const filas=parts[2].split(',').map(x=>x.trim()).filter(Boolean).map(x=>{const m=x.match(/^(.+?)\s*=\s*(-?\d+(?:\.\d+)?)$/);return m?{nombre:m[1].trim(),valor:Number(m[2])}:null;});
+      const filas=(csvFields ? parts.slice(2,-1) : parts[2].split(',')).map(x=>x.trim()).filter(Boolean).map(x=>{const m=x.match(/^(.+?)\s*=\s*(-?\d+(?:\.\d+)?)$/);return m?{nombre:m[1].trim(),valor:Number(m[2])}:null;});
       if(filas.length<3||filas.length>12||filas.some(x=>!x||!x.nombre||!Number.isFinite(x.valor)))return {err:'Indica entre 3 y 12 elementos con valores numéricos distintos'};
       if(new Set(filas.map(x=>x.valor)).size!==filas.length||new Set(filas.map(x=>x.nombre.toLowerCase())).size!==filas.length)return {err:'No se admiten valores ni elementos repetidos'};
-      try { if(!/^https?:$/.test(new URL(parts[3]).protocol))throw Error(); } catch(e){return {err:'Indica una URL de fuente http o https válida'};}
+      try { if(!/^https?:$/.test(new URL(parts[csvFields ? parts.length-1 : 3]).protocol))throw Error(); } catch(e){return {err:'Indica una URL de fuente http o https válida'};}
       filas.sort((a,b)=>direccion==='asc'?a.valor-b.valor:b.valor-a.valor);
-      return {value:{title:parts[0] + (direccion==='asc' ? ' · de menor a mayor' : ' · de mayor a menor'),items:filas.map(x=>x.nombre),valores:filas.map(x=>x.valor),direccion,unidad:'',fuente:parts[3]},key:parts[0].toLowerCase()};
+      return {value:{title:parts[0] + (direccion==='asc' ? ' · de menor a mayor' : ' · de mayor a menor'),items:filas.map(x=>x.nombre),valores:filas.map(x=>x.valor),direccion,unidad:'',fuente:parts[csvFields ? parts.length-1 : 3]},key:parts[0].toLowerCase()};
     }
     if (game === 'trivia') {
       if (parts.length < 4) return { err: 'Formato: Pregunta | A | B | C | D | letra' };
@@ -17335,18 +17347,18 @@ window.addEventListener('DOMContentLoaded', () => {
     }
     if (game === 'personaje') {
       if (parts.length < 2) return { err: 'Formato: Nombre | pista1, pista2…' };
-      const clues = parts.slice(1).join(',').split(',').map(x => x.trim()).filter(Boolean);
+      const clues = csvFields ? parts.slice(1) : parts.slice(1).join(',').split(',').map(x => x.trim()).filter(Boolean);
       if (clues.length < 2 || clues.length > 12) return { err: 'Necesita entre 2 y 12 pistas; no se truncarán' };
       return { value: { who: parts[0], clues }, key: parts[0].toLowerCase() };
     }
     if (game === 'precio') {
-      if (parts.length < 2) return { err: 'Formato: Objeto | precio' };
+      if (parts.length < 2 || (csvFields && parts.length !== 2)) return { err: 'Formato: Objeto | precio' };
       const num = V.precioDecimal.normalizar(parts[1]);
       if (num === null) return {err:'Escribe un precio no negativo, con hasta 100 dígitos, sin símbolos ni unidades'};
       return {value:{q:parts[0],a:num,t:V.precioDecimal.nivel(num)},key:parts[0].toLowerCase()};
     }
     /* genéricos: texto libre */
-    const clean = stripMarkers(htmlEntities(line)).replace(/^["'«»]\s*|\s*["'«»]$/g, '').trim();
+    const clean = line.trim();
     if (!clean) return { err: 'Línea vacía' };
     return { value: clean, key: clean.toLowerCase() };
   }
@@ -17359,16 +17371,40 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   /* --------------------------------------------------------------- ANÁLISIS */
+  /* CSV con coma RFC 4180: las comillas y saltos internos pertenecen al
+     campo. Se rechaza un archivo mal cerrado sin importar filas parciales. */
+  function leerCSV(raw) {
+    const text=String(raw).replace(/^\uFEFF/,''), out=[];
+    let i=0, line=1, start=0, startLine=1, fields=[], field='', quoted=false, after=false, atStart=true;
+    function finCampo(){fields.push(field);field='';atStart=true;after=false;}
+    function finRegistro(end){finCampo();out.push({line:startLine,original:text.slice(start,end),fields});fields=[];}
+    while(i<text.length){const c=text[i];
+      if(quoted){if(c==='"'){if(text[i+1]==='"'){field+='"';i+=2;continue;}quoted=false;after=true;i++;continue;}
+        if(c==='\r' && text[i+1]==='\n'){field+='\r\n';i+=2;line++;continue;} if(c==='\n'||c==='\r')line++;field+=c;i++;continue;}
+      if(after && c!==',' && c!=='\r' && c!=='\n')throw Error('CSV inválido en línea '+line+': caracteres después de cerrar las comillas.');
+      if(c==='"'){if(!atStart)throw Error('CSV inválido en línea '+line+': comilla dentro de un campo sin entrecomillar.');quoted=true;atStart=false;i++;continue;}
+      if(c===','){finCampo();i++;continue;}
+      if(c==='\r'||c==='\n'){finRegistro(i);if(c==='\r'&&text[i+1]==='\n')i++;i++;line++;start=i;startLine=line;continue;}
+      field+=c;atStart=false;i++;
+    }
+    if(quoted)throw Error('CSV inválido: campo entrecomillado sin cerrar desde la línea '+startLine+'.');
+    if(start<text.length || fields.length || field.length || after)finRegistro(text.length);
+    return out;
+  }
+
   function analyze(game, variant, raw, opciones) {
     const opts = Object.assign({}, OPC_DEF, opciones || {});
-    const lines = String(raw).replace(/\r/g, '').split('\n');
+    const lines = String(raw).split(/\r\n|\r|\n/);
+    const records = opts.formato === 'csv' ? leerCSV(raw) : lines.map((original,i)=>({line:i+1,original}));
     const existing = corpus(game, variant, opts);
     const seen = new Set();
     const valid = [], junk = [], dups = [];
     let blank = 0;
 
-    lines.forEach((line, i) => {
-      let trimmed = line.trim();
+    records.forEach((record) => {
+      const line=record.original, lineno=record.line;
+      const fields=record.fields && record.fields.map(v=>{let t=opts.tildes?v.normalize('NFC').replace(/[ \t]+/g,' ').trim():v.trim();return opts.simbolos?limpiarSimbolos(t):t;});
+      let trimmed = fields ? fields.join(' | ') : (opts.tildes ? line.normalize('NFC').replace(/[ \t]+/g, ' ').trim() : line.trim());
       if (!trimmed) { blank++; return; }
       /* Filtro de símbolos: quita emojis y adornos antes de interpretar la línea. */
       if (opts.simbolos) {
@@ -17378,33 +17414,33 @@ window.addEventListener('DOMContentLoaded', () => {
 
       for (const j of JUNK) {
         if (game === 'ranking' && j.why === 'URL dentro del texto') continue;
-        if (j.re.test(trimmed)) { junk.push({ text: trimmed, why: j.why, line: i + 1 }); return; }
+        if (j.re.test(trimmed)) { junk.push({ text: trimmed, why: j.why, line: lineno }); return; }
       }
-      if (trimmed.length < 4) { junk.push({ text: trimmed, why: 'Demasiado corto', line: i + 1 }); return; }
-      if (trimmed.length > 220) { junk.push({ text: trimmed.slice(0, 90) + '…', why: 'Demasiado largo (párrafo, no ficha)', line: i + 1 }); return; }
+      if (trimmed.length < 4) { junk.push({ text: trimmed, why: 'Demasiado corto', line: lineno }); return; }
+      if (trimmed.length > 220) { junk.push({ text: trimmed.slice(0, 90) + '…', why: 'Demasiado largo (párrafo, no ficha)', line: lineno }); return; }
 
-      const parsed = parseLine(game, trimmed);
-      if (parsed.err) { junk.push({ text: trimmed, why: parsed.err, line: i + 1 }); return; }
+      const parsed = parseLine(game, trimmed, fields);
+      if (parsed.err) { junk.push({ text: trimmed, why: parsed.err, line: lineno }); return; }
 
       const destino = V.__v67.destino(game,variant);
-      if (!destino.validar(parsed.value)) { junk.push({text:trimmed,why:'No cumple el formato completo del juego',line:i+1}); return; }
+      if (!destino.validar(parsed.value)) { junk.push({text:trimmed,why:'No cumple el formato completo del juego',line:lineno}); return; }
       const key = claveSegun(parsed.value, opts);
       const motivo = existing.has(key) ? 'Ya existe en el mazo'
         : (seen.has(key) ? 'Repetida en el texto pegado' : null);
       if (motivo) {
         /* Con «Ignorar duplicadas» activo se apartan y se informan; apagado,
            bloquean la importación hasta que se corrijan. */
-        if (opts.ignorarDups) dups.push({ text: trimmed, why: motivo, line: i + 1 });
-        else junk.push({ text: trimmed, why: motivo + ' · no se ignoran', line: i + 1 });
+        dups.push({ text: trimmed, original:line, why: motivo, line: lineno, bloquea:!opts.ignorarDups });
         return;
       }
       seen.add(key);
-      valid.push({ text: trimmed, value: parsed.value, key, line: i + 1 });
+      valid.push({ text: trimmed, original:line, value: parsed.value, key, line: lineno });
     });
 
     const d = V.__v67.destino(game,variant);
     const revision = V.__v67.analizarImportacion(d.id,d.pool,valid.map(x=>x.value),d.validar);
-    return { valid, junk, dups, blank, similares:revision.similares, total: lines.length };
+    junk.forEach(x=>{const r=records.find(r=>r.line===x.line);x.original=r?r.original:''});
+    return { valid, junk, dups, blank, similares:revision.similares, total: records.length-blank, lineas:lines.length };
   }
 
   /* --------------------------------------------------------------- INSERCIÓN */
@@ -17418,7 +17454,7 @@ window.addEventListener('DOMContentLoaded', () => {
      Lo que se añade son tres opciones con efecto real, arrastre de archivo y
      un registro de acciones; nada de eso es decorativo. */
 
-  const OPC_DEF = { tildes: true, simbolos: true, ignorarDups: true };
+  const OPC_DEF = { tildes: true, simbolos: true, ignorarDups: true, formato:'texto' };
 
   /* Clave de comparación sensible a las tildes, para cuando el usuario apaga
      «Normalizar tildes». Extrae el mismo campo que V.__v67.clave. */
@@ -17433,17 +17469,11 @@ window.addEventListener('DOMContentLoaded', () => {
     return JSON.stringify(String(c).toLowerCase().replace(/\s+/g, ' ').trim());
   }
 
-  function claveSegun(v, opts) {
-    return opts.tildes ? V.__v67.clave(v) : claveExacta(v);
-  }
+  function claveSegun(v, opts) { return V.__v67.clave(v); }
 
   /* Quita emojis, símbolos decorativos, espacios raros y de ancho cero. */
   function limpiarSimbolos(t) {
-    return String(t)
-      .replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE00}-\u{FE0F}\u{200B}-\u{200F}\u{2028}-\u{202E}\u{2B00}-\u{2BFF}]/gu, ' ')
-      .replace(/[\u00A0\u1680\u2000-\u200A\u205F\u3000]/g, ' ')
-      .replace(/[ \t]{2,}/g, ' ')
-      .trim();
+    return String(t).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g, '');
   }
 
   /* Ejemplos válidos por juego: pasan el esquema real, sin inventar campos. */
@@ -17561,269 +17591,105 @@ window.addEventListener('DOMContentLoaded', () => {
     document.head.appendChild(st);
   }
 
+  const CSS_PRO = `
+#v-imp2{color:#15283c;font-family:inherit} #v-imp2 *{box-sizing:border-box}
+#v-imp2 .im-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+#v-imp2 .im-top button{margin-left:auto} #v-imp2 .im-status{font-size:13px;color:#28745f}
+#v-imp2 .im-steps{display:flex;justify-content:space-between;gap:8px;border-bottom:1px solid #deded9;padding:12px 0 18px;margin-bottom:16px}
+#v-imp2 .im-step{display:flex;align-items:center;gap:7px;color:#7a8389;font-weight:700;font-size:13px}
+#v-imp2 .im-step b{display:grid;place-items:center;border-radius:50%;width:28px;height:28px;color:#fff;background:#aab2b4}
+#v-imp2 .im-step.on{color:#16705b} #v-imp2 .im-step.on b{background:#16705b}
+#v-imp2 .im-selects,#v-imp2 .im-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:16px;margin-bottom:16px}
+#v-imp2 label.im-lab{display:block;font-weight:800;font-size:13px;margin-bottom:7px}
+#v-imp2 select,#v-imp2 textarea{font:inherit;color:#182c40;background:#fff;border:1px solid #d7d9d6;border-radius:9px;padding:10px;width:100%}
+#v-imp2 .im-panel{background:#fff;border:1px solid #dfdfd8;border-radius:12px;padding:16px;min-width:0}
+#v-imp2 .im-panel h3{font-size:16px;margin:0 0 12px;color:#15283c}
+#v-imp2 .im-editor{display:flex;height:250px;border:1px dashed #cbd0cd;border-radius:8px;overflow:hidden}
+#v-imp2 .im-lines{overflow:hidden;white-space:pre;text-align:right;flex:0 0 40px;padding:10px 7px;background:#f4f5f2;color:#8c9695;margin:0;font:13px/20px ui-monospace,monospace;user-select:none}
+#v-imp2 textarea{resize:none;border:0;border-radius:0;overflow:auto;white-space:pre;font:13px/20px ui-monospace,monospace;padding:10px;min-width:0}
+#v-imp2 .im-drop{padding:8px 0;color:#387a69;cursor:pointer;font-size:13px}#v-imp2 .im-drop.hot{background:#e1f3eb}
+#v-imp2 .im-opt{display:flex;gap:12px;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #eee}
+#v-imp2 .im-opt small{display:block;font-size:12px;color:#6e7b7e;line-height:1.35;margin-top:3px}
+#v-imp2 .im-opt input{width:20px;height:20px;accent-color:#18745d;flex-shrink:0}
+#v-imp2 .im-counters{display:grid;grid-template-columns:repeat(3,1fr);gap:7px} #v-imp2 .im-count{padding:10px 5px;border:1px solid #e3e5e2;border-radius:8px;text-align:center;font-size:12px}
+#v-imp2 .im-count strong{display:block;font-size:20px;color:#173b38} #v-imp2 .im-note{font-size:12px;color:#607171;line-height:1.4}
+#v-imp2 .im-tabs{display:flex;gap:7px;flex-wrap:wrap;margin:8px 0 12px}#v-imp2 button{font:inherit;cursor:pointer}
+#v-imp2 .im-btn,#v-imp2 .im-tab{border:1px solid #d5dcd8;background:#fff;border-radius:9px;padding:9px 12px;color:#1b3446;font-size:13px}
+#v-imp2 .im-tab.on,#v-imp2 .im-btn.primary{background:#19745e;border-color:#19745e;color:#fff}#v-imp2 button:disabled{opacity:.5;cursor:not-allowed}
+#v-imp2 .im-table-wrap{overflow:auto;max-height:290px}#v-imp2 table{width:100%;border-collapse:collapse;min-width:530px;font-size:13px}
+#v-imp2 th,#v-imp2 td{padding:9px;text-align:left;border-bottom:1px solid #e9ebe8;vertical-align:top;overflow-wrap:anywhere}#v-imp2 th{position:sticky;top:0;background:#fff}
+#v-imp2 .im-badge{display:inline-block;padding:3px 8px;border-radius:99px;background:#e4f2ea;color:#17684e;white-space:nowrap}
+#v-imp2 .im-badge.bad{background:#fcebe8;color:#ad3b35}#v-imp2 .im-badge.dup{background:#fff4dc;color:#9b6813}
+#v-imp2 .im-actions{position:sticky;bottom:0;display:flex;gap:9px;justify-content:flex-end;flex-wrap:wrap;padding:14px 0 3px;background:#f8f7f2;z-index:2}
+#v-imp2 .im-actions span{margin-right:auto;align-self:center;font-size:12px;color:#687977}#v-imp2 [role=alert]{color:#a02d29}
+@media(max-width:700px){#v-imp2 .im-selects,#v-imp2 .im-grid{grid-template-columns:1fr}#v-imp2 .im-steps{gap:4px}#v-imp2 .im-step{font-size:11px}#v-imp2 .im-actions button{flex:1 1 125px}}
+`;
+
   V.importer = {
     analizar: analyze,
+    leerCSV: leerCSV,
     open: function () {
-      inyectarCSS();
-      const state = {
-        game: 'tabu', variant: 'general', result: null, tab: 'valid',
-        fuente: 'Manual', opc: Object.assign({}, OPC_DEF), log: []
-      };
-
-      const nombreJuego = (id) => (GROUPS.flatMap(g => g.items).find(i => i.id === id) || {}).name || id;
-      const marca = () => new Date().toTimeString().slice(0, 8);
-
-      const m = V.modal({
-        title: 'Importación profesional de datos',
-        sub: 'Todos los juegos vigentes · modo y destino explícitos · guardado transaccional',
-        width: 900,
-        body:
-          '<div id="v-imp2">' +
-            '<div class="im-grid">' +
-              '<div>' +
-                '<div class="im-row2">' +
-                  '<div class="im-group"><label class="im-lab" for="im-game">Juego de destino</label>' +
-                    '<select id="im-game">' +
-                      GROUPS.map(g => '<optgroup label="' + esc(g.label) + '">' +
-                        g.items.map(i => '<option value="' + i.id + '">' + esc(i.name) + '</option>').join('') +
-                      '</optgroup>').join('') +
-                    '</select></div>' +
-                  '<div class="im-group"><label class="im-lab">Variante</label>' +
-                    '<div class="im-variants" id="im-variants" role="group" aria-label="Variante"></div></div>' +
-                '</div>' +
-                '<div class="im-group"><label class="im-lab">Formato requerido</label>' +
-                  '<div class="im-banner" id="im-banner"></div></div>' +
-                '<div class="im-group"><label class="im-lab" for="im-text">Datos a importar</label>' +
-                  '<textarea id="im-text" spellcheck="false" placeholder="Pega aquí lo que copiaste…"></textarea></div>' +
-                '<div class="im-drop" id="im-drop" tabindex="0" role="button" aria-label="Cargar archivo">' +
-                  'Arrastra un archivo <b>.csv</b> o <b>.txt</b> · o haz clic para elegirlo' +
-                  '<input type="file" id="im-file" accept=".csv,.txt,text/plain,text/csv" hidden></div>' +
-              '</div>' +
-              '<div class="im-right">' +
-                '<div class="im-opt"><div>Ignorar palabras duplicadas' +
-                  '<small>Desactivado: las duplicadas bloquean la importación</small></div>' +
-                  '<label class="im-sw"><input type="checkbox" id="im-dup" checked aria-label="Ignorar duplicadas"><span class="im-sl"></span></label></div>' +
-                '<div class="im-opt"><div>Normalizar tildes' +
-                  '<small>Compara sin tildes al buscar duplicados; el texto no se altera</small></div>' +
-                  '<label class="im-sw"><input type="checkbox" id="im-tilde" checked aria-label="Normalizar tildes"><span class="im-sl"></span></label></div>' +
-                '<div class="im-opt"><div>Filtrar símbolos no válidos' +
-                  '<small>Quita emojis, adornos y espacios de ancho cero</small></div>' +
-                  '<label class="im-sw"><input type="checkbox" id="im-sym" checked aria-label="Filtrar símbolos"><span class="im-sl"></span></label></div>' +
-                '<div class="im-meta">Fuente de datos detectada: <b id="im-src">Manual</b><br>' +
-                  'Caracteres detectados: <b id="im-chars">0</b></div>' +
-                '<table class="im-log"><thead><tr><th>Acción</th><th>Estado</th><th>Fecha</th></tr></thead>' +
-                  '<tbody id="im-log"></tbody></table>' +
-              '</div>' +
-            '</div>' +
-            '<div class="im-report" id="im-report"></div>' +
-            '<div class="im-footer">' +
-              '<button class="im-btn" type="button" data-im="junk">Ejemplo con basura</button>' +
-              '<button class="im-btn" type="button" data-im="formato">Ejemplo formato</button>' +
-              '<button class="im-btn dark" type="button" data-im="run">Analizar y limpiar</button>' +
-              '<button class="im-btn" type="button" data-im="clear">Vaciar todo</button>' +
-            '</div>' +
-            '<div class="im-ver">importador v1.5.3</div>' +
-          '</div>',
-        onMount: (body, close) => {
-          const $ = (s) => body.querySelector(s);
-          const selGame = $('#im-game'), variants = $('#im-variants'), banner = $('#im-banner');
-          const ta = $('#im-text'), report = $('#im-report'), logBody = $('#im-log');
-          const src = $('#im-src'), chars = $('#im-chars');
-
-          function addLog(accion, estado) {
-            state.log.unshift({ accion, estado, hora: marca() });
-            if (state.log.length > 40) state.log.length = 40;
-            logBody.innerHTML = state.log.slice(0, 8).map(x =>
-              '<tr><td>' + esc(x.accion) + '</td><td class="' +
-              (x.estado === 'Éxito' ? 'ok' : x.estado === 'Aviso' ? 'warn' : 'bad') + '">' +
-              esc(x.estado) + '</td><td>' + esc(x.hora) + '</td></tr>').join('') ||
-              '<tr><td colspan="3" style="color:#8a8177">Sin acciones todavía</td></tr>';
-          }
-
-          function syncChars() { chars.textContent = String(ta.value.length); }
-
-          function syncVariantes() {
-            const opts = VARIANTES[state.game] || [['general', 'Todo público']];
-            state.variant = opts[0][0];
-            variants.innerHTML = opts.map(([v, n]) =>
-              '<button class="im-vbtn' + (v === state.variant ? ' on' : '') + '" type="button" data-var="' + esc(v) + '">' +
-              esc(n) + '</button>').join('');
-            variants.querySelectorAll('[data-var]').forEach(b => b.addEventListener('click', () => {
-              state.variant = b.dataset.var;
-              variants.querySelectorAll('[data-var]').forEach(x => x.classList.toggle('on', x === b));
-              limpiarInforme();
-            }));
-            banner.textContent = GUIDE[state.game] || 'Un elemento por línea.';
-          }
-
-          function limpiarInforme() { state.result = null; report.innerHTML = ''; }
-
-          selGame.addEventListener('change', () => {
-            state.game = selGame.value;
-            limpiarInforme(); syncVariantes();
-            addLog('Destino: ' + nombreJuego(state.game), 'Éxito');
-          });
-          ta.addEventListener('input', () => { limpiarInforme(); syncChars(); if (state.fuente !== 'Manual') { state.fuente = 'Manual'; src.textContent = 'Manual'; } });
-
-          [['#im-dup', 'ignorarDups'], ['#im-tilde', 'tildes'], ['#im-sym', 'simbolos']].forEach(([sel, k]) => {
-            $(sel).addEventListener('change', (e) => {
-              state.opc[k] = e.target.checked;
-              limpiarInforme();
-              addLog('Opción ' + k + ': ' + (e.target.checked ? 'activada' : 'desactivada'), 'Éxito');
-            });
-          });
-
-          /* ---- arrastre y selección de archivo ---- */
-          const drop = $('#im-drop'), fileInput = $('#im-file');
-          const cargar = (file) => {
-            if (!file) return;
-            if (!/\.(csv|txt)$/i.test(file.name)) {
-              V.toast('Solo se aceptan archivos .csv o .txt', 'warn', 2600);
-              addLog('Archivo rechazado: ' + file.name, 'Error');
-              return;
-            }
-            const fr = new FileReader();
-            fr.onload = () => {
-              ta.value = String(fr.result || '');
-              state.fuente = 'Archivo · ' + file.name;
-              src.textContent = state.fuente;
-              syncChars(); limpiarInforme();
-              addLog('Archivo cargado: ' + file.name, 'Éxito');
-              V.toast(file.name + ' cargado · pulsa Analizar y limpiar', 'ok', 2400);
-            };
-            fr.onerror = () => { addLog('Error al leer ' + file.name, 'Error'); V.toast('No se pudo leer el archivo', 'warn'); };
-            fr.readAsText(file);
+      if (!document.getElementById('v-imp-pro-css')) { const style=document.createElement('style');style.id='v-imp-pro-css';style.textContent=CSS_PRO;document.head.appendChild(style); }
+      const state={game:'tabu',variant:'general',result:null,tab:'all',opc:{tildes:true,simbolos:true,ignorarDups:true,formato:'texto'},dirty:false,busy:false,revision:0,similar:false,completed:false};
+      const nombre=id=>(GROUPS.flatMap(g=>g.items).find(i=>i.id===id)||{}).name||id;
+      let editor;
+      const modal=V.modal({
+        title:'Importación de datos',sub:'Carga, limpia y organiza tus datos de forma rápida y segura.',width:1240,
+        beforeClose:()=>!state.dirty||window.confirm('¿Cerrar y perder el borrador de importación?'),
+        body:`<div id="v-imp2">
+          <div class="im-top"><span aria-hidden="true">📄</span><span class="im-status" id="im-status" role="status">Preparado</span><button type="button" class="im-btn" id="im-help">Ayuda</button></div>
+          <div class="im-steps" aria-label="Etapas"><span class="im-step on" data-step="1"><b>1</b> Configurar</span><span class="im-step" data-step="2"><b>2</b> Analizar</span><span class="im-step" data-step="3"><b>3</b> Importar</span></div>
+          <div class="im-selects"><div><label class="im-lab" for="im-game">Juego de destino</label><select id="im-game">${GROUPS.map(g=>'<optgroup label="'+esc(g.label)+'">'+g.items.map(i=>'<option value="'+esc(i.id)+'">'+esc(i.name)+'</option>').join('')+'</optgroup>').join('')}</select></div>
+          <div><label class="im-lab" for="im-variant">Variante</label><select id="im-variant"></select></div></div>
+          <div class="im-grid"><section class="im-panel"><h3>Contenido de entrada</h3><p class="im-note" id="im-banner"></p><label class="im-lab" for="im-format">Formato de entrada</label><select id="im-format"><option value="texto">Texto con el separador del juego</option><option value="csv">CSV estándar (coma; campos entrecomillados)</option></select><div class="im-drop" id="im-drop" tabindex="0" role="button">Arrastra un archivo o <u>selecciona un archivo</u><input type="file" id="im-file" accept=".txt,.csv,text/plain,text/csv" hidden></div>
+          <div class="im-editor"><pre class="im-lines" id="im-lines" aria-hidden="true">1</pre><textarea id="im-text" aria-label="Contenido a importar" spellcheck="false" wrap="off" placeholder="Escribe o pega aquí, una ficha por línea"></textarea></div></section>
+          <aside class="im-panel"><h3>Reglas de limpieza</h3>
+          <label class="im-opt"><span>Ignorar duplicados<small>Si se desactiva, las coincidencias bloquean la importación.</small></span><input id="im-dup" type="checkbox" checked></label>
+          <label class="im-opt"><span>Normalizar texto<small>Unifica Unicode y espacios sin quitar tildes ni ñ.</small></span><input id="im-tilde" type="checkbox" checked></label>
+          <label class="im-opt"><span>Filtrar símbolos no válidos<small>Elimina caracteres de control incompatibles con el formato; conserva símbolos válidos.</small></span><input id="im-sym" type="checkbox" checked></label>
+          <h3 style="margin-top:18px">Resultado del análisis</h3><div class="im-counters"><div class="im-count">Válidas<strong id="im-valid">0</strong></div><div class="im-count">Duplicadas<strong id="im-dups">0</strong></div><div class="im-count">Descartadas<strong id="im-junk">0</strong></div></div><p class="im-note" id="im-totals">Todavía no hay análisis.</p></aside></div>
+          <section class="im-panel" id="im-report"><h3>Revisión de registros</h3><p class="im-note">Analiza el contenido para revisar los registros.</p></section>
+          <div id="im-message" role="alert"></div><div class="im-actions"><span id="im-summary">Configura y analiza los datos.</span><button type="button" class="im-btn" id="im-export" disabled>Exportar informe</button><button type="button" class="im-btn" data-im="clear">Vaciar contenido</button><button type="button" class="im-btn primary" data-im="run" id="im-insert">Analizar datos</button></div>
+        </div>`,
+        onMount:(body,close)=>{
+          const $=q=>body.querySelector(q),text=$('#im-text'),game=$('#im-game'),variant=$('#im-variant'),report=$('#im-report'),status=$('#im-status'),main=$('#im-insert'),lines=$('#im-lines');editor=text;
+          const statusSet=(s,step)=>{status.textContent=s;body.querySelectorAll('[data-step]').forEach(e=>e.classList.toggle('on',Number(e.dataset.step)===step));};
+          const syncLines=()=>{const n=text.value.split(/\r\n|\r|\n/).length;lines.textContent=Array.from({length:n},(_,i)=>i+1).join('\n');lines.scrollTop=text.scrollTop;};
+          const syncVariants=()=>{variant.innerHTML=(VARIANTES[state.game]||[]).map(([v,n])=>'<option value="'+esc(v)+'">'+esc(n)+'</option>').join('');state.variant=variant.value;$('#im-banner').textContent=(GUIDE[state.game]||'Una entrada por línea.')+(state.opc.formato==='csv'?' CSV: una columna por campo; en Tabú y Personaje una columna por palabra o pista, y en Ranking una columna por elemento=valor y la URL al final.':'');};
+          const invalidate=()=>{state.revision++;state.result=null;state.similar=false;state.completed=false;state.dirty=!!text.value;$('#im-message').textContent='';report.innerHTML='<h3>Revisión de registros</h3><p class="im-note">El análisis está pendiente o desactualizado.</p>';$('#im-valid').textContent='0';$('#im-dups').textContent='0';$('#im-junk').textContent='0';$('#im-totals').textContent='Todavía no hay análisis vigente.';$('#im-export').disabled=true;main.disabled=false;main.textContent='Analizar datos';$('#im-summary').textContent='Configura y analiza los datos.';statusSet('Preparado',1);};
+          const render=()=>{const r=state.result;if(!r)return;
+            const lista=[...r.valid.map(x=>({...x,estado:'Válida'})),...r.junk.map(x=>({...x,estado:'Descartada'})),...r.dups.map(x=>({...x,estado:'Duplicada'}))].sort((a,b)=>a.line-b.line);
+            const f={all:lista,valid:lista.filter(x=>x.estado==='Válida'),junk:lista.filter(x=>x.estado==='Descartada'),dups:lista.filter(x=>x.estado==='Duplicada')};
+            $('#im-valid').textContent=r.valid.length;$('#im-dups').textContent=r.dups.length;$('#im-junk').textContent=r.junk.length;$('#im-totals').textContent=r.total+' registros candidatos · '+r.blank+' líneas vacías ignoradas.';
+            report.innerHTML='<h3>Revisión de registros</h3><p class="im-note">'+r.valid.length+' válidas · '+r.dups.length+' duplicadas · '+r.junk.length+' descartadas</p><div class="im-tabs">'+[['all','Todas'],['valid','Válidas'],['junk','Descartadas'],['dups','Duplicadas']].map(([id,n])=>'<button type="button" class="im-tab '+(state.tab===id?'on':'')+'" data-tab="'+id+'">'+n+' ('+f[id].length+')</button>').join('')+'</div><div class="im-table-wrap"><table><thead><tr><th>Línea</th><th>Contenido</th><th>Estado</th><th>Detalle</th></tr></thead><tbody>'+(f[state.tab].map(x=>'<tr><td>'+x.line+'</td><td>'+esc(x.text)+'</td><td><span class="im-badge '+(x.estado==='Descartada'?'bad':x.estado==='Duplicada'?'dup':'')+'">'+x.estado+'</span></td><td><details><summary>'+esc(x.why||'Lista para importar')+'</summary><p>Original: '+esc(x.original||x.text)+'</p><p>Procesado: '+esc(x.text)+'</p></details></td></tr>').join('')||'<tr><td colspan="4">Sin registros en este filtro.</td></tr>')+'</tbody></table></div>'+(r.similares.length?'<p class="im-note">Hay '+r.similares.length+' posibles coincidencias cercanas. Revísalas antes de importar.</p><ul>'+r.similares.map(x=>'<li><strong>Línea '+r.valid[x.indice-1].line+':</strong> '+esc(typeof x.entrada==='string'?x.entrada:JSON.stringify(x.entrada))+'<br>Similar a: '+esc(typeof x.parecida==='string'?x.parecida:JSON.stringify(x.parecida))+'</li>').join('')+'</ul><label><input type="checkbox" id="im-rev" '+(state.similar?'checked':'')+'> He revisado las coincidencias y son distintas.</label>':'');
+            report.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{state.tab=b.dataset.tab;render();});
+            const rev=$('#im-rev');if(rev)rev.onchange=()=>{state.similar=rev.checked;boton();};
+            $('#im-export').disabled=false;boton();
           };
-          drop.addEventListener('click', () => fileInput.click());
-          drop.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); } });
-          fileInput.addEventListener('change', () => { cargar(fileInput.files && fileInput.files[0]); fileInput.value = ''; });
-          ['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add('hot'); }));
-          ['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.remove('hot'); }));
-          drop.addEventListener('drop', (e) => cargar(e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]));
-
-          /* ---- informe ---- */
-          function renderReport() {
-            const r = state.result;
-            if (!r) { report.innerHTML = ''; return; }
-            const list = state.tab === 'valid' ? r.valid.map(x => ({ text: x.text, line: x.line, why: 'Lista para insertar' }))
-              : state.tab === 'junk' ? r.junk : r.dups;
-
-            report.innerHTML =
-              '<div class="im-sum"><strong>Informe de limpieza</strong><span>' + r.total + ' líneas leídas · <b>' +
-                r.valid.length + '</b> válidas · ' + r.junk.length + ' descartadas · ' + r.dups.length +
-                ' duplicadas · ' + r.blank + ' en blanco</span></div>' +
-              '<div class="im-tabs">' +
-                [['valid', 'Válidas', r.valid.length], ['junk', 'Descartadas', r.junk.length], ['dups', 'Duplicadas', r.dups.length]]
-                  .map(([id, n, c]) => '<button class="im-tab' + (state.tab === id ? ' on' : '') + '" type="button" data-tab="' + id + '">' +
-                    n + ' (' + c + ')</button>').join('') +
-              '</div>' +
-              '<div class="im-list">' + (list.length ? list.map(x =>
-                '<div class="im-item"><strong>' + esc(x.text) + '</strong><span>línea ' + x.line + ' · ' + esc(x.why) + '</span></div>'
-              ).join('') : '<div class="im-item" style="color:#8a8177">Nada en esta pestaña.</div>') + '</div>' +
-              '<div class="im-actions">' +
-                '<button class="im-btn dark" type="button" id="im-insert"' +
-                  (r.valid.length && !r.junk.length ? '' : ' disabled') + '>Insertar ' + r.valid.length + ' en el mazo</button>' +
-                '<button class="im-btn" type="button" id="im-copy">Copiar informe</button>' +
-              '</div>' +
-              (r.junk.length ? '<p class="im-note">Hay ' + r.junk.length +
-                ' líneas inválidas: se corrige el texto y se vuelve a analizar. No se inserta nada a medias.</p>' : '');
-
-            report.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => { state.tab = b.dataset.tab; renderReport(); }));
-
-            if (r.similares.length) {
-              const box = document.createElement('div');
-              box.className = 'im-sum';
-              box.style.cssText = 'margin-top:10px;flex-direction:column;align-items:flex-start;gap:6px';
-              box.innerHTML = '<strong>Posibles duplicados cercanos: ' + r.similares.length + '</strong>' +
-                r.similares.slice(0, 4).map(x => '<span style="font-size:.74rem">«' + esc(V.__v67.clave(x.entrada)) +
-                  '» ↔ «' + esc(V.__v67.clave(x.parecida)) + '»</span>').join('') +
-                '<label style="font-size:.76rem;display:flex;gap:6px;align-items:center">' +
-                '<input type="checkbox" id="im-rev"> He revisado las coincidencias y confirmo que son contenidos distintos</label>';
-              report.appendChild(box);
-              box.querySelector('#im-rev').addEventListener('change', (e) => {
-                const b = report.querySelector('#im-insert');
-                if (b) b.disabled = !e.target.checked || !!r.junk.length;
-                addLog('Revisión de parecidos: ' + (e.target.checked ? 'confirmada' : 'retirada'), 'Éxito');
-              });
-              const b = report.querySelector('#im-insert');
-              if (b) b.disabled = true;
-            }
-
-            const ins = report.querySelector('#im-insert');
-            if (ins) ins.addEventListener('click', () => {
-              if (!state.result || state.result.junk.length) {
-                addLog('Insertar bloqueado', 'Error');
-                V.toast('Corrige las líneas inválidas antes de importar. No se ha cambiado nada.', 'warn', 3200);
-                return;
-              }
-              let n = 0;
-              try { n = insert(state.game, state.variant, state.result.valid, !!(report.querySelector('#im-rev') || {}).checked); }
-              catch (e) { addLog('Insertar fallido', 'Error'); V.toast(e.message, 'warn', 6000); return; }
-              const pedidos = state.result.valid.length;
-              if (n < pedidos) V.toast(n + ' añadidos · ' + (pedidos - n) + ' ya existían en el mazo', 'info', 3200);
-              else V.toast(n + ' elementos añadidos a ' + nombreJuego(state.game), 'ok', 2600);
-              addLog('Insertar ' + n + '/' + pedidos + ' en ' + nombreJuego(state.game), n ? 'Éxito' : 'Aviso');
-              if (['precio', 'probable', 'yonunca', 'cadena', 'dial'].includes(state.game)) {
-                V.toast('Se aplican al empezar la siguiente ronda', 'info', 2400);
-              }
-              close();
-            });
-
-            const cp = report.querySelector('#im-copy');
-            if (cp) cp.addEventListener('click', () => {
-              const txt = 'Informe de limpieza · ' + state.game + ' (' + state.variant + ')\n' +
-                'Total: ' + r.total + ' · válidas: ' + r.valid.length + ' · descartadas: ' + r.junk.length +
-                ' · duplicadas: ' + r.dups.length + ' · en blanco: ' + r.blank + '\n\n' +
-                'DESCARTADAS:\n' + (r.junk.map(x => '· ' + x.text + '  →  ' + x.why).join('\n') || '(ninguna)') + '\n\n' +
-                'DUPLICADAS:\n' + (r.dups.map(x => '· ' + x.text + '  →  ' + x.why).join('\n') || '(ninguna)');
-              try { navigator.clipboard.writeText(txt); V.toast('Informe copiado', 'ok', 1600); addLog('Copiar informe', 'Éxito'); }
-              catch (e) { V.toast('No se pudo copiar', 'warn'); addLog('Copiar informe', 'Error'); }
-            });
-          }
-
-          /* ---- acciones del pie ---- */
-          body.querySelectorAll('[data-im]').forEach(btn => btn.addEventListener('click', () => {
-            const act = btn.dataset.im;
-            if (act === 'junk') {
-              ta.value = EJEMPLO_BASURA.join('\n');
-              state.fuente = 'Manual · ejemplo con basura'; src.textContent = state.fuente;
-              syncChars(); limpiarInforme(); addLog('Ejemplo con basura', 'Éxito');
-              V.toast('Ejemplo cargado: pulsa Analizar y limpiar', 'info', 2000);
-            }
-            if (act === 'formato') {
-              const ej = EJEMPLO_FORMATO[state.game] || 'Una frase de ejemplo por línea';
-              ta.value = ej;
-              state.fuente = 'Manual · ejemplo de formato'; src.textContent = state.fuente;
-              syncChars(); limpiarInforme(); addLog('Ejemplo de formato: ' + nombreJuego(state.game), 'Éxito');
-              V.toast('Formato de ' + nombreJuego(state.game) + ' cargado', 'info', 2200);
-            }
-            if (act === 'clear') {
-              ta.value = ''; state.fuente = 'Manual'; src.textContent = 'Manual';
-              syncChars(); limpiarInforme(); addLog('Vaciar', 'Éxito');
-            }
-            if (act === 'run') {
-              const raw = ta.value;
-              if (!raw || raw.trim().length < 4) {
-                addLog('Analizar sin datos', 'Aviso');
-                V.toast('Pega algo de texto primero', 'warn'); return;
-              }
-              limpiarInforme();
-              try { state.result = analyze(state.game, state.variant, raw, state.opc); }
-              catch (e) { addLog('Analizar fallido', 'Error'); V.toast(e.message, 'warn', 6000); return; }
-              state.tab = state.result.valid.length ? 'valid' : (state.result.junk.length ? 'junk' : 'dups');
-              renderReport();
-              const r = state.result;
-              addLog('Analizar: ' + r.valid.length + ' válidas · ' + r.junk.length + ' descartadas', r.valid.length ? 'Éxito' : 'Aviso');
-              V.toast(r.valid.length + ' válidas · ' + r.junk.length + ' descartadas', 'ok', 2200);
-            }
-          }));
-
-          /* estado inicial */
-          selGame.value = state.game;
-          syncVariantes(); syncChars(); addLog('Importador abierto', 'Éxito');
+          const boton=()=>{const r=state.result;if(!r||state.completed){main.textContent='Analizar datos';main.disabled=state.busy;return;}
+            const bloqueado=r.dups.some(x=>x.bloquea),similares=r.similares.length&&!state.similar;
+            main.textContent='Importar '+r.valid.length+' registros válidos';main.disabled=state.busy||!r.valid.length||bloqueado||similares;
+            $('#im-summary').textContent=bloqueado?'Las duplicadas bloquean la importación.':similares?'Revisa las coincidencias cercanas.':!r.valid.length?'No hay registros importables.':r.valid.length+' registros preparados para importar.';
+          };
+          game.value=state.game;syncVariants();syncLines();
+          game.onchange=()=>{state.game=game.value;syncVariants();invalidate();};variant.onchange=()=>{state.variant=variant.value;invalidate();};$('#im-format').onchange=e=>{state.opc.formato=e.target.value;syncVariants();invalidate();};
+          text.addEventListener('input',()=>{syncLines();invalidate();});text.addEventListener('scroll',()=>{lines.scrollTop=text.scrollTop;});
+          [['#im-dup','ignorarDups'],['#im-tilde','tildes'],['#im-sym','simbolos']].forEach(([sel,k])=>$(sel).onchange=e=>{state.opc[k]=e.target.checked;invalidate();});
+          $('#im-help').onclick=()=>{window.alert('Destino: '+nombre(state.game)+' · '+variant.options[variant.selectedIndex].text+'\n\n'+$('#im-banner').textContent+'\n\nTexto: una ficha por línea, con el separador indicado. CSV: coma como delimitador, comillas dobles para campos con comas, comillas o saltos de línea; una columna por campo del juego. En Tabú y Personaje cada palabra o pista va en su propia columna; en Ranking cada elemento=valor va en una columna y la URL al final. La carga no importa los datos. El banco rechaza duplicados; si se desactiva Ignorar duplicados, debes corregirlos.');};
+          const file=$('#im-file'),drop=$('#im-drop');
+          const cargar=async f=>{if(!f)return;if(!/\.(txt|csv)$/i.test(f.name)){statusSet('Error',1);$('#im-message').textContent='Solo se admiten archivos TXT o CSV de texto.';return;}const rev=++state.revision;statusSet('Leyendo archivo',1);try{const valor=await f.text();if(rev!==state.revision)return;if(!valor.trim())throw Error('El archivo está vacío.');text.value=valor;state.opc.formato=/\.csv$/i.test(f.name)?'csv':'texto';$('#im-format').value=state.opc.formato;syncVariants();syncLines();invalidate();}catch(e){statusSet('Error',1);$('#im-message').textContent='No se pudo cargar el archivo: '+e.message;}};
+          drop.onclick=()=>file.click();drop.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();file.click();}};file.onchange=()=>{cargar(file.files[0]);file.value='';};
+          ['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('hot');}));['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('hot');}));drop.addEventListener('drop',e=>cargar(e.dataTransfer.files[0]));
+          body.querySelector('[data-im="clear"]').onclick=()=>{if(text.value&&!window.confirm('¿Vaciar el borrador? Los bancos guardados no se modificarán.'))return;text.value='';syncLines();invalidate();};
+          $('#im-export').onclick=()=>{if(!state.result)return;const r=state.result;const informe={fecha:new Date().toISOString(),juego:state.game,variante:state.variant,reglas:state.opc,totales:{candidatos:r.total,validas:r.valid.length,duplicadas:r.dups.length,descartadas:r.junk.length,ignoradas:r.blank},registros:[...r.valid.map(x=>({...x,estado:'válida'})),...r.dups.map(x=>({...x,estado:'duplicada'})),...r.junk.map(x=>({...x,estado:'descartada'}))].sort((a,b)=>a.line-b.line)};V.download('informe-importacion.json',JSON.stringify(informe,null,2),'application/json;charset=utf-8');};
+          main.onclick=(event)=>{if(event.detail>1||state.busy)return;$('#im-message').textContent='';if(!state.result||state.completed){if(!text.value.trim()){$('#im-message').textContent='Introduce datos antes de analizar.';return;}state.busy=true;boton();statusSet('Analizando',2);const rev=state.revision;setTimeout(()=>{try{const r=analyze(state.game,state.variant,text.value,state.opc);if(rev!==state.revision)return;state.result=r;state.completed=false;state.tab='all';statusSet('Listo para importar',2);render();}catch(e){statusSet('Error',2);$('#im-message').textContent=e.message;}finally{state.busy=false;boton();}},0);return;}
+            state.busy=true;boton();statusSet('Importando',3);try{const anterior=state.result,actual=analyze(state.game,state.variant,text.value,state.opc);if(actual.valid.length!==anterior.valid.length||actual.dups.length!==anterior.dups.length||actual.valid.some((x,i)=>x.key!==anterior.valid[i].key)||JSON.stringify(actual.similares)!==JSON.stringify(anterior.similares)){state.result=null;state.similar=false;statusSet('Preparado',1);throw Error('El banco cambió desde el análisis. Analiza de nuevo.');}
+              const d=V.__v67.destino(state.game,state.variant),antes=V.__v67.importados(d.id).length;const n=insert(state.game,state.variant,actual.valid,state.similar);const guardado=JSON.parse(localStorage.getItem('sintonia:bolsa:'+d.id)||'null');if(!guardado||!Array.isArray(guardado.importados)||guardado.importados.length!==antes+n)throw Error('No se pudo verificar la escritura. Revisa el banco antes de reintentar.');
+              state.dirty=false;state.completed=true;statusSet('Importación completada',3);$('#im-summary').textContent='Se guardaron '+n+' registros en '+nombre(state.game)+'.';report.insertAdjacentHTML('afterbegin','<p>Se guardaron '+n+' registros.</p>');main.textContent='Analizar datos';$('#im-export').disabled=false;
+            }catch(e){statusSet('Error',2);$('#im-message').textContent=e.message;}finally{state.busy=false;boton();}}
         }
       });
-      return m;
+      return modal;
     }
   };
 
@@ -18458,21 +18324,34 @@ window.addEventListener('DOMContentLoaded', () => {
         '<div class="vr-big-text" style="font-size:clamp(18px,2.2vw,25px)">' + esc(q.q) + '</div>' +
         '<div class="v-col v-mt2" style="gap:8px">' + q.o.map((o, k) => {
           const cls = (T.resolved && k === q.a) ? ' btn-teal-filled' : '';
-          return '<div class="btn-action' + cls + '" data-opt="' + k + '">' +
-            String.fromCharCode(65 + k) + '. ' + esc(o) + '</div>';
+          const individual = V.settings.gameMode === 'solo';
+          const oculto = individual && ocultosDe(0).includes(k);
+          const tag = individual ? 'button' : 'div';
+          return '<' + tag + ' class="btn-action' + cls + '" data-opt="' + k + '"' +
+            (individual ? ' type="button"' + (!T.open || oculto ? ' disabled' : '') : '') + '>' +
+            String.fromCharCode(65 + k) + '. ' + (oculto ? 'Opción descartada' : esc(o)) + '</' + tag + '>';
         }).join('') + '</div>' +
         (T.resolved ? '<p class="v-small" role="status">Respuesta correcta: <b>' + esc(q.o[q.a]) + '</b> · ' + (T.winner == null ? 'Sin ganador' : 'Acertó ' + esc((s.teams[T.winner] || {}).name || 'Jugador')) + '. Siguiente pregunta en 5 segundos.</p>' : '') +
         '<div class="v-triv-wild">' +
-          '<span class="w">Comodines de cada jugador en su teléfono: 2× 50/50 · 1× saltar</span>' +
+          (V.settings.gameMode==='solo' ? '<button class="btn-action" data-solo-wild="w50"'+(!T.open?' disabled':'')+'>50/50 ('+wildDe(0).w50+')</button><button class="btn-action" data-solo-wild="skip"'+(!T.open?' disabled':'')+'>Saltar con acierto ('+wildDe(0).skip+')</button>' : '<span class="w">Comodines de cada jugador en su teléfono: 2× 50/50 · 1× saltar</span>') +
         '</div>' +
         '<div class="v-row v-mt3" style="gap:8px;flex-wrap:wrap">' +
           (T.open ? '<button class="btn-action" data-wild="skip">Saltar pregunta (PC)</button>' : '') +
           (T.open ? '<button class="btn-action" data-close-puls>Cerrar pulsador</button>' : '') +
         '</div>' +
-        renderTrivPanel(s) +
+        (V.settings.gameMode==='solo' ? '' : renderTrivPanel(s)) +
       '</div>';
 
     pintarReloj();
+    if (V.settings.gameMode==='solo') {
+      box.querySelectorAll('[data-opt]').forEach(b=>b.addEventListener('click',()=>{
+        const respuesta=V.triviaAnswer(0,Number(b.dataset.opt));
+        if(respuesta && respuesta.t==='trivok' && !respuesta.right) resolverTrivia(null,'Respuesta incorrecta');
+      }));
+      box.querySelectorAll('[data-solo-wild]').forEach(b=>b.addEventListener('click',()=>{
+        const respuesta=V.triviaWildcard(0,b.dataset.soloWild);if(!respuesta.ok)V.toast(respuesta.reason,'warn');
+      }));
+    }
 
     box.querySelectorAll('[data-wild]').forEach(b => b.addEventListener('click', () => {
       const w = b.dataset.wild;
@@ -20930,18 +20809,26 @@ window.addEventListener('DOMContentLoaded', () => {
         '<div class="rm-precio-real"><small>Precio real</small><b>' + esc(p.realTexto) + '</b>' +
           (p.categoria ? '<span class="rm-precio-cat">' + esc(p.categoria) + '</span>' : '') + '</div>' +
         '<div class="rm-precio-doc">' + (p.documentado ? 'Referencia del proyecto' + (p.fuente ? ': ' + esc(p.fuente) : '') : 'Hipotético · sin fuente verificada') + '</div>' +
-        '<div class="rm-precio-escala">' +
-          '<span class="real" style="left:' + Math.max(0, Math.min(100, p.realPct)) + '%"></span>' +
-          p.filas.map(f => '<span class="m' + (f.gana ? ' win' : '') + '" style="left:' + Math.max(0, Math.min(100, f.pct)) + '%"></span>').join('') +
-        '</div>' +
+        V.precioGrafico(p.real, p.filas.map(f => ({name:f.name,val:f.val}))) +
         p.filas.map(f => '<div class="rm-precio-fila' + (f.gana ? ' win' : '') + '">' +
-          '<span>' + esc(f.name) + '</span><span>' + esc(f.texto) + '</span>' +
+          '<span>' + (p.filas.indexOf(f)+1) + '. ' + esc(f.name) + '</span><span>' + esc(f.texto) + '</span>' +
           (f.gana ? '<em>' + (p.deshecho ? 'deshecho' : p.pendiente ? 'pendiente' : p.sinPuntos ? 'empate' : '+' + esc(V.formatScore(p.puntos))) + '</em>' : (f.pasado ? '<em class="over">se pasó</em>' : '')) + '</div>').join('') +
         (p.ganador ? '<div class="rm-precio-win">' + (p.empate ? 'Empate: ' : 'Gana ') + esc(p.ganador) + (p.deshecho ? ' · reparto deshecho' : p.pendiente ? ' · puntuación pendiente' : p.sinPuntos ? ' · sin puntos' : ' · ' + esc(V.formatScore(p.puntos)) + ' puntos cada uno') + (p.exacto ? ' · ¡clavado!' : '') + '</div>'
           : '<div class="rm-precio-win">Ronda sin puntos</div>') +
         '</div>';
     }
 
+    if (Array.isArray(scr.pistasPersonaje) && scr.pistasPersonaje.length) {
+      html += '<div class="rm-pistas-personaje"><b>Pistas publicadas</b><ol>' +
+        scr.pistasPersonaje.map(p => '<li>' + esc(p) + '</li>').join('') + '</ol></div>';
+    }
+    if (scr.rankingResultado) {
+      const rr = scr.rankingResultado;
+      html += '<div class="rm-ranking-resultado"><b>Orden correcto</b><ol>' +
+        rr.correcto.map(x => '<li>' + esc(x) + '</li>').join('') + '</ol>' +
+        (rr.propio.length ? '<b>Tu respuesta</b><ol>' + rr.propio.map(x => '<li>' + esc(x) + '</li>').join('') + '</ol>' : '<p>No enviaste una respuesta en esta ronda.</p>') +
+        '<p>Puntos: ' + esc(V.formatScore(rr.puntos)) + '</p></div>';
+    }
     if (scr.personaje) {
       const pp = scr.personaje;
       const enviado = !!pp.texto;
@@ -22516,7 +22403,7 @@ window.addEventListener('DOMContentLoaded', () => {
     if (!V.settings.onboarded.__hub) {
       setTimeout(() => {
         V.settings.onboarded.__hub = true; V.saveSettings();
-        V.toast('Bienvenido. Todo se guarda solo y funciona sin internet.', 'ok', 4200);
+        V.toast('Bienvenido a Sintonía. El modo con mandos necesita conexión.', 'ok', 4200);
       }, 2800);
     }
     console.log('%cSintonía v14', 'background:#1C1917;color:#E8C36A;padding:2px 8px;border-radius:4px', 'capa de producto lista');
@@ -27952,7 +27839,7 @@ var qrcode = function() {
   if (reduced && MODE === 'epic') MODE = 'def';
 
   /* Tiempo en pantalla: suficiente para que se disfrute, corto para no estorbar. */
-  var MIN_MS = sinArranque ? 0 : (isRemote ? 2000 : (isSala ? 2600 : 3500));
+  var MIN_MS = sinArranque ? 0 : (reduced || MODE === 'min' ? 150 : 700);
   var HARD_MS = MIN_MS + 1900;
 
   var root = document.documentElement;
@@ -29055,7 +28942,7 @@ var qrcode = function() {
       zona: 'Acá se ven las preguntas, las respuestas y el personaje que hay que descubrir.'
     },
     precio: {
-      reglas: 'Cada jugador estima desde su teléfono. Por defecto gana el más cercano: 1 punto, o 2 si acierta exactamente. Si hay empate, por defecto nadie puntúa.',
+      reglas: 'Puntúa la estimación más cercana: exacta 5; hasta 10 % de error 3; hasta 20 % 2; hasta 30 % 1. Si hay empate, por defecto nadie puntúa.',
       zona: 'El botón resaltado «El más cercano» cambia a «Sin pasarse» al tocarlo. El botón de empate permite repartir los puntos entre empatados.'
     }
   };
@@ -29095,7 +28982,7 @@ var qrcode = function() {
     if (!d) return TOUR_HUB;
     return [
       { sel: heroDe, kicker: 'Cómo se juega', titulo: nombreJuego(id) || 'Este juego', texto: d.reglas },
-      { sel: '.game-teams-strip', kicker: 'El marcador', titulo: 'Quién va ganando', texto: 'Esta franja es el marcador: los equipos, el turno y los puntos de cada uno. Tocá «Equipos» arriba para cambiar nombres y colores.' },
+      { sel: '.sidebar-scoreboard', kicker: 'El marcador', titulo: 'Quién va ganando', texto: 'Esta franja es el marcador: los equipos, el turno y los puntos de cada uno. Tocá «Equipos» arriba para cambiar nombres y colores.' },
       { sel: zonaDe, kicker: 'La mesa', titulo: 'Acá se juega', texto: d.zona },
       { sel: cabeceraDe, kicker: 'Los mandos', titulo: 'Equipos, ajustes y tutorial', texto: 'Arriba están Equipos, Ajustes y este botón de Tutorial, por si querés volver a ver esto en cualquier momento.' }
     ];
@@ -33612,15 +33499,13 @@ window.__PRECIO_DOC = [{"q": "Un litro de gasolina especial", "a": 6.96, "f": "D
 
   function aplicar(d) {
     if (!esMando()) return;
-    var antes = T.on + '|' + T.mio + '|' + T.quien + '|' + T.serial;
+    var serialAnterior = T.serial;
     T.serial = d.serial;
     T.on = !!d.on;
     T.mio = !!d.mio;
     T.quien = String(d.quien || '');
     if (d.on && d.item) T.item = String(d.item);
-    if (d.on && (!d.mio || antes !== T.on + '|' + T.mio + '|' + T.quien + '|' + T.serial)) {
-      if (d.mio) { T.buf = ''; T.enviado = false; T.esperando=false; } // teclado limpio en cada turno
-    }
+    if (d.on && d.mio && serialAnterior !== d.serial) { T.buf = ''; T.enviado = false; T.esperando=false; } // solo cambia al iniciar otro turno, no durante la reconexión
     if (d.on && d.mio && d.hecho) { T.enviado=true; T.esperando=false; }
     if (!d.on) { T.buf = ''; T.enviado = false; T.esperando=false; }
     pintar();
@@ -33681,14 +33566,17 @@ window.__PRECIO_DOC = [{"q": "Un litro de gasolina especial", "a": 6.96, "f": "D
 .v75-doc.ok{background:#EEF4FF;border-color:#C9DBF5;color:#2F5FA8}
 .v75-nivel{font-size:11.5px;color:#9A8F7D}
 .v75-fuente{margin:2px 0 0;line-height:1.4}
-.v75-escala{position:relative;height:74px;margin:16px 0 6px}
-.v75-riel{position:absolute;left:0;right:0;top:30px;height:6px;border-radius:4px;background:#EFE7D8}
-.v75-real{position:absolute;top:16px;transform:translateX(-50%);width:3px;height:32px;background:#1E7A4C;border-radius:2px}
-.v75-real em{position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-style:normal;font-size:10px;font-weight:900;color:#1E7A4C}
-.v75-marca{position:absolute;top:22px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:2px}
-.v75-marca i{width:11px;height:11px;border-radius:50%;background:#8A6318;border:2px solid #fff;box-shadow:0 0 0 1px #E0D3B8}
-.v75-marca b{font-size:9.5px;font-weight:800;color:#6B6259;white-space:nowrap;max-width:72px;overflow:hidden;text-overflow:ellipsis}
-.v75-pie{position:absolute;left:0;right:0;top:44px;display:flex;justify-content:space-between;font-size:10px;color:#9A8F7D}
+.v75-escala{position:relative;height:100px;margin:22px 0 8px;overflow:visible;color:#554d40}
+.v75-riel{position:absolute;left:7%;right:7%;top:48px;height:5px;border-radius:4px;background:#d9d2c5}
+.v75-tick{position:absolute;top:47px;transform:translateX(-50%);text-align:center}
+.v75-menor{position:absolute;top:49px;height:7px;width:1px;background:#a99e8f}
+.v75-tick i{display:block;width:2px;height:12px;background:#8c8274;margin:auto}
+.v75-tick b{display:block;font-size:10px;font-weight:700;white-space:nowrap;margin-top:3px}
+.v75-real{position:absolute;top:37px;transform:translateX(-50%);width:3px;height:29px;background:#1e7a4c;border-radius:2px}
+.v75-real em{position:absolute;top:31px;left:50%;transform:translateX(-50%);font-style:normal;font-size:10px;font-weight:900;color:#1e7a4c}
+.v75-punto{position:absolute;top:43px;transform:translateX(-50%);width:11px;height:11px;background:#b8862f;border:2px solid #fff;border-radius:50%;box-shadow:0 0 0 1px #b8862f}
+.v75-grupo{position:absolute;top:11px;transform:translateX(-50%);display:block;max-width:72px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:2px 5px;border:1px solid #d3b675;border-radius:8px;background:#fff3d2;color:#684b12;font-size:10px;font-weight:800;transition:left .25s ease}
+.v75-grupo:after{content:'';position:absolute;left:50%;top:100%;height:10px;border-left:1px solid #a68131}
 html.v-spicy .v75-riel{background:#3A2233}html.v-spicy .v75-marca b{color:#D9C3D2}
 </style>
 <script id="v37-dial-fiable">
@@ -34312,6 +34200,21 @@ html.v-spicy .v75-riel{background:#3A2233}html.v-spicy .v75-marca b{color:#D9C3D
 })();
 
 </script>
+<style id="v40-sala-previa-css">
+body.v40-solo #hub-view .hub-card:is([data-game="dial"],[data-game="tabu"],[data-game="probable"],[data-game="impostor"]){filter:grayscale(1);opacity:.72}
+body.v40-solo #hub-view .hub-card:is([data-game="dial"],[data-game="tabu"],[data-game="probable"],[data-game="impostor"])::after{content:'Necesita más jugadores';display:block;margin-top:8px;font-size:11px;font-weight:800;color:#504e49}
+.v40-necesita{padding:18px;border-radius:16px;background:#fffae9;border:1px solid #e9ca80;box-shadow:0 0 0 4px rgba(232,195,106,.18);color:#342c20;line-height:1.5}
+.v40-necesita b{display:block;font-size:17px;margin-bottom:6px}.v40-necesita p{margin:0 0 12px}
+#v40-sala-previa{position:fixed;inset:0;z-index:5000;overflow:auto;background:#f7f5ef;color:#102943;padding:clamp(12px,2.5vw,30px)}
+#v40-sala-previa .v40-sala-inner{max-width:1500px;margin:auto}
+#v40-sala-previa header{display:flex;align-items:center;justify-content:space-between;gap:14px;background:#fffdfa;border:1px solid #e6e2d8;border-radius:15px;padding:16px 20px;margin-bottom:14px}
+#v40-sala-previa h1{font-size:clamp(21px,3vw,30px);margin:3px 0;color:#102943}#v40-sala-previa p{margin:0;color:#607080;font-size:13px}#v40-sala-previa small{color:#208879;font-weight:800;letter-spacing:.13em}
+#v40-sala-previa button{font:inherit;font-weight:800;cursor:pointer;border:1px solid #cfd9d9;background:#fff;border-radius:10px;padding:10px 15px;color:#173c4b}
+#v40-local-form{background:#fffdfa;border:1px solid #e6e2d8;border-radius:15px;padding:15px 20px;margin-bottom:14px}#v40-local-form[hidden]{display:none}#v40-local-form label{display:block;font-weight:800;margin-bottom:8px}#v40-local-form div{display:flex;gap:8px}#v40-local-nombre{min-width:0;flex:1;font:inherit;padding:10px;border:1px solid #cbd4d0;border-radius:9px}#v40-local-parejas{background:#fffdfa;border:1px solid #e6e2d8;border-radius:15px;padding:14px 20px;margin-bottom:14px}#v40-local-parejas[hidden]{display:none}#v40-local-parejas label{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-top:8px}#v40-local-parejas select{font:inherit;padding:6px;border:1px solid #cbd4d0;border-radius:8px}
+#v40-sala-previa #v44-espera{padding:18px;margin:0;background:#fffdfa}#v40-sala-previa .s51-grid{grid-template-columns:minmax(210px,1fr) minmax(0,2fr)}#v40-sala-previa .s51-players{min-height:260px;background:#fafaf7;border:1px solid #e6e2d8;padding:14px;border-radius:12px}
+#v40-sala-previa footer{position:sticky;bottom:0;z-index:2;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 14px;background:#f7f5ef;border-top:1px solid #e3ded2;color:#607080;font-size:13px}#v40-sala-previa #v40-sala-jugar{background:#198b78;color:white;border:0;padding:14px 32px}
+@media(max-width:700px){#v40-sala-previa header{align-items:flex-start}#v40-sala-previa .s51-grid{grid-template-columns:1fr}#v40-sala-previa .s51-players{min-height:120px}#v40-sala-previa footer{flex-wrap:wrap}#v40-sala-jugar{width:100%}}
+</style>
 <script id="v40-entrada-modos">
 /* ============================================================================
    SINTONÍA v14 · CÓMO VAN A JUGAR  (v40)
@@ -34419,7 +34322,9 @@ html.v-spicy .v75-riel{background:#3A2233}html.v-spicy .v75-marca b{color:#D9C3D
   /* --------------------------------------------------------------- opciones */
   function opcionesHtml() {
     return '<div class="v40-grid" id="v40-grid">' +
-      opt('servidor', '🖥️', 'Crear sala como anfitrión', 'La computadora dirige; cada jugador usa su teléfono.', 'PC') +
+      opt('servidor', '🖥️', 'Crear sala como servidor', 'Esta pantalla dirige; cada participante usa su teléfono.', 'anfitrión') +
+      opt('local', '👥', 'Jugar en este dispositivo', 'Participantes y turnos en una sola pantalla, sin sala remota.', 'local') +
+      opt('solo', '👤', 'Jugar solo', 'Un reto individual en este dispositivo.', 'una persona') +
       opt('mando', '🎮', 'Entrar como jugador', 'Unite desde tu teléfono con el código de la sala.', 'teléfono') +
       '</div>';
   }
@@ -34579,23 +34484,88 @@ html.v-spicy .v75-riel{background:#3A2233}html.v-spicy .v75-marca b{color:#D9C3D
     scope.querySelectorAll('#v40-tipo [data-tipo]').forEach(function (x) { x.classList.toggle('on', x.dataset.tipo === cfg.tipo); });
   }
 
+  var cambiandoModo = false;
   function elegir(k, scope) {
-    if (k === 'local') {
-      var c = (scope || document).querySelector('#v40-cfg');
-      if (c) c.classList.add('on');
-      var go = (scope || document).querySelector('#v40-go');
-      if (go) go.textContent = cfg.n === 1 ? 'Jugar solo' : 'Empezar así';
-      return;
+    if (cambiandoModo || ['local','solo','servidor','mando'].indexOf(k) < 0) return;
+    var anterior = modo(), st = V.G(), cambia = anterior && anterior !== k;
+    var tieneDatos = !!(st && st.teams && st.teams.length) || !!(V.net && (V.net.code || V.net.conns && V.net.conns.size));
+    if (cambia && tieneDatos && !window.confirm('Cambiar de modo cerrará la sala y descartará los participantes y puntajes de esta sesión. ¿Continuar?')) return;
+    function completar(){
+      if (cambia && st) { st.teams = []; st.activeTeamIdx = 0; try { V.saveSession(); } catch(e) {} }
+      if (salaPrevia) cerrarSalaPrevia();
+      V.settings.gameMode = k;
+      if (k === 'local' || k === 'solo') { V.settings.playersMode = 'solo'; V.settings.gameTeamType = 'individual'; }
+      try { V.saveSettings(); } catch (e) {}
+      cerrarPortada(); marcarModo(); cambiandoModo=false;
+      if (k === 'mando') { if (V.net && V.net.startRemote) V.net.startRemote(); else V.toast('El mando no está disponible.', 'warn'); return; }
+      if (k === 'servidor' && (!V.net || V.net.status !== 'open')) {
+        var btn = $('v-nb-server');
+        if (btn) btn.click(); else V.toast('No se encontró el módulo de sala.', 'warn');
+      }
+      abrirSalaPrevia();
     }
-    if (k === 'solo') { aplicar({ n: 1, tipo: 'individual', modo: 'solo' }); return; }
-    var destino = k === 'sala' ? 'v-nb-open' : (k === 'servidor' ? 'v-nb-server' : 'v-nb-join');
-    V.settings.gameMode = k;
-    try { V.saveSettings(); } catch (e) {}
-    marcarModo();
-    cerrarPortada();
-    var btn = $(destino);
-    if (btn) btn.click();
-    else V.toast('Esta versión no trae el módulo de salas.', 'warn');
+    var redAbierta = cambia && V.net && (V.net.peer || V.net.code || V.net.conns && V.net.conns.size);
+    if (redAbierta) {
+      cambiandoModo=true;
+      try { if (V.__v27api && V.__v27api.activo()) V.__v27api.apagar(true); else V.net.close(); }
+      catch(e) { cambiandoModo=false; V.toast('No se pudo cerrar la sala anterior.', 'warn'); return; }
+      // NET.close cierra los canales y el peer tras 220 ms; esperar evita que
+      // su callback destruya una sala nueva creada inmediatamente después.
+      setTimeout(completar,300);
+    } else completar();
+  }
+
+  /* La sala previa reutiliza el mismo panel y registro del hub: no duplica
+     jugadores, conexiones ni puntuaciones. El catálogo permanece inaccesible
+     hasta confirmar JUGAR. */
+  var salaPrevia = null, lugarSala = null, relojSala = null;
+  function abrirSalaPrevia() {
+    if (salaPrevia) return;
+    if (V.__v44api) V.__v44api.pintar();
+    var original = $('v44-espera');
+    if (!original) { V.toast('La sala todavía no está lista. Intenta de nuevo.', 'warn'); return; }
+    lugarSala = document.createComment('sala de espera'); original.parentNode.insertBefore(lugarSala, original);
+    salaPrevia = document.createElement('section'); salaPrevia.id = 'v40-sala-previa';
+    salaPrevia.innerHTML = '<div class="v40-sala-inner"><header><div><small>SINTONÍA</small><h1>Preparar la partida</h1><p id="v40-sala-ayuda"></p></div><button type="button" id="v40-sala-modo">Cambiar modo</button></header>'+
+      '<form id="v40-local-form"><label for="v40-local-nombre">Agregar participante en este dispositivo</label><div><input id="v40-local-nombre" maxlength="20" autocomplete="off" placeholder="Nombre del participante"><button type="submit">Agregar</button></div></form><section id="v40-local-parejas" hidden></section><div id="v40-sala-contenido"></div><footer><span id="v40-sala-aviso" role="status"></span><button type="button" id="v40-sala-jugar">JUGAR →</button></footer></div>';
+    document.body.appendChild(salaPrevia); salaPrevia.querySelector('#v40-sala-contenido').appendChild(original);
+    salaPrevia.querySelector('#v40-local-form').onsubmit = function(e) { e.preventDefault(); var input=$('v40-local-nombre'); if (modo()==='solo' && V.G().teams.length) { V.toast('En modo solo participa una persona.', 'warn'); return; } if (V.__v44api.agregar(input.value)) { input.value=''; input.focus(); actualizarSalaPrevia(); } };
+    salaPrevia.querySelector('#v40-sala-modo').onclick = function(){ abrirPortada(); };
+    salaPrevia.querySelector('#v40-sala-jugar').onclick = function(){
+      var n = V.__v55 && V.__v55.jugadores ? V.__v55.jugadores().length : 0;
+      if (modo() === 'servidor' && (!V.net || V.net.status !== 'open')) { $('v40-sala-aviso').textContent='La sala todavía no está conectada. Comprueba la señalización.'; return; }
+      if (modo()==='solo' ? n!==1 : n<2) { $('v40-sala-aviso').textContent=modo()==='solo'?'Agrega tu nombre para continuar.':'Agrega al menos dos participantes para continuar.'; return; }
+      try { if(V.saveSessionNow) V.saveSessionNow(); else V.saveSession(); } catch(e) {}
+      cerrarSalaPrevia();
+      if(modo()==='local' && V.__v63 && V.__v63.pendienteLocal()){
+        if(V.__v63.reanudarGuardada(null)){V.toast('Votación local recuperada.', 'ok', 4000);}
+        else{V.__v63.descartarLocal();V.toast('No se pudo recuperar la votación; comienza una ronda nueva.', 'warn', 6000);}
+      }
+    };
+    actualizarSalaPrevia(); relojSala=setInterval(actualizarSalaPrevia,700);
+  }
+  function actualizarSalaPrevia(){
+    if (!salaPrevia) return;
+    var local=modo()==='local', solo=modo()==='solo', n=V.__v55 && V.__v55.jugadores ? V.__v55.jugadores().length : 0;
+    $('v40-local-form').hidden=!(local||solo); $('v40-local-nombre').disabled=solo&&n>=1; $('v40-local-form').querySelector('button').disabled=solo&&n>=1;
+    var pares=$('v40-local-parejas'), equipos=(V.G()&&V.G().teams)||[]; pares.hidden=!local||!equipos.length;
+    var firma=JSON.stringify(equipos.map(function(t){return [t.name,t.dialEquipo,t.tabuEquipo]}));
+    if(local && pares.dataset.firma!==firma){
+      pares.dataset.firma=firma;
+      pares.innerHTML='<b>Parejas de El Dial (opcional ahora)</b><p>Si van a jugar El Dial, elijan la misma pareja para dos personas. No se asignan automáticamente.</p>'+equipos.map(function(t,i){
+        return '<label><span>'+esc(t.name)+'</span><select data-par="'+i+'" aria-label="Pareja de '+esc(t.name)+'"><option value="">Sin pareja</option>'+Array.from({length:6},function(_,k){return '<option value="'+(k+1)+'"'+(t.dialEquipo===k+1?' selected':'')+'>Pareja '+(k+1)+'</option>'}).join('')+'</select></label>';
+      }).join('') + '<b>Equipos de Tabú (opcional ahora)</b><p>Elijan el mismo equipo para compartir sus puntos; no se forman automáticamente.</p>' + equipos.map(function(t,i){return '<label><span>'+esc(t.name)+'</span><select data-tabu-equipo="'+i+'" aria-label="Equipo Tabú de '+esc(t.name)+'"><option value="">Sin equipo</option>'+Array.from({length:6},function(_,k){return '<option value="'+(k+1)+'"'+(t.tabuEquipo===k+1?' selected':'')+'>Equipo '+(k+1)+'</option>'}).join('')+'</select></label>';}).join('');
+      pares.querySelectorAll('[data-tabu-equipo]').forEach(function(sel){sel.onchange=function(){var t=V.G().teams[Number(sel.dataset.tabuEquipo)];if(!t)return;t.tabuEquipo=sel.value?Number(sel.value):null;try{if(V.saveSessionNow)V.saveSessionNow();}catch(e){};actualizarSalaPrevia();};});
+      pares.querySelectorAll('[data-par]').forEach(function(sel){sel.onchange=function(){var t=V.G().teams[Number(sel.dataset.par)];if(!t)return;t.dialEquipo=sel.value?Number(sel.value):null;try{if(V.saveSessionNow)V.saveSessionNow();}catch(e){};actualizarSalaPrevia();};});
+    }
+    $('v40-sala-ayuda').textContent=solo?'Agrega tu nombre para jugar por tu cuenta.':local?'Agrega a quienes jugarán por turnos en esta pantalla.':'Comparte el código o el enlace; esta pantalla dirige y no ocupa una plaza.';
+    $('v40-sala-aviso').textContent=(local||solo) ? n+' participante'+(n===1?'':'s')+' en este dispositivo' : (V.net && V.net.status==='open' ? n+' participante'+(n===1?'':'s')+' conectado'+(n===1?'':'s') : 'Conectando la sala o sin señalización');
+  }
+  function cerrarSalaPrevia(){
+    if (!salaPrevia) return;
+    var original=$('v44-espera'); if(original && lugarSala && lugarSala.parentNode) lugarSala.parentNode.replaceChild(original,lugarSala);
+    salaPrevia.remove(); salaPrevia=null; lugarSala=null; clearInterval(relojSala); relojSala=null;
+    try { V.__v44api.pintar(); } catch(e) {}
   }
 
   /* -------------------------------------------------------------- portada -- */
@@ -34612,15 +34582,15 @@ html.v-spicy .v75-riel{background:#3A2233}html.v-spicy .v75-marca b{color:#D9C3D
       w.id = WELCOME_ID;
       w.innerHTML = '<div class="box" role="dialog" aria-modal="true" aria-label="Cómo van a jugar">' +
         '<h2>¿Cómo van a jugar hoy?</h2>' +
-        '<p class="lead">La computadora crea y dirige la sala. Cada jugador entra desde su teléfono con el código o el QR.</p>' +
+        '<p class="lead">Elige cómo quieres jugar: a solas, juntos o con mandos conectados.</p>' +
         opcionesHtml() + cfgHtml() +
         '<div class="wfoot"><span class="v40-sub">Podés cambiarlo cuando quieras desde el chip del inicio.</span>' +
-        '<button class="skip" type="button" id="v40-skip">Ahora no</button></div></div>';
+        (modo() ? '<button class="skip" type="button" id="v40-skip">Volver</button>' : '')+'</div></div>';
       document.body.appendChild(w);
       atar(w);
       var skip = w.querySelector('#v40-skip');
       if (skip) skip.addEventListener('click', function () { pendiente = null; cerrarPortada(); });
-      w.addEventListener('click', function (e) { if (e.target === w) { pendiente = null; cerrarPortada(); } });
+      w.addEventListener('click', function (e) { if (e.target === w && modo()) { pendiente = null; cerrarPortada(); } });
     }
     w.style.display = 'grid';
   }
@@ -34665,6 +34635,13 @@ html.v-spicy .v75-riel{background:#3A2233}html.v-spicy .v75-marca b{color:#D9C3D
   }
 
   /* --------------------------------------- enganches con los juegos/hub ---- */
+  /* Estos juegos necesitan interlocutores reales; no se inventan rivales. */
+  function requierePersonas(id) { return modo()==='solo' && ['dial','probable','tabu','impostor'].indexOf(id)>=0; }
+  function explicarParticipantes(id) {
+    var m=V.modal({title:'Necesitas más jugadores',sub:V.gameName(id),width:480,
+      body:'<div class="v40-necesita"><b>Este juego se disfruta acompañado</b><p>En modo solo estás jugando tú. Para dar pistas, adivinar o votar necesitas otras personas reales.</p><p>Elige jugar en este dispositivo o crea una sala para invitar a tus amigos.</p><button class="btn-action btn-primary-filled" data-cambiar-modo>Cambiar modo</button> <button class="btn-action" data-close>Volver al catálogo</button></div>'});
+    m.body.querySelector('[data-cambiar-modo]').onclick=function(){m.close();abrirPortada();};
+  }
   /* 1 · si tocan un juego sin modo elegido, primero se elige */
   document.addEventListener('click', function (e) {
     if (!e.target || !e.target.closest) return;
@@ -34672,6 +34649,7 @@ html.v-spicy .v75-riel{background:#3A2233}html.v-spicy .v75-marca b{color:#D9C3D
     if (!card) return;
     var id = card.dataset.game;
     if (id.charAt(0) === '_') return;                 // torneo/caos/voto ya son modos
+    if (requierePersonas(id)) {e.preventDefault();e.stopPropagation();explicarParticipantes(id);return;}
     if (modo()) return;
     e.preventDefault(); e.stopPropagation();
     abrirPortada(id);
@@ -34680,13 +34658,12 @@ html.v-spicy .v75-riel{background:#3A2233}html.v-spicy .v75-marca b{color:#D9C3D
   /* 2 · al entrar a un juego: barra de turno y aviso si el juego pide más */
   var abre = V.openGame;
   V.openGame = function (id) {
+    if (requierePersonas(id)) { explicarParticipantes(id); return false; }
     var r = abre.apply(this, arguments);
     setTimeout(function () {
       css();
       barraTurno();
-      if (modo() === 'solo' && ['dial', 'probable', 'charadas', 'tabu', 'impostor', 'mentiroso'].indexOf(id) >= 0) {
-        V.toast('Este juego luce más con 2 o más. En modo solo podés practicarlo igual.', 'warn', 3200);
-      }
+
     }, 60);
     return r;
   };
@@ -34708,13 +34685,17 @@ html.v-spicy .v75-riel{background:#3A2233}html.v-spicy .v75-marca b{color:#D9C3D
   function boot() {
     css();
     // Las sesiones antiguas se conservan, pero deben elegir el flujo actual.
-    if (!esMando() && ['local','solo','sala','pantalla'].indexOf(modo()) >= 0) {
+    if (!esMando() && ['sala','pantalla'].indexOf(modo()) >= 0) {
       V.settings.gameMode = null;
       try { V.saveSettings(); } catch (e) {}
     }
     panel();
     marcarModo();
     if (esMando()) return;
+    var saltarEntrada = /[?&](entrada=off|arranque=off)\b/.test(location.search);
+    if (!saltarEntrada && (modo() === 'local' || modo() === 'solo' || modo() === 'servidor')) {
+      setTimeout(function(){ if (!esMando() && V.gameOf && V.gameOf() === 'hub' && !$('v40-welcome')) abrirSalaPrevia(); }, 1100);
+    }
     if (!modo()) {
       var q = /[?&]modo=([a-z]+)/.exec(location.search);
       if (q && (q[1] === 'servidor' || q[1] === 'mando')) { elegir(q[1], document); return; }
@@ -35289,6 +35270,7 @@ html.v-spicy .v75-riel{background:#3A2233}html.v-spicy .v75-marca b{color:#D9C3D
   }
   function asiento(i) { return conexiones()[i] || null; }
   function info(i) {
+    if (V.settings.gameMode === 'local') return {remoto:false,enLinea:false,listo:true,quien:'',dev:''};
     var a = asiento(i);
     /* si el teléfono dejó de dar señales, se muestra sin conexión aunque la
        ficha siga en la sala (el motor la da por muerta a los 18 s). Y si la
@@ -35645,7 +35627,8 @@ html.v-spicy .v75-riel{background:#3A2233}html.v-spicy .v75-marca b{color:#D9C3D
 
     /* panel B · estado */
     var pct = c.remotos ? Math.round((c.listos / c.remotos) * 100) : 0;
-    var estadoTxt = !abierta ? (arr.length ? 'Sin sala abierta' : 'Sin jugadores')
+    var local = V.settings.gameMode === 'local';
+    var estadoTxt = local ? (arr.length ? 'Jugadores en este dispositivo' : 'Sin jugadores') : !abierta ? (arr.length ? 'Sin sala abierta' : 'Sin jugadores')
       : todosListos ? 'Todos listos'
       : c.remotos === 0 ? 'Esperando teléfonos'
       : ('Esperando ' + c.esperando + (c.esperando === 1 ? ' jugador' : ' jugadores'));
@@ -35657,12 +35640,12 @@ html.v-spicy .v75-riel{background:#3A2233}html.v-spicy .v75-marca b{color:#D9C3D
       '<div class="s51-panel s51-status" aria-label="Estado de la partida">' +
         '<h3 class="s51-h">Estado de la partida</h3>' +
         (arr.length
-          ? '<div class="s51-big">' + c.listos + '<small>/ ' + (c.remotos || 0) + ' listos</small></div>' +
+          ? '<div class="s51-big">' + (local ? arr.length : c.listos) + '<small>' + (local ? ' participantes' : '/ ' + (c.remotos || 0) + ' listos') + '</small></div>' +
             '<div class="s51-bar"><i style="width:' + pct + '%"></i></div>'
           : '<div class="s51-big">0<small>jugadores</small></div>' +
             '<div class="s51-bar"><i style="width:0%"></i></div>') +
         '<div class="s51-kv"><span>Conectados</span><b>' + c.remotos + ' de ' + MAX + '</b></div>' +
-        '<div class="s51-kv"><span>Anfitrión</span><b>Dirige · no juega</b></div>' +
+        (local ? '' : '<div class="s51-kv"><span>Anfitrión</span><b>Dirige · no juega</b></div>') +
         '<div class="s51-kv"><span>Rondas</span><b>' + (st.rounds || st.round || 0) + '</b></div>' +
         (function () {
           var w = [];
@@ -35672,7 +35655,7 @@ html.v-spicy .v75-riel{background:#3A2233}html.v-spicy .v75-marca b{color:#D9C3D
             '<div class="s51-wait">' + w.map(function (x) { return esc(x.nombre); }).join(' · ') + '</div>';
         })() +
         '<div class="s51-sep"></div>' +
-        '<div class="s51-kv"><span>Sala</span><b>' + (abierta ? (code ? 'abierta · ' + esc(code) : 'abierta') : 'cerrada') + '</b></div>' +
+        '<div class="s51-kv"><span>Sala</span><b>' + (local ? 'No requiere conexión' : abierta ? (code ? 'abierta · ' + esc(code) : 'abierta') : 'cerrada') + '</b></div>' +
         '<div class="s51-kv"><span>Modo</span><b>' + esc(etiquetaModo()) + '</b></div>' +
         '<div class="s51-kv"><span>Ahora</span><b>' + esc(estadoTxt) + '</b></div>' +
         '<div class="s51-sep"></div>' +
@@ -39452,6 +39435,9 @@ html.v50-hub #hub-view #v-play-chip { display:none !important; }
 
 </script>
 <style id="v75-telefono">
+.rm-pistas-personaje,.rm-ranking-resultado{margin:10px 0;padding:12px;border-radius:12px;background:#fff9ec;border:1px solid #dfd4bc;color:#2c241d}
+.rm-pistas-personaje ol,.rm-ranking-resultado ol{margin:6px 0;padding-left:22px;line-height:1.5}
+
 .rm-precio{margin:8px 0;padding:11px;border-radius:14px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18)}
 .rm-precio-real{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .rm-precio-real small{font-size:11px;text-transform:uppercase;letter-spacing:.08em;opacity:.75}
@@ -39732,6 +39718,11 @@ html.v50-hub #hub-view #v-play-chip { display:none !important; }
   function $(id) { return document.getElementById(id); }
   function esc(t) { return V.esc ? V.esc(t) : String(t == null ? '' : t); }
   function DB() { return OBJETIVOS.slice(); }
+  function tituloVisible(set) {
+    var nombres = set.items.slice().sort(function(a,b){return a.localeCompare(b,'es');}).join(', ');
+    var sufijo = ' · ' + nombres;
+    return set.title.endsWith(sufijo) ? set.title.slice(0, -sufijo.length) : set.title;
+  }
   function nItems() { return RAN.set ? RAN.set.items.length : 0; }
   function actual() { return RAN.orden[RAN.turno]; }
   function conTelefono(slot) { return S.telefono(slot); }
@@ -39929,12 +39920,10 @@ html.v50-hub #hub-view #v-play-chip { display:none !important; }
     var slot = actual();
     var local = !conTelefono(slot);
     var d = borrador(slot);
-    var suOrden = d.map(function (pos) { return '<i>' + esc(RAN.set.items[RAN.pres[pos]]) + '</i>'; }).join(' → ');
     box.innerHTML = '<div class="epic-card">' +
-      '<div class="epic-label">Ranking imposible · ' + esc(RAN.set.title) + '</div>' +
+      '<div class="epic-label">Ranking imposible · ' + esc(tituloVisible(RAN.set)) + '</div>' +
       '<div class="v61-quien">Ordena <b>' + esc(S.nombre(slot)) + '</b> · ' + (d.length + 1) + 'º lugar</div>' +
       tarjetasHtml(local, slot) +
-      (d.length ? '<div class="v61-orden">Su orden: ' + suOrden + '</div>' : '') +
       ordenNumeradoHtml(slot) +
       '<p class="v-small v-muted">' + (local
         ? 'Tocá las tarjetas siguiendo el criterio indicado.'
@@ -39962,8 +39951,14 @@ html.v50-hub #hub-view #v-play-chip { display:none !important; }
       sc.secret = null;
       sc.kicker = 'Ranking imposible';
       sc.title = 'El orden correcto';
-      sc.text = RAN.set.items.map(function(item,i){return item + ' (' + RAN.set.valores[i] + (RAN.set.unidad ? ' ' + RAN.set.unidad : '') + ')';}).join(' → ');
-      sc.sub = 'Tus puntos: ' + (RAN.resp[slot] ? RAN.resp[slot].puntos : 0) + ' · Fuente: ' + RAN.set.fuente;
+      var propia = RAN.resp[slot];
+      sc.text = '';
+      sc.rankingResultado = {
+        correcto: RAN.set.items.map(function(item,i){return item + ' (' + RAN.set.valores[i] + (RAN.set.unidad ? ' ' + RAN.set.unidad : '') + ')';}),
+        propio: propia ? propia.orden.map(function(i){return RAN.set.items[i];}) : [],
+        puntos: propia ? propia.puntos : 0
+      };
+      sc.sub = 'Fuente: ' + RAN.set.fuente;
       sc.actions = [];
       return;
     }
@@ -39974,7 +39969,7 @@ html.v50-hub #hub-view #v-play-chip { display:none !important; }
       sc.secret = null;
       sc.kicker = 'Ranking imposible';
       sc.title = 'Ordena ' + S.nombre(actual());
-      sc.text = RAN.set.title;
+      sc.text = tituloVisible(RAN.set);
       sc.sub = 'Espera tu turno.';
       sc.actions = [];
       return;
@@ -39982,7 +39977,7 @@ html.v50-hub #hub-view #v-play-chip { display:none !important; }
 
     var d = borrador(slot);
     sc.kicker = 'Ranking imposible';
-    sc.title = RAN.set.title;
+    sc.title = tituloVisible(RAN.set);
     sc.text = d.length
       ? 'Tu orden: ' + d.map(function (p, i) { return (i + 1) + 'º ' + RAN.set.items[RAN.pres[p]]; }).join(' · ')
       : 'Toca las tarjetas siguiendo el criterio indicado.';
@@ -40706,10 +40701,11 @@ html.v50-hub #hub-view #v-play-chip { display:none !important; }
     box.innerHTML = '<div class="epic-card">' +
       '<div class="epic-label">¿Quién es más probable que…?</div>' +
       '<div class="v63-frase">' + esc(PR.frase) + tonoHtml + '</div>' +
-      '<p class="v-small v-muted">' + (PR.candidatos ? 'Desempate: todos votan entre las personas empatadas.' : 'Todos votan a la vez desde su teléfono. Un voto por jugador y ronda.') + '</p>' +
+      '<p class="v-small v-muted">' + (PR.candidatos ? 'Desempate: todos votan entre las personas empatadas.' : V.settings.gameMode==='local' ? 'Cada persona vota en privado por turno, pasando este dispositivo.' : 'Todos votan a la vez desde su teléfono. Un voto por jugador y ronda.') + '</p>' +
       tarjetasHtml() +
       veredicto +
       '<div class="v-row v-mt3" style="gap:8px">' +
+        (PR.fase === 'votar' && V.settings.gameMode==='local' && votaron<total ? '<button class="btn-action btn-primary-filled" data-votar-local>Pasar para votar</button>' : '') +
         (PR.fase === 'votar'
           ? '<button class="btn-action btn-teal-filled" data-cerrar>Contar votos (' + votaron + '/' + total + ')</button>'
           : (PR.fase === 'resultado'
@@ -40718,6 +40714,15 @@ html.v50-hub #hub-view #v-play-chip { display:none !important; }
         '<button class="btn-action" data-nueva>Reiniciar ronda</button>' +
       '</div></div>';
 
+    var localBtn=box.querySelector('[data-votar-local]');
+    if(localBtn) localBtn.addEventListener('click',function(){
+      var proximo=jugadores().find(function(p){return PR.votos[p.slot]==null}); if(!proximo)return;
+      var ronda=PR.ronda;
+      V.secret.pass(proximo.nombre,'Vota sin que los demás vean tu elección.',function(){
+        if(PR.fase!=='votar'||PR.ronda!==ronda)return;
+        V.modal({title:'Voto de '+proximo.nombre,sub:PR.frase,body:'<div class="v-col" style="gap:8px">'+jugadores().filter(function(p){return !PR.candidatos||PR.candidatos.indexOf(p.slot)>=0}).map(function(p){return '<button type="button" class="btn-action" data-voto-local="'+p.slot+'">'+esc(nombreJugador(p.slot))+'</button>'}).join('')+'</div>',onMount:function(body,close){body.querySelectorAll('[data-voto-local]').forEach(function(b){b.onclick=function(){var r=votar(proximo.slot,Number(b.dataset.votoLocal));if(r.ok)close();else V.toast(r.motivo,'warn');};});}});
+      });
+    });
     var c = box.querySelector('[data-cerrar]');
     if (c) c.addEventListener('click', cerrar);
     var dt = box.querySelector('[data-desempatar]');
@@ -40782,6 +40787,7 @@ html.v50-hub #hub-view #v-play-chip { display:none !important; }
   // La votación y su lista original se guardan juntas; el código de sala evita
   // reanudar un guardado de una sala distinta.
   var guardadoAlCargar = V.store && V.store.get('session', null);
+  var pendienteLocal = !!(guardadoAlCargar && guardadoAlCargar.v63recuperacion && guardadoAlCargar.v63recuperacion.tipo==='local');
   var payloadAnterior = V.sessionPayload;
   V.sessionPayload = function () {
     var p = payloadAnterior.apply(this, arguments);
@@ -40793,6 +40799,16 @@ html.v50-hub #hub-view #v-play-chip { display:none !important; }
           guardadoAlCargar.v63recuperacion && marca.code === guardadoAlCargar.v63recuperacion.code &&
           (!V.net || V.net.status !== 'open')) return Object.assign({}, guardadoAlCargar, {at:Date.now()});
     } catch (e) {}
+    if(p && pendienteLocal && V.settings.gameMode==='local' && V.gameOf()==='hub' && guardadoAlCargar && guardadoAlCargar.v63recuperacion){
+      var a=guardadoAlCargar.teams||[], b=p.teams||[];
+      if(a.length===b.length && a.every(function(t,i){return t.id===b[i].id && t.name===b[i].name;}))
+        return Object.assign({},p,{game:'probable',vistaGuardada:'probable',v63recuperacion:guardadoAlCargar.v63recuperacion});
+      pendienteLocal=false;
+      V.toast('La lista de jugadores cambió; la votación guardada se canceló.', 'warn', 6000);
+    }
+    if(p && V.settings.gameMode==='local' && V.gameOf()==='probable' && PR.on){
+      p.v63recuperacion={version:2,tipo:'local',participantes:(p.teams||[]).map(function(t,i){return {id:t.id,nombre:t.name,slot:i};}),estado:JSON.parse(JSON.stringify(PR))};
+    }
     if (p && V.gameOf() === 'probable' && PR.on && V.net && V.net.status === 'open' && V.__v54) {
       p.v63recuperacion = { version: 1, code: V.net.code,
         participantes: V.__v54.participantes(), estado: JSON.parse(JSON.stringify(PR)) };
@@ -40801,19 +40817,22 @@ html.v50-hub #hub-view #v-play-chip { display:none !important; }
   };
   function reanudarGuardada(code) {
     var p = guardadoAlCargar, r = p && p.v63recuperacion;
-    if (!V.settings.autosave || V.gameOf() !== 'hub' || !r || r.version !== 1 || r.code !== code || p.game !== 'probable' ||
+    var local=!!(r && r.tipo==='local' && r.version===2 && code===null && V.settings.gameMode==='local' && pendienteLocal);
+    if (!V.settings.autosave || V.gameOf() !== 'hub' || !r || (!local && (r.version !== 1 || r.code !== code)) || p.game !== 'probable' ||
         !Array.isArray(r.participantes) || !r.participantes.length || r.participantes.length > 16 ||
-        new Set(r.participantes).size !== r.participantes.length || !r.estado ||
+        (!local && new Set(r.participantes).size !== r.participantes.length) || !r.estado ||
         !['votar','resultado'].includes(r.estado.fase) || typeof r.estado.frase !== 'string' ||
         !r.estado.frase.trim() || r.estado.frase.length > 1000 ||
         !Number.isSafeInteger(r.estado.ronda) || r.estado.ronda < 1 || !r.estado.votos ||
         typeof r.estado.votos !== 'object' || Array.isArray(r.estado.votos) || !Array.isArray(p.teams)) return false;
     var slots = r.participantes.map(function(pid) {
+      if(local){var i=pid && pid.slot, t=Number.isInteger(i)&&p.teams[i],actual=V.G()&&V.G().teams[i];return t && actual && t.id===pid.id && t.name===pid.nombre && actual.id===pid.id && actual.name===pid.nombre ? i : -1;}
       if (typeof pid !== 'string' || !pid) return -1;
       var indices = [];
       p.teams.forEach(function(t,i) { if (t && Array.isArray(t.__v55pids) && t.__v55pids.indexOf(pid)>=0) indices.push(i); });
       return indices.length === 1 ? indices[0] : -1;
     });
+    if(local && (r.participantes.length!==p.teams.length || r.participantes.length!==V.G().teams.length))return false;
     if (slots.indexOf(-1) >= 0 || new Set(slots).size !== slots.length) return false;
     var votos = r.estado.votos;
     if (!Object.keys(votos).every(function(k) {
@@ -40839,11 +40858,11 @@ html.v50-hub #hub-view #v-play-chip { display:none !important; }
     try {
       // El host abre la vista antes de que vuelvan los mandos; no se fabrica
       // ningún participante. v54 conserva las identidades originales.
-      V.settings.gameMode = 'pantalla';
+      if(!local) V.settings.gameMode = 'pantalla';
       V.openGame('probable');
     } finally { V.settings.gameMode = oldMode; }
     if (V.gameOf() !== 'probable') { PR.on=false; PR.fase='apagada'; return false; }
-    V.__v54.reanudar(r.participantes, 'probable');
+    if(local) pendienteLocal=false; else V.__v54.reanudar(r.participantes, 'probable');
     pintar(); S.sincro();
     return true;
   }
@@ -40851,6 +40870,7 @@ html.v50-hub #hub-view #v-play-chip { display:none !important; }
   V.__v63 = {
     version: 'v63',
     reanudarGuardada: reanudarGuardada,
+    pendienteLocal:function(){return pendienteLocal;}, descartarLocal:function(){pendienteLocal=false;},
     estado: function () { return { fase: PR.fase, frase: PR.frase, ronda: PR.ronda, votos: Object.assign({}, PR.votos), resultado: PR.resultado, candidatos: PR.candidatos && PR.candidatos.slice() }; },
     empezar: empezar, votar: votar, cerrar: cerrar, desempatar: desempatar, siguiente: siguiente, pintar: pintar, recuento: recuento,
     textoDe: textoDe, tonoDe: tonoDe
@@ -41061,7 +41081,21 @@ html.v50-hub #hub-view #v-play-chip { display:none !important; }
     var id='t65-propuestas', box=$(id);
     if (juego() !== 'tabu' || (T.fase !== 'visible' && T.fase !== 'fin')) { if(box)box.remove(); return; }
     if(!box){box=document.createElement('section');box.id=id;box.setAttribute('aria-label','Propuestas privadas para el anfitrión');box.style.cssText='margin:14px auto;max-width:760px;padding:14px;border:1px solid #c9b98f;border-radius:16px;background:#fffdf8;color:#2c241d';var anchor=$('tabu-card-box');if(anchor&&anchor.parentNode)anchor.parentNode.insertBefore(box,anchor.nextSibling);else document.body.appendChild(box);}
-    box.textContent=''; var h=document.createElement('h3');h.textContent='Propuestas privadas · solo para el anfitrión';box.appendChild(h);
+    box.textContent=''; var h=document.createElement('h3');h.textContent=V.settings.gameMode==='local'?'Propuestas · este dispositivo':'Propuestas privadas · solo para el anfitrión';box.appendChild(h);
+    if(V.settings.gameMode==='local' && T.fase==='visible' && !T.pausado){
+      var lista=document.createElement('select');lista.setAttribute('aria-label','Participante que propone');
+      (S.roster()||[]).filter(function(p){return p.local}).forEach(function(p){var o=document.createElement('option');o.value=p.slot;o.textContent=p.nombre;lista.appendChild(o)});
+      var entrada=document.createElement('button');entrada.type='button';entrada.textContent='Pasar para escribir propuesta';entrada.onclick=function(){
+        var slot=Number(lista.value), ronda=T.ronda,carta=T.carta, persona=(S.roster()||[]).find(function(p){return p.local&&p.slot===slot});if(!persona)return;
+        T.localEntrada=true;T.ocultarCarta=true;pintarCarta();
+        V.secret.pass(persona.nombre,'Escribe tu propuesta sin mirar la carta.',function(){
+          if(T.ronda!==ronda||T.carta!==carta||T.fase!=='visible'){T.localEntrada=false;pintarCarta();return;}
+          V.modal({title:'Propuesta de '+persona.nombre,body:'<label>Tu propuesta<input id="t65-local-texto" maxlength="80" autocomplete="off"></label><button type="button" class="btn-action" data-enviar-local>Enviar</button>',
+            onClose:function(){V.secret.pass('Quien describe','Recupera el dispositivo para revisar las propuestas.',function(){T.localEntrada=false;pintarCarta();});},
+            onMount:function(b,close){b.querySelector('[data-enviar-local]').onclick=function(){var r=intentoLocal(slot,b.querySelector('#t65-local-texto').value,ronda,carta);if(r.ok)close();else V.toast(r.motivo,'warn');};}});
+        });
+      };box.appendChild(lista);box.appendChild(entrada);
+    }
     var keys=Object.keys(T.intentos||{}).filter(function(k){return T.intentos[k]&&T.intentos[k].ronda===T.ronda&&T.intentos[k].carta===T.carta;});
     if(!keys.length){var empty=document.createElement('p');empty.textContent='Aún no hay propuestas.';box.appendChild(empty);return;}
     keys.forEach(function(k){var q=T.intentos[k],row=document.createElement('div');row.style.cssText='display:flex;gap:10px;align-items:center;margin:8px 0';var label=document.createElement('span');label.textContent=q.nombre+' ('+nombre(q.slot)+') propuso: «'+q.texto+'»';label.style.flex='1';var yes=document.createElement('button');yes.type='button';yes.textContent='Elegir ganador (+1)';yes.onclick=function(){resolver(k);};row.appendChild(label);row.appendChild(yes);box.appendChild(row);});
@@ -41110,7 +41144,7 @@ html.v50-hub #hub-view #v-play-chip { display:none !important; }
     try { V.net && V.net.conns && V.net.conns.forEach(function (r) { if (r.online && r.conn && r.conn.open) n++; }); } catch (e) {}
     return n > 0;
   }
-  function cartaTapada() { return T.ocultarCarta !== false && hayTelefonos(); }
+  function cartaTapada() { return T.ocultarCarta !== false && (hayTelefonos() || T.localEntrada); }
   function pintarCarta() {
     var w = $('tabu-secret-title'), box = $('tabu-forbidden-box'), cat = $('tabu-card-category');
     if (cat) cat.textContent = T.categoria || '';
@@ -41194,11 +41228,18 @@ html.v50-hub #hub-view #v-play-chip { display:none !important; }
     if(!rec||!rec.conn||!rec.conn.open||rec.slot!==slot)return {ok:false,motivo:'Asiento no autorizado'};
     var g=V.G(),conectado=false;try{V.net.conns.forEach(function(x){if(x===rec&&x.slot===slot&&x.conn&&x.conn.open&&x.online)conectado=true;});}catch(e){}
     if(!conectado||!g||!g.teams||!g.teams[slot])return {ok:false,motivo:'Jugador no conectado'};
+    return registrarIntento(slot,texto,round,card,identidad(rec),rec.name||nombre(slot));
+  }
+  function intentoLocal(slot,texto,round,card){
+    if(V.settings.gameMode!=='local'||T.fase!=='visible'||T.pausado)return {ok:false,motivo:'La ronda no acepta propuestas ahora'};
+    var p=(S.roster()||[]).find(function(x){return x.local&&x.slot===slot});if(!p)return {ok:false,motivo:'Participante inexistente'};
+    return registrarIntento(slot,texto,round,card,'local:'+slot,p.nombre);
+  }
+  function registrarIntento(slot,texto,round,card,jugador,nombreJugador){
     if(Number(round)!==T.ronda||Number(card)!==T.carta)return {ok:false,motivo:'La propuesta pertenece a una ronda anterior'};
     var t=String(texto||'').replace(/\s+/g,' ').trim().slice(0,80);if(t.length<1)return {ok:false,motivo:'Escribe una propuesta'};
-    var jugador=identidad(rec);
     if(T.intentos[jugador])return {ok:false,motivo:'Ya enviaste una propuesta para esta carta'};
-    T.intentos[jugador]={slot:slot,nombre:rec.name||nombre(slot),texto:t,ronda:T.ronda,carta:T.carta,at:Date.now()};
+    T.intentos[jugador]={slot:slot,nombre:nombreJugador,texto:t,ronda:T.ronda,carta:T.carta,at:Date.now()};
     renderPropuestas();if(S)S.sincro();return {ok:true};
   }
   function resolver(winner){
@@ -41206,7 +41247,13 @@ html.v50-hub #hub-view #v-play-chip { display:none !important; }
     var key=T.ronda+':'+T.carta;if(T.resueltas[key])return {ok:false,motivo:'Carta ya puntuada'};
     if(winner!==null&&winner!==undefined){var propuesta=T.intentos[winner];if(!propuesta||propuesta.ronda!==T.ronda||propuesta.carta!==T.carta)return {ok:false,motivo:'El ganador no tiene una propuesta vigente'};}
     T.decidido=true;T.resueltas[key]=true;
-    if(winner!==null&&winner!==undefined){T.aciertos++;var pts=((V.G()&&V.G().config&&V.G().config.tabu&&V.G().config.tabu.pointsPerHit)||1);V.award(propuesta.slot,pts,'Palabra Tabú · ganadora elegida por anfitrión');}
+    if(winner!==null&&winner!==undefined){T.aciertos++;var g=V.G(),pts=((g&&g.config&&g.config.tabu&&g.config.tabu.pointsPerHit)||1),team=g&&g.teams&&g.teams[propuesta.slot],members=[];
+      if(V.settings.gameMode==='local' && team && Number.isInteger(team.tabuEquipo))members=g.teams.map(function(t,i){return t.tabuEquipo===team.tabuEquipo?i:-1}).filter(function(i){return i>=0});
+      if(!members.length)members=[propuesta.slot];
+      V._diffScores && V._diffScores();V._batchPriceScore=true;
+      try{members.forEach(function(i){V.award(i,pts/members.length,'Palabra Tabú · propuesta elegida');});}finally{V._batchPriceScore=false;}
+      V._diffScores && V._diffScores();
+    }
     T.intentos={};
     if(T.fase==='fin'){pintarEstado();renderPropuestas();if(S)S.sincro();return {ok:true,acierto:winner!=null};}
     siguienteCarta();return {ok:true,acierto:winner!=null};
@@ -41270,7 +41317,7 @@ html.v50-hub #hub-view #v-play-chip { display:none !important; }
   var salir=V.exitGame;
   if(typeof salir==='function'&&!salir.__v65){var ex=function(){if(juego()==='tabu')resetear();return salir.apply(this,arguments);};ex.__v65=1;V.exitGame=ex;}
   function limpiarTemporizador(){relojPara();var c=$('v65-canal');if(c)c.remove();}
-  function resetear(){limpiarTemporizador();T.pausado=false;T.fase='oculta';T.palabra='';T.categoria='';T.prohibidas=[];T.seg=0;T.intento=null;T.intentos={};T.decidido=false;var panel=$('t65-propuestas');if(panel)panel.remove();var w=$('tabu-secret-title');if(w)w.textContent='';var f=$('tabu-forbidden-box');if(f)f.textContent='';}
+  function resetear(){limpiarTemporizador();T.localEntrada=false;T.pausado=false;T.fase='oculta';T.palabra='';T.categoria='';T.prohibidas=[];T.seg=0;T.intento=null;T.intentos={};T.decidido=false;var panel=$('t65-propuestas');if(panel)panel.remove();var w=$('tabu-secret-title');if(w)w.textContent='';var f=$('tabu-forbidden-box');if(f)f.textContent='';}
 
   V.__v65 = {
     version: 'v65', publicScreen:publicScreen, remotePayload:remotePayload,
@@ -41316,6 +41363,10 @@ function parejas(){
       var grupo=grupos[k],a=grupo[0]||null,b=grupo.length===2?grupo[1]:null;
       out.push({n:out.length+1,a:a,b:b,completa:grupo.length===2,falta:grupo.length===1&&a?a.nombre:null});
     });
+  }else if(V.settings.gameMode==='local'){
+    var porPareja={}, st=gs();
+    ps.forEach(function(p){var t=st&&st.teams&&st.teams[p.slot], k=t&&t.dialEquipo; if(!Number.isInteger(k)||k<1){out.push({n:out.length+1,a:p,b:null,completa:false,falta:p.nombre});return;} (porPareja[k]||(porPareja[k]=[])).push(p);});
+    Object.keys(porPareja).sort(function(a,b){return Number(a)-Number(b)}).forEach(function(k){var g=porPareja[k];out.push({n:Number(k),a:g[0]||null,b:g.length===2?g[1]:null,completa:g.length===2,falta:g.length===1?g[0].nombre:'Pareja '+k+' necesita exactamente dos personas'});});
   }else{
     for(var i=0;i<ps.length;i+=2){var a=ps[i]||null,b=ps[i+1]||null;out.push({n:out.length+1,a:a,b:b,completa:!!(a&&b),falta:a&&!b?a.nombre:null});}
   }
@@ -41398,24 +41449,32 @@ V.__v66={version:'v66',parejas:parejas,parejaDe:function(slot){var ps=parejas();
 'use strict';
 var V=window.V14||window.V;if(!V||V.__v67)return;
 var memoria=Object.create(null),prefijo='sintonia:bolsa:';
-function normal(x){if(typeof x==='string')return x.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^\p{L}\p{N}]+/gu,' ').trim();if(Array.isArray(x))return x.map(normal);if(x&&typeof x==='object'){var o={};Object.keys(x).sort().forEach(function(k){o[k]=normal(x[k]);});return o;}return x;}
-function clave(x){
- var contenido=x;
- if(x&&typeof x==='object'&&!Array.isArray(x)){
-   if(typeof x.q==='string')contenido=x.q;
-   else if(typeof x.word==='string')contenido=x.word;
-   else if(typeof x.title==='string')contenido=x.title;
-   else if(typeof x.who==='string')contenido=x.who;
- }
+function normal(x){if(typeof x==='string')return x.normalize('NFC').toLocaleLowerCase('es').replace(/[^\p{L}\p{M}\p{N}]+/gu,' ').trim();if(Array.isArray(x))return x.map(normal);if(x&&typeof x==='object'){var o={};Object.keys(x).sort().forEach(function(k){o[k]=normal(x[k]);});return o;}return x;}
+function normalAnterior(x){if(typeof x==='string')return x.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^\p{L}\p{N}]+/gu,' ').trim();if(Array.isArray(x))return x.map(normalAnterior);if(x&&typeof x==='object'){var o={};Object.keys(x).sort().forEach(function(k){o[k]=normalAnterior(x[k]);});return o;}return x;}
+function contenidoClave(x){if(x&&typeof x==='object'&&!Array.isArray(x)){
+ if(typeof x.q==='string')return x.q;
+ if(typeof x.word==='string')return x.word;
+ if(typeof x.title==='string')return x.title;
+ if(typeof x.who==='string')return x.who;
+ }return x;}
+function claveAnterior(x){return JSON.stringify(normalAnterior(contenidoClave(x)));}
+function clave(x){var contenido=contenidoClave(x);
+ if(x&&typeof x==='object'&&!Array.isArray(x)&&typeof x.word==='string'&&typeof x.category==='string') contenido=x.word+' | '+x.category;
  return JSON.stringify(normal(contenido));
 }
-function leer(id){if(memoria[id])return memoria[id];var s;try{s=JSON.parse(localStorage.getItem(prefijo+id)||'{}');}catch(e){}if(!s||typeof s!=='object'||Array.isArray(s))s={};s.usados=s.usados&&typeof s.usados==='object'?s.usados:{};s.importados=Array.isArray(s.importados)?s.importados:[];var usados={};Object.keys(s.usados).forEach(function(k){try{usados[clave(JSON.parse(k))]=true;}catch(e){usados[k]=true;}});s.usados=usados;return memoria[id]=s;}
+function leer(id){if(memoria[id])return memoria[id];var s;try{s=JSON.parse(localStorage.getItem(prefijo+id)||'{}');}catch(e){}if(!s||typeof s!=='object'||Array.isArray(s))s={};s.usados=s.usados&&typeof s.usados==='object'?s.usados:{};
+ s.importados=Array.isArray(s.importados)?s.importados:[];
+ // Las claves antiguas perdían tildes y categoría: se conservan como bloqueo
+ // legado hasta reiniciar la bolsa, sin reinterpretarlas como datos nuevos.
+ if(s.versionClave!==2){var previos=s.usados,legado={};Object.keys(previos).forEach(function(k){try{legado[claveAnterior(JSON.parse(k))]=previos[k];}catch(e){legado[k]=previos[k];}});s.usadosLegado=legado;s.usados={};s.versionClave=2;}
+ s.usadosLegado=s.usadosLegado&&typeof s.usadosLegado==='object'?s.usadosLegado:{};
+ return memoria[id]=s;}
 function guardar(id){try{localStorage.setItem(prefijo+id,JSON.stringify(leer(id)));return true;}catch(e){return false;}}
 function lista(pool,id){var vistos=new Set(),valida=compatibles(id);return pool.filter(function(x){try{if(!valida(x))return false;}catch(e){return false;}var k=clave(x);if(vistos.has(k))return false;vistos.add(k);return true;});}
-function disponibles(id,pool,permitir){var s=leer(id),legado=id.indexOf('ranking:')===0&&!s.repetirLegado?leer('ranking').usados:{};return lista(pool.concat(s.importados),id).filter(function(x){return (!permitir||permitir(x))&&!Object.prototype.hasOwnProperty.call(s.usados,clave(x))&&!Object.prototype.hasOwnProperty.call(legado,clave(x));});}
+function disponibles(id,pool,permitir){var s=leer(id),ranking=id.indexOf('ranking:')===0&&!s.repetirLegado?leer('ranking'):null;return lista(pool.concat(s.importados),id).filter(function(x){return (!permitir||permitir(x))&&!Object.prototype.hasOwnProperty.call(s.usados,clave(x))&&!Object.prototype.hasOwnProperty.call(s.usadosLegado,claveAnterior(x))&&!(ranking&&(Object.prototype.hasOwnProperty.call(ranking.usados,clave(x))||Object.prototype.hasOwnProperty.call(ranking.usadosLegado,claveAnterior(x))));});}
 function guardarCambio(id,nuevo){var anterior=leer(id);memoria[id]=nuevo;if(!guardar(id)){memoria[id]=anterior;throw Error('No se pudo guardar. No se ha cambiado la bolsa. Revisa el almacenamiento del navegador.');}}
 function sacar(id,pool,permitir){var ds=disponibles(id,pool,permitir);if(!ds.length)return null;var x=ds[Math.floor(Math.random()*ds.length)];var nuevo=JSON.parse(JSON.stringify(leer(id)));nuevo.usados[clave(x)]=true;guardarCambio(id,nuevo);return x;}
-function reiniciar(id){var nuevo=JSON.parse(JSON.stringify(leer(id)));nuevo.usados={};nuevo.repetirLegado=true;try{guardarCambio(id,nuevo);return true;}catch(e){return false;}}
+function reiniciar(id){var nuevo=JSON.parse(JSON.stringify(leer(id)));nuevo.usados={};nuevo.usadosLegado={};nuevo.repetirLegado=true;try{guardarCambio(id,nuevo);return true;}catch(e){return false;}}
 // Registro de formatos dentro del motor compartido; no crea otro almacén.
 function texto(x,min,max){return typeof x==='string'&&x.trim().length>=(min==null?1:min)&&x.length<=(max||1500)&&!/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/.test(x);}
 function objeto(x){return x&&typeof x==='object'&&!Array.isArray(x);}
@@ -42184,6 +42243,8 @@ V.__v67={destino:destino,esquema:esquema,analizarImportacion:analizarImportacion
 
   /* ─────────────────────────────────────────────────── vista de la PC ───── */
   var CSS =
+    '.rm-pistas-personaje{margin:10px 0;padding:12px;border-radius:12px;background:#fff9ec;border:1px solid #dfd4bc;color:#2c241d}' +
+    '.rm-pistas-personaje ol{margin:6px 0 0;padding-left:22px;line-height:1.5}' +
     '.v70-premio{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:999px;' +
     ' background:#FFF4E2;border:1px solid #EBD7AF;color:#8A6318;font-size:13px;font-weight:900;white-space:nowrap}' +
     '.v70-premio b{font-size:16px;color:#B8862F}' +
@@ -42297,7 +42358,7 @@ V.__v67={destino:destino,esquema:esquema,analizarImportacion:analizarImportacion
         '<span class="epic-label">Adivina el personaje · turno de ' + esc(nombre(slot)) + '</span>' +
         '<span class="v70-premio" id="v70-premio">Premio <b>' + premio() + '</b> pt' + (premio() === 1 ? '' : 's') + '</span>' +
       '</div>' +
-      '<div class="v70-pistas" id="v70-pistas"></div>' +
+      '<div class="v70-pistas" id="v70-pistas" data-ronda="' + PER.ronda + '"></div>' +
       '<div class="v70-resp" id="v70-respuestas"></div>' +
       (tieneTel ? '' :
         '<div class="v-row v-mt3" style="gap:8px;flex-wrap:wrap">' +
@@ -42318,7 +42379,7 @@ V.__v67={destino:destino,esquema:esquema,analizarImportacion:analizarImportacion
     /* el contenedor de pistas SOBREVIVE al repintado: mismo nodo, mismos hijos */
     var contViejo = $('v70-pistas');
     box.innerHTML = h;
-    if (contViejo) {
+    if (contViejo && contViejo.dataset.ronda === String(PER.ronda)) {
       var contNuevo = $('v70-pistas');
       if (contNuevo && contNuevo !== contViejo) contNuevo.parentNode.replaceChild(contViejo, contNuevo);
     }
@@ -42354,6 +42415,8 @@ V.__v67={destino:destino,esquema:esquema,analizarImportacion:analizarImportacion
     sc.actions = [];
 
     if (PER.fase === 'pistas') {
+      // Solo se envían pistas ya publicadas; el personaje y las demás quedan en la PC.
+      sc.pistasPersonaje = PER.item ? PER.item.clues.slice(0, PER.pistas) : [];
       var mio = (slot === actual());
       var resp = respuestaDe(slot);
       if (mio) {
