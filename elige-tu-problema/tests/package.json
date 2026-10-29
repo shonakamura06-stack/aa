@@ -1,0 +1,12 @@
+{
+  "name": "elige-tu-problema-tests",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Pruebas automatizadas opcionales (desarrollo) para ELIGE TU PROBLEMA",
+  "scripts": {
+    "test": "node run.cjs"
+  },
+  "devDependencies": {
+    "jsdom": "^30.1.3"
+  }
+}
