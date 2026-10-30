@@ -4,7 +4,8 @@ const assert=require('node:assert/strict');
 const {chromium}=require(process.env.PLAYWRIGHT_CORE||'playwright-core');
 const primero=require('../contenido/lote-general-01.json');
 const segundo=require('../contenido/lote-general-02.json');
-const lote=Object.fromEntries(Object.keys(primero).map(k=>[k,primero[k].concat(segundo[k])]));
+const tercero=require('../contenido/lote-general-03.json');
+const lote=Object.fromEntries(Object.keys(primero).map(k=>[k,primero[k].concat(segundo[k],tercero[k])]));
 
 test('El lote General está integrado, no duplica al sincronizar y no se repite tras recargar',{timeout:40000},async()=>{
   const b=await chromium.launch({executablePath:process.env.CHROMIUM_PATH,headless:true,args:['--no-sandbox','--no-zygote','--single-process','--disable-dev-shm-usage']});
@@ -28,9 +29,9 @@ test('El lote General está integrado, no duplica al sincronizar y no se repite 
       return filas;
     },lote);
     for(const f of resultado){
-      assert.equal(f.presentes,50,JSON.stringify(f));
-      assert.equal(f.validas,50,JSON.stringify(f));
-      assert.equal(f.leidas,50,JSON.stringify(f));
+      assert.equal(f.presentes,60,JSON.stringify(f));
+      assert.equal(f.validas,60,JSON.stringify(f));
+      assert.equal(f.leidas,60,JSON.stringify(f));
       assert.equal(f.agotada,true,JSON.stringify(f));
       assert.equal(f.picante,0,JSON.stringify(f));
       assert.equal(f.totalTrasSincronizar,f.total,JSON.stringify(f));

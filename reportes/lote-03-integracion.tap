@@ -1,0 +1,38 @@
+TAP version 13
+# Subtest: El historial de cada banco sobrevive al cierre y reapertura del navegador
+ok 1 - El historial de cada banco sobrevive al cierre y reapertura del navegador
+  ---
+  duration_ms: 2034.863524
+  type: 'test'
+  ...
+# Subtest: El lote General está integrado, no duplica al sincronizar y no se repite tras recargar
+not ok 2 - El lote General está integrado, no duplica al sincronizar y no se repite tras recargar
+  ---
+  duration_ms: 1098.097939
+  type: 'test'
+  location: '/home/user/aa/tests/contenido-lote-general.cjs:10:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    {"juego":"palabras","total":99,"presentes":59,"validas":60,"leidas":60,"agotada":true,"picante":0,"totalTrasSincronizar":99}
+    
+    59 !== 60
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 60
+  actual: 59
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/home/user/aa/tests/contenido-lote-general.cjs:32:14)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 1
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3924.342521

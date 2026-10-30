@@ -124,3 +124,7 @@ También se buscaron los términos «Sintonía», «Sintonia» y «PENDIENTES» 
 ### Suite repetida tras ajustar la prueba de tutorial
 
 La primera ejecución posterior a la corrección de Historia terminó **64/65**: `tests/multijugador.cjs` no pudo pulsar Precio porque el tutorial diferido interceptaba el clic, no por una aserción de juego. Se ajustó únicamente la prueba para esperar el tutorial y cerrarlo por la interfaz; el archivo afectado pasó **1/1** en `reintento-multijugador.tap`. La siguiente suite completa terminó **65/65**, 398,7 s, `suite-ultima.tap`. Los ensayos siguen siendo Chromium y PeerServer locales, y los dos resultados anteriores y sus fallos permanecen registrados; esta suite no prueba todos los ciclos ni satisface por sí sola la puerta de producción.
+
+## Continuación posterior
+
+Para la continuación, los ensayos de sala a resultado, la ampliación de contenido, las reproducciones de acciones anteriores a la recarga y las capturas móviles, ver `CONTINUACION-MISION.md`. La tabla histórica anterior no refleja la cobertura añadida allí.

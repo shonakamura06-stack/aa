@@ -2,7 +2,7 @@
 
 ## Sintonía (trabajo en curso)
 
-**Auditoría más reciente:** la suite completa del HTML actual pasó 65/65 en Chromium y señalización local. Una ejecución previa terminó 64/65 al interceptar un tutorial un clic; se corrigió la espera de la prueba y se repitió. Hay 250 entradas General nuevas y correcciones de autorización y de mensajes atrasados. Los ensayos no certifican todos los juegos ni la puerta de producción; ver `reportes/AUDITORIA-SINTONIA.md` para matriz y límites.
+**Auditoría más reciente:** se ampliaron los recorridos multijugador locales y se corrigieron acciones antiguas en Personaje, Trivia, Ranking, Precio y Tabú. Hay 300 entradas General incorporadas durante la misión, todavía muy lejos de los objetivos. Las pruebas y sus límites están en `reportes/CONTINUACION-MISION.md`; las suites en `reportes/suite-mision-continuada-final.tap` y `reportes/suite-mision-repetida.tap` no sustituye las pruebas críticas pendientes ni autoriza producción.
 
 El repositorio no contenía la aplicación de Sintonía; `index.html` parte del
 `actual.html` proporcionado por el usuario. La copia intacta se encuentra en

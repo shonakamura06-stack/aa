@@ -1,8 +1,8 @@
 {
   "nota": "Bancos base activos; validez estructural según la API actual, no revisión humana ni inventario de importaciones. La suma cuenta mercados y conjuntos por separado y no deduplica entre bancos.",
   "objetivoGlobal": 12000,
-  "sumaPorBanco": 4533,
-  "diferenciaMinimaBajoEstaConvencion": 7467,
+  "sumaPorBanco": 4583,
+  "diferenciaMinimaBajoEstaConvencion": 7417,
   "filas": [
     {
       "juego": "dial",
@@ -32,13 +32,13 @@
       "juego": "reto",
       "variante": "general",
       "id": "verdad:general:RETO",
-      "total": 530,
-      "validas": 530,
-      "unicas": 530,
+      "total": 540,
+      "validas": 540,
+      "unicas": 540,
       "duplicadas": 0,
       "invalidas": 0,
       "objetivo": 1000,
-      "faltanEstructurales": 470
+      "faltanEstructurales": 460
     },
     {
       "juego": "tabu",
@@ -56,49 +56,49 @@
       "juego": "palabras",
       "variante": "general",
       "id": "impostor:general:palabras",
-      "total": 90,
-      "validas": 90,
-      "unicas": 90,
+      "total": 100,
+      "validas": 100,
+      "unicas": 100,
       "duplicadas": 0,
       "invalidas": 0,
       "objetivo": 1000,
-      "faltanEstructurales": 910
+      "faltanEstructurales": 900
     },
     {
       "juego": "probable",
       "variante": "general",
       "id": "probable:general",
-      "total": 120,
-      "validas": 120,
-      "unicas": 120,
+      "total": 130,
+      "validas": 130,
+      "unicas": 130,
       "duplicadas": 0,
       "invalidas": 0,
       "objetivo": 1000,
-      "faltanEstructurales": 880
+      "faltanEstructurales": 870
     },
     {
       "juego": "yonunca",
       "variante": "general",
       "id": "yonunca:general",
-      "total": 115,
-      "validas": 115,
-      "unicas": 115,
+      "total": 125,
+      "validas": 125,
+      "unicas": 125,
       "duplicadas": 0,
       "invalidas": 0,
       "objetivo": 1000,
-      "faltanEstructurales": 885
+      "faltanEstructurales": 875
     },
     {
       "juego": "cadena",
       "variante": "general",
       "id": "cadena:general",
-      "total": 90,
-      "validas": 90,
-      "unicas": 90,
+      "total": 100,
+      "validas": 100,
+      "unicas": 100,
       "duplicadas": 0,
       "invalidas": 0,
       "objetivo": 1000,
-      "faltanEstructurales": 910
+      "faltanEstructurales": 900
     },
     {
       "juego": "ranking",
