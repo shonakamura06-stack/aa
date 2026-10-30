@@ -34,7 +34,7 @@ jobs:
       - uses: browser-actions/setup-chrome@v1
         id: chrome
         with:
-          install-chrome: true
+          chrome-version: stable
 
       - name: Instalar dependencias
         working-directory: devkit
