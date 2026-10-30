@@ -5,10 +5,13 @@ escribes una `f(x)` y la bala vuela siguiendo esa curva desde tu personaje.
 
 Todo ocurre en el navegador: sin servidor, sin dependencias y sin conectarse a la partida.
 
+**En línea:** <https://trazador-math-wars.vercel.app>
+
 ![Captura](captura.png)
 
 ## Abrir
 
+- En línea: <https://trazador-math-wars.vercel.app> (desplegado desde esta carpeta)
 - Doble clic en `index.html` (funciona sin servidor), o
 - `python3 -m http.server 8000` en esta carpeta y abrir <http://localhost:8000>.
 
