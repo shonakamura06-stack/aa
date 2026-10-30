@@ -1,0 +1,121 @@
+# REPETICION 1
+TAP version 13
+# DIAG RELOAD {"teams":[{"name":"Luis","pids":["pmvuh8ra8pokyw3"],"owners":["121e72fb-d20a-42c4-8baf-198550375e46"],"score":0},{"name":"Ana","pids":["pmvuh8pyrty6j5r"],"owners":["6ba031c3-045b-4d9c-9eca-436b0f18ba4a"],"score":0}],"dir":{"pmvuh8pyrty6j5r":{"pid":"pmvuh8pyrty6j5r","name":"Ana","slot":1,"joined":true,"online":true,"at":1793334814754},"pmvuh8ra8pokyw3":{"pid":"pmvuh8ra8pokyw3","name":"Luis","slot":0,"joined":true,"online":true,"at":1793334814748}},"conns":[{"id":"121e72fb-d20a-42c4-8baf-198550375e46","name":"Luis","pid":"pmvuh8ra8pokyw3","slot":0,"online":true,"open":true},{"id":"6ba031c3-045b-4d9c-9eca-436b0f18ba4a","name":"Ana","pid":"pmvuh8pyrty6j5r","slot":1,"online":true,"open":true}],"individuales":false,"game":"hub"}
+# Subtest: Precio rechaza estimaciones de antes de recargar y acepta la actual
+not ok 1 - Precio rechaza estimaciones de antes de recargar y acepta la actual
+  ---
+  duration_ms: 19831.547151
+  type: 'test'
+  location: '/home/user/aa/tests/precio-ronda-recarga.cjs:8:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    locator.waitFor: Timeout 10000ms exceeded.
+    Call log:
+      - waiting for locator('#v36-capa #v36-enviar') to be visible
+    
+  code: 'ERR_TEST_FAILURE'
+  name: 'TimeoutError'
+  stack: |-
+    abrir (/home/user/aa/tests/precio-ronda-recarga.cjs:15:480)
+    async TestContext.<anonymous> (/home/user/aa/tests/precio-ronda-recarga.cjs:17:812)
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 20513.594516
+# REPETICION 2
+TAP version 13
+# DIAG RELOAD {"teams":[{"name":"Ana","pids":["pmvuh95mmq5vu7q"],"owners":["d2349943-7ffd-428e-b406-f5667cc8f311"],"score":0},{"name":"Luis","pids":["pmvuh972qsswkxl"],"owners":["dfed5aa9-8b93-414b-bca4-ac5b9112dff6"],"score":0}],"dir":{"pmvuh95mmq5vu7q":{"pid":"pmvuh95mmq5vu7q","name":"Ana","slot":0,"joined":true,"online":true,"at":1793334835249},"pmvuh972qsswkxl":{"pid":"pmvuh972qsswkxl","name":"Luis","slot":1,"joined":true,"online":true,"at":1793334835296}},"conns":[{"id":"d2349943-7ffd-428e-b406-f5667cc8f311","name":"Ana","pid":"pmvuh95mmq5vu7q","slot":0,"online":true,"open":true},{"id":"dfed5aa9-8b93-414b-bca4-ac5b9112dff6","name":"Luis","pid":"pmvuh972qsswkxl","slot":1,"online":true,"open":true}],"individuales":false,"game":"hub"}
+# DIAG ANTES {"mesa":{"slot":0,"serial":1793334832770214,"on":true,"quien":"Ana","hecho":false},"players":[{"slot":0,"estado":{"on":true,"mio":true,"quien":"Ana","item":"Una cena de aniversario para dos","buf":"","enviado":false,"esperando":false,"serial":1793334832770214}},{"slot":1,"estado":{"on":true,"mio":false,"quien":"Ana","item":"Una cena de aniversario para dos","buf":"","enviado":false,"esperando":false,"serial":1793334832770214}}]}
+# Subtest: Precio rechaza estimaciones de antes de recargar y acepta la actual
+ok 1 - Precio rechaza estimaciones de antes de recargar y acepta la actual
+  ---
+  duration_ms: 11631.263856
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 12006.022206
+# REPETICION 3
+TAP version 13
+# DIAG RELOAD {"teams":[{"name":"Ana","pids":["pmvuh9f17a2pzj1"],"owners":["da57b098-0dce-4e97-b701-d1791b77db46"],"score":0},{"name":"Luis","pids":["pmvuh9gc3sxgp90"],"owners":["e0ad36a8-a64b-4b85-983d-0fa960a9a556"],"score":0}],"dir":{"pmvuh9f17a2pzj1":{"pid":"pmvuh9f17a2pzj1","name":"Ana","slot":0,"joined":true,"online":true,"at":1793334847232},"pmvuh9gc3sxgp90":{"pid":"pmvuh9gc3sxgp90","name":"Luis","slot":1,"joined":true,"online":true,"at":1793334847240}},"conns":[{"id":"e0ad36a8-a64b-4b85-983d-0fa960a9a556","name":"Luis","pid":"pmvuh9gc3sxgp90","slot":1,"online":true,"open":true},{"id":"da57b098-0dce-4e97-b701-d1791b77db46","name":"Ana","pid":"pmvuh9f17a2pzj1","slot":0,"online":true,"open":true}],"individuales":false,"game":"hub"}
+# DIAG ANTES {"mesa":{"slot":0,"serial":1793334844816007,"on":true,"quien":"Ana","hecho":false},"players":[{"slot":0,"estado":{"on":true,"mio":true,"quien":"Ana","item":"Un pasaje La Paz–Santa Cruz en avión","buf":"","enviado":false,"esperando":false,"serial":1793334844816007}},{"slot":1,"estado":{"on":true,"mio":false,"quien":"Ana","item":"Un pasaje La Paz–Santa Cruz en avión","buf":"","enviado":false,"esperando":false,"serial":1793334844816007}}]}
+# Subtest: Precio rechaza estimaciones de antes de recargar y acepta la actual
+ok 1 - Precio rechaza estimaciones de antes de recargar y acepta la actual
+  ---
+  duration_ms: 11922.224967
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 12298.187744
+# REPETICION 4
+TAP version 13
+# DIAG RELOAD {"teams":[{"name":"Ana","pids":["pmvuh9ols9ymnbc"],"owners":["f6aefc20-d7ef-4cf6-8dcb-0f2478c58566"],"score":0},{"name":"Luis","pids":["pmvuh9q75gngrye"],"owners":["37059b26-737d-4318-8abb-58012b6aa46f"],"score":0}],"dir":{"pmvuh9ols9ymnbc":{"pid":"pmvuh9ols9ymnbc","name":"Ana","slot":0,"joined":true,"online":true,"at":1793334860085},"pmvuh9q75gngrye":{"pid":"pmvuh9q75gngrye","name":"Luis","slot":1,"joined":true,"online":true,"at":1793334860105}},"conns":[{"id":"37059b26-737d-4318-8abb-58012b6aa46f","name":"Luis","pid":"pmvuh9q75gngrye","slot":1,"online":true,"open":true},{"id":"f6aefc20-d7ef-4cf6-8dcb-0f2478c58566","name":"Ana","pid":"pmvuh9ols9ymnbc","slot":0,"online":true,"open":true}],"individuales":false,"game":"hub"}
+# DIAG ANTES {"mesa":{"slot":0,"serial":1793334857673059,"on":true,"quien":"Ana","hecho":false},"players":[{"slot":0,"estado":{"on":true,"mio":true,"quien":"Ana","item":"Un litro de aceite de girasol","buf":"","enviado":false,"esperando":false,"serial":1793334857673059}},{"slot":1,"estado":{"on":true,"mio":false,"quien":"Ana","item":"Un litro de aceite de girasol","buf":"","enviado":false,"esperando":false,"serial":1793334857673059}}]}
+# Subtest: Precio rechaza estimaciones de antes de recargar y acepta la actual
+ok 1 - Precio rechaza estimaciones de antes de recargar y acepta la actual
+  ---
+  duration_ms: 12626.675894
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 13024.563434
+# REPETICION 5
+TAP version 13
+# DIAG RELOAD {"teams":[{"name":"Luis","pids":["pmvuha0cich879j"],"owners":["be97cd9b-90b2-4532-9ae3-926cd7865c95"],"score":0},{"name":"Ana","pids":["pmvuh9yrkmiufrp"],"owners":["432c9f26-45a3-447b-8063-5c897f355788"],"score":0}],"dir":{"pmvuh9yrkmiufrp":{"pid":"pmvuh9yrkmiufrp","name":"Ana","slot":1,"joined":true,"online":true,"at":1793334873018},"pmvuha0cich879j":{"pid":"pmvuha0cich879j","name":"Luis","slot":0,"joined":true,"online":true,"at":1793334873011}},"conns":[{"id":"be97cd9b-90b2-4532-9ae3-926cd7865c95","name":"Luis","pid":"pmvuha0cich879j","slot":0,"online":true,"open":true},{"id":"432c9f26-45a3-447b-8063-5c897f355788","name":"Ana","pid":"pmvuh9yrkmiufrp","slot":1,"online":true,"open":true}],"individuales":false,"game":"hub"}
+# Subtest: Precio rechaza estimaciones de antes de recargar y acepta la actual
+not ok 1 - Precio rechaza estimaciones de antes de recargar y acepta la actual
+  ---
+  duration_ms: 10933.136554
+  type: 'test'
+  location: '/home/user/aa/tests/precio-ronda-recarga.cjs:8:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    no debe avanzar al siguiente jugador con estimaciones anteriores
+    
+    0 !== -1
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: -1
+  actual: 0
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/home/user/aa/tests/precio-ronda-recarga.cjs:18:177)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 11471.037775

@@ -1,0 +1,70 @@
+# REPETICION 1
+TAP version 13
+# DIAG ANTES {"mesa":{"slot":0,"serial":1793334654548917,"on":true,"quien":"Equipo 1","hecho":false},"players":[{"slot":0,"estado":{"on":true,"mio":true,"quien":"Equipo 1","item":"Una cena de aniversario para dos","buf":"","enviado":false,"esperando":false,"serial":1793334654548917}},{"slot":0,"estado":{"on":true,"mio":true,"quien":"Equipo 1","item":"Una cena de aniversario para dos","buf":"","enviado":false,"esperando":false,"serial":1793334654548917}}]}
+# DIAG FALLO {"mesa":{"slot":0,"serial":1793334654548917,"on":false,"quien":"Equipo 1","hecho":false,"estimates":[{"name":"Equipo 1","slot":0,"value":"45"}]},"players":[{"slot":0,"estado":{"on":false,"mio":true,"quien":"Equipo 1","item":"Una cena de aniversario para dos","buf":"","enviado":false,"esperando":false,"serial":1793334654548917}},{"slot":0,"estado":{"on":false,"mio":true,"quien":"Equipo 1","item":"Una cena de aniversario para dos","buf":"","enviado":false,"esperando":false,"serial":1793334654548917}}]}
+# Subtest: Precio rechaza estimaciones de antes de recargar y acepta la actual
+not ok 1 - Precio rechaza estimaciones de antes de recargar y acepta la actual
+  ---
+  duration_ms: 21851.507439
+  type: 'test'
+  location: '/home/user/aa/tests/precio-ronda-recarga.cjs:8:1'
+  failureType: 'testCodeFailure'
+  error: 'page.waitForFunction: Timeout 10000ms exceeded.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TimeoutError'
+  stack: |-
+    TestContext.<anonymous> (/home/user/aa/tests/precio-ronda-recarga.cjs:20:161)
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 22260.874026
+# REPETICION 2
+TAP version 13
+# DIAG ANTES {"mesa":{"slot":0,"serial":1793334676764491,"on":true,"quien":"Equipo 1","hecho":false},"players":[{"slot":0,"estado":{"on":true,"mio":true,"quien":"Equipo 1","item":"Una botella de singani de 750 ml","buf":"","enviado":false,"esperando":false,"serial":1793334676764491}},{"slot":0,"estado":{"on":true,"mio":true,"quien":"Equipo 1","item":"Una botella de singani de 750 ml","buf":"","enviado":false,"esperando":false,"serial":1793334676764491}}]}
+# DIAG FALLO {"mesa":{"slot":0,"serial":1793334676764491,"on":false,"quien":"Equipo 1","hecho":false,"estimates":[{"name":"Equipo 1","slot":0,"value":"45"}]},"players":[{"slot":0,"estado":{"on":false,"mio":true,"quien":"Equipo 1","item":"Una botella de singani de 750 ml","buf":"","enviado":false,"esperando":false,"serial":1793334676764491}},{"slot":0,"estado":{"on":false,"mio":true,"quien":"Equipo 1","item":"Una botella de singani de 750 ml","buf":"","enviado":false,"esperando":false,"serial":1793334676764491}}]}
+# Subtest: Precio rechaza estimaciones de antes de recargar y acepta la actual
+not ok 1 - Precio rechaza estimaciones de antes de recargar y acepta la actual
+  ---
+  duration_ms: 21656.339531
+  type: 'test'
+  location: '/home/user/aa/tests/precio-ronda-recarga.cjs:8:1'
+  failureType: 'testCodeFailure'
+  error: 'page.waitForFunction: Timeout 10000ms exceeded.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TimeoutError'
+  stack: |-
+    TestContext.<anonymous> (/home/user/aa/tests/precio-ronda-recarga.cjs:20:161)
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 22113.606702
+# REPETICION 3
+TAP version 13
+# DIAG ANTES {"mesa":{"slot":0,"serial":1793334698804071,"on":true,"quien":"Ana","hecho":false},"players":[{"slot":0,"estado":{"on":true,"mio":true,"quien":"Ana","item":"Un paquete de 12 salteñas","buf":"","enviado":false,"esperando":false,"serial":1793334698804071}},{"slot":1,"estado":{"on":true,"mio":false,"quien":"Ana","item":"Un paquete de 12 salteñas","buf":"","enviado":false,"esperando":false,"serial":1793334698804071}}]}
+# Subtest: Precio rechaza estimaciones de antes de recargar y acepta la actual
+ok 1 - Precio rechaza estimaciones de antes de recargar y acepta la actual
+  ---
+  duration_ms: 12414.824029
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 12790.638706

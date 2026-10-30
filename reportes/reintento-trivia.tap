@@ -1,0 +1,16 @@
+TAP version 13
+# Subtest: Trivia en solitario permite responder en pantalla y resuelve una vez
+ok 1 - Trivia en solitario permite responder en pantalla y resuelve una vez
+  ---
+  duration_ms: 4083.024305
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4542.04637

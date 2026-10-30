@@ -1,0 +1,44 @@
+TAP version 13
+# Subtest: Personaje rechaza respuestas sin ronda o de antes de recargar, y acepta la actual
+not ok 1 - Personaje rechaza respuestas sin ronda o de antes de recargar, y acepta la actual
+  ---
+  duration_ms: 8352.145005
+  type: 'test'
+  location: '/home/user/aa/tests/personaje-ronda-segura.cjs:8:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    no debe aceptar mensajes sin identificador de ronda
+    + actual - expected
+    
+    + {
+    +   '0': {
+    +     at: 1793322947209,
+    +     ronda: 1,
+    +     texto: 'Respuesta sin identificador'
+    +   }
+    + }
+    - {}
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual:
+    0:
+      ronda: 1
+      texto: 'Respuesta sin identificador'
+      at: 1793322947209
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (/home/user/aa/tests/personaje-ronda-segura.cjs:17:148)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 8913.501478

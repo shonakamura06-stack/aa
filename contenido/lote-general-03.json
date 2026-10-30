@@ -1,0 +1,102 @@
+{
+  "reto": [
+    "Describe un objeto cotidiano sin decir su nombre y deja que los demás lo adivinen.",
+    "Ordena tres sonidos que te gusten de más suave a más intenso y explica tu elección.",
+    "Dibuja un medio de transporte que pueda circular tanto por agua como por tierra.",
+    "Cuenta una noticia optimista inventada en menos de treinta segundos.",
+    "Inventa una pregunta para entrevistar a una persona que cuida un bosque.",
+    "Di tres palabras que te recuerden a una mañana de vacaciones.",
+    "Describe una escena usando únicamente comparaciones con sabores.",
+    "Organiza con las manos una pequeña orquesta imaginaria durante diez segundos.",
+    "Cuenta un recuerdo agradable sin nombrar el lugar donde ocurrió.",
+    "Propón una forma amable de dar la bienvenida a alguien que acaba de llegar."
+  ],
+  "cadena": [
+    "La dueña del taller abrió una caja de botones y encontró uno que daba indicaciones.",
+    "En el último asiento del teatro alguien había dejado un programa de una obra que aún no existía.",
+    "El equipo de rescate llegó al puente y descubrió que el río había cambiado de dirección.",
+    "Un cocinero encontró en su recetario una página que solo aparecía a la luz de la mañana.",
+    "La emisora local recibió una llamada de alguien que decía vivir dentro del viejo reloj.",
+    "Cada ventana del museo reflejaba una estación distinta aunque afuera era verano.",
+    "Una niña encontró en el bolsillo de su abrigo una entrada para un concierto de grillos.",
+    "El sendero del parque terminaba en una puerta con una nota: vuelve cuando tengas una pregunta.",
+    "Durante el apagón, los vecinos escucharon una melodía que parecía venir del ascensor.",
+    "La nueva profesora llevó al aula una caja cerrada que se movía al escuchar su nombre."
+  ],
+  "yonunca": [
+    "he aprendido a reparar una prenda en vez de reemplazarla",
+    "he escuchado una entrevista completa de alguien que admiro",
+    "he visitado una exposición de fotografía",
+    "he cambiado de opinión después de leer sobre un tema",
+    "he ayudado a alguien a buscar un objeto perdido",
+    "he probado una fruta que no conocía",
+    "he dejado una nota de agradecimiento a otra persona",
+    "he seguido una ruta distinta para regresar a casa",
+    "he compartido una herramienta con una persona vecina",
+    "he preparado una lista de música para un viaje"
+  ],
+  "probable": [
+    "¿Quién es más probable que encuentre una forma de reparar algo antes de comprar otro?",
+    "¿Quién es más probable que descubra un artista nuevo y comparta su música?",
+    "¿Quién es más probable que recuerde llevar agua durante una caminata?",
+    "¿Quién es más probable que haga una pregunta interesante en una visita guiada?",
+    "¿Quién es más probable que organice una tarde de juegos cooperativos?",
+    "¿Quién es más probable que aprenda una receta familiar y la anote?",
+    "¿Quién es más probable que se ofrezca a cuidar una planta durante un viaje?",
+    "¿Quién es más probable que prepare una sorpresa hecha a mano?",
+    "¿Quién es más probable que reconozca una canción con las primeras notas?",
+    "¿Quién es más probable que descubra un camino alternativo en un paseo?"
+  ],
+  "palabras": [
+    {
+      "word": "CALENDARIO",
+      "category": "Organización",
+      "clueHint": "Fechas, meses y días"
+    },
+    {
+      "word": "SISMÓGRAFO",
+      "category": "Instrumentos",
+      "clueHint": "Terremoto, medición y vibración"
+    },
+    {
+      "word": "COLADOR",
+      "category": "Cocina",
+      "clueHint": "Agujeros, líquidos y separar"
+    },
+    {
+      "word": "COMETA",
+      "category": "Juguetes",
+      "clueHint": "Viento, cuerda y cielo"
+    },
+    {
+      "word": "SEMILLA",
+      "category": "Naturaleza",
+      "clueHint": "Tierra, germinar y planta"
+    },
+    {
+      "word": "MOSAICO",
+      "category": "Arte",
+      "clueHint": "Piezas, imagen y superficie"
+    },
+    {
+      "word": "ORFEBRE",
+      "category": "Oficios",
+      "clueHint": "Metales, joyas y taller"
+    },
+    {
+      "word": "MARIMBA",
+      "category": "Música",
+      "clueHint": "Láminas, mazos y melodía"
+    },
+    {
+      "word": "SILLÓN",
+      "category": "Muebles",
+      "clueHint": "Asiento, respaldo y descanso"
+    },
+    {
+      "word": "MONTAÑA",
+      "category": "Geografía",
+      "clueHint": "Cumbre, pendiente y altura"
+    }
+  ]
+}
