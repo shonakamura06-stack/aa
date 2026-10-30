@@ -8,8 +8,10 @@ let browserMod;
 let disponible = true;
 try {
   browserMod = await import('../lib/browser.mjs');
-  browserMod.resolveChrome();
-  browserMod.resolveLibs();
+  browserMod.resolveChrome(); // basta con tener un navegador: las libs son opcionales
+  // comprobar que el lanzador funciona de verdad, no solo que el binario exista
+  const probe = await browserMod.launch({ width: 400, height: 300 });
+  await probe.close();
 } catch {
   disponible = false;
 }

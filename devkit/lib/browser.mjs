@@ -23,13 +23,15 @@ export const VIEWPORTS = {
   og: { width: 1200, height: 630 },
 };
 
+/** Devuelve el directorio de librerías o null si no hace falta (Chromium del sistema). */
 export function resolveLibs() {
+  if (process.env.LD_LIBRARY_PATH && fs.existsSync(path.join(process.env.LD_LIBRARY_PATH.split(':')[0], 'libnspr4.so'))) {
+    return process.env.LD_LIBRARY_PATH.split(':')[0];
+  }
   for (const d of CANDIDATE_LIBS) {
     if (fs.existsSync(path.join(d, 'libnspr4.so'))) return d;
   }
-  throw new Error(
-    'Librerías NSS/NSPR no encontradas. Ejecuta: bash toolkit/bootstrap.sh',
-  );
+  return null;
 }
 
 export function resolveChrome() {
@@ -61,9 +63,15 @@ export function fontFaceCss() {
 }
 
 export async function launch({ width = 1440, height = 900, dpr = 1, lang = 'es-ES' } = {}) {
-  const libs = resolveLibs();
   const executablePath = resolveChrome();
-  process.env.LD_LIBRARY_PATH = [libs, process.env.LD_LIBRARY_PATH].filter(Boolean).join(':');
+  // Las librerías solo son necesarias para el binario del sandbox (@sparticuz),
+  // no para un Chromium del sistema. En CI se usa el del sistema y no se exigen.
+  const esBinarioDelSandbox = CANDIDATE_CHROME.includes(executablePath);
+  const libs = resolveLibs();
+  if (esBinarioDelSandbox && !libs) {
+    throw new Error('Librerías NSS/NSPR no encontradas. Ejecuta: bash toolkit/bootstrap.sh');
+  }
+  if (libs) process.env.LD_LIBRARY_PATH = [libs, process.env.LD_LIBRARY_PATH].filter(Boolean).join(':');
   const chromium = (await import('@sparticuz/chromium')).default;
   const puppeteer = (await import('puppeteer-core')).default;
 
