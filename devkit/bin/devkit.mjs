@@ -245,4 +245,14 @@ const commands = {
 
 if (!cmd || cmd === 'help' || cmd === '--help') { console.log(HELP); process.exit(0); }
 if (!commands[cmd]) { console.error(`comando desconocido: ${cmd}\n\n${HELP}`); process.exit(1); }
-Promise.resolve(commands[cmd]()).catch((e) => { console.error(`error: ${e.message}`); process.exit(1); });
+Promise.resolve(commands[cmd]()).catch((e) => {
+  console.error(`error: ${e.message}`);
+  if (process.env.GITHUB_ACTIONS) {
+    // sin acceso a logs, la anotación es el único canal legible
+    console.log(`::error title=devkit ${cmd}::${String(e.message).replace(/[\r\n]+/g, ' ').slice(0, 600)}`);
+    if (e.stack) console.log(`::error title=stack::${String(e.stack).split('\n').slice(0, 4).join(' | ').slice(0, 600)}`);
+  } else if (process.env.DEVKIT_DEBUG) {
+    console.error(e.stack);
+  }
+  process.exit(1);
+});
