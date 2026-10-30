@@ -6,7 +6,13 @@ import path from 'node:path';
 
 const CANDIDATE_LIBS = ['/home/user/lib', '/tmp/toolkit/lib'];
 const CANDIDATE_CHROME = ['/tmp/chromium', '/tmp/toolkit/chromium'];
-const FONT_DIR = '/home/user/lib/fonts';
+// Orden de búsqueda: permite que CI use exactamente las mismas fuentes que el sandbox.
+const FONT_DIRS = [
+  process.env.FONT_DIR,
+  '/home/user/lib/fonts',
+  path.resolve(import.meta.dirname, '../../toolkit/fonts'),
+].filter(Boolean);
+const FONT_DIR = FONT_DIRS.find((d) => fs.existsSync(d) && fs.readdirSync(d).some((f) => f.endsWith('.ttf'))) || FONT_DIRS[1];
 
 export const VIEWPORTS = {
   desktop: { width: 1440, height: 900 },
@@ -42,6 +48,8 @@ export function resolveChrome() {
 /** @font-face con cada TTF del repo, para que las capturas no usen la fuente por defecto del sandbox. */
 export function fontFaceCss() {
   if (!fs.existsSync(FONT_DIR)) return '';
+  // También expone la ruta usada, para poder auditarla en CI.
+  fontFaceCss.dir = FONT_DIR;
   return fs.readdirSync(FONT_DIR)
     .filter((f) => f.endsWith('.ttf'))
     .map((f) => {

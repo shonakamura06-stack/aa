@@ -1,7 +1,7 @@
 name: devkit
 
 # Lo que el sandbox no puede hacer, lo hace el CI: navegador del sistema,
-# matrices de Node, y verificación independiente de los mismos tests.
+# matrices de Node y verificación independiente de los mismos tests.
 on:
   push:
     branches: [main, 'arena/**']
@@ -16,14 +16,12 @@ concurrency:
 
 jobs:
   test:
-    name: tests (${{ matrix.os }} · node ${{ matrix.node }})
-    runs-on: ${{ matrix.os }}
+    name: tests (node ${{ matrix.node }})
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - { os: ubuntu-latest, node: 22 }
-          - { os: ubuntu-latest, node: 20 }
+        node: [20, 22]
     steps:
       - uses: actions/checkout@v4
 
@@ -33,36 +31,52 @@ jobs:
           cache: npm
           cache-dependency-path: devkit/package-lock.json
 
-      # En CI se usa el Chromium del sistema en lugar del binario del sandbox.
+      - uses: browser-actions/setup-chrome@v1
+        id: chrome
+        with:
+          install-chrome: true
+
       - name: Instalar dependencias
         working-directory: devkit
         run: npm ci --no-audit --no-fund
 
-      - name: Instalar Chromium del sistema
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq chromium-browser || sudo apt-get install -y -qq chromium || true
-          command -v chromium-browser || command -v chromium || command -v google-chrome
-
-      - name: Fuentes para que el render sea reproducible
-        run: |
-          sudo apt-get install -y -qq fonts-inter fonts-jetbrains-mono || true
-
       - name: Tests unitarios y de integración
         working-directory: devkit
         env:
-          CHROME_PATH: ${{ vars.CHROME_PATH }}
+          CHROME_PATH: ${{ steps.chrome.outputs.chrome-path }}
+          FONT_DIR: ${{ github.workspace }}/toolkit/fonts
         run: npm test
 
       - name: Regenerar tokens y comprobar que no hay deriva
         working-directory: devkit
         run: |
           node bin/tokens.mjs
-          git diff --exit-code reference/ || (echo "::error::los tokens cambiaron; ejecuta 'devkit tokens' y commitea" && exit 1)
+          git diff --exit-code reference/ || { echo "::error::los tokens cambiaron; ejecuta 'devkit tokens' y commitea"; exit 1; }
 
-      - name: Gate de diseño (interfaz de referencia debe puntuar 100)
+      - name: Gate de diseño (la interfaz de referencia debe puntuar 100)
         working-directory: devkit
+        env:
+          CHROME_PATH: ${{ steps.chrome.outputs.chrome-path }}
+          FONT_DIR: ${{ github.workspace }}/toolkit/fonts
         run: node bin/devkit.mjs check test/fixtures/good.html --min-score 100 --max-errors 0
+
+      - name: Análisis de ejemplo de una interfaz con defectos (no bloquea)
+        if: always()
+        working-directory: devkit
+        env:
+          CHROME_PATH: ${{ steps.chrome.outputs.chrome-path }}
+          FONT_DIR: ${{ github.workspace }}/toolkit/fonts
+        run: |
+          node bin/devkit.mjs audit test/fixtures/bad.html --viewport mobile || true
+          echo "### Auditoría de la interfaz con defectos" >> $GITHUB_STEP_SUMMARY
+          cat "$(ls -t reports/*.md | head -1)" >> $GITHUB_STEP_SUMMARY
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: devkit-report-node${{ matrix.node }}
+          path: devkit/reports/
+          retention-days: 7
 
   gate:
     name: puerta de calidad
@@ -70,14 +84,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: 22, cache: npm, cache-dependency-path: devkit/package-lock.json }
-      - working-directory: devkit
-        run: npm ci --no-audit --no-fund
-      - name: Verificar que el repositorio no tiene binarios pesados fuera de toolkit/lib
+      - name: Verificar que no se commitean archivos sobredimensionados
         run: |
           limite=$((3 * 1024 * 1024))
           malos=$(git ls-files -z | xargs -0 -I{} sh -c 'test -f "{}" && s=$(wc -c <"{}") && [ "$s" -gt '"$limite"' ] && echo "{} $s"' || true)
-          if [ -n "$malos" ]; then echo "::warning::archivos > 3 MB:"; echo "$malos"; fi
+          if [ -n "$malos" ]; then
+            echo "::warning::archivos > 3 MB versionados:"
+            echo "$malos"
+          fi
       - name: Resumen
-        run: echo "devkit verificado en CI" >> $GITHUB_STEP_SUMMARY
+        run: echo "devkit verificado en CI (tests, tokens sin deriva, gate de diseño)" >> $GITHUB_STEP_SUMMARY

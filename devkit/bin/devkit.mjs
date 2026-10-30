@@ -195,10 +195,23 @@ async function check() {
   if (fallos.length) {
     console.error(`FALLO en ${target} (${vpName}): ${fallos.join(' | ')}`);
     if (detalle) console.error(detalle);
+    // Anotaciones de GitHub Actions: hacen el fallo legible sin acceso a logs.
+    if (process.env.GITHUB_ACTIONS) {
+      for (const f of r.findings) {
+        console.log(`::error title=${f.id}::${f.severity}: ${f.title} — ${String(f.evidence).slice(0, 200)}`);
+      }
+      const fs2 = fs;
+      if (process.env.GITHUB_STEP_SUMMARY) {
+        const lines = [`### FALLO en \`${target}\` (${vpName})`, '', `| Severidad | id | Detalle |`, `|---|---|---|`,
+          ...r.findings.map((f) => `| ${f.severity} | \`${f.id}\` | ${f.title} |`)];
+        fs2.appendFileSync(process.env.GITHUB_STEP_SUMMARY, lines.join('\n') + '\n');
+      }
+    }
     process.exitCode = 1;
     return;
   }
   console.log(`OK ${target} (${vpName}) · errores ${error} · advertencias ${warning} · puntuación ${score}`);
+  console.log(`fuentes: ${fontFaceCss.dir || 'del sistema'}`);
 }
 
 const HELP = `devkit — entorno de desarrollo verificado del sandbox
