@@ -65,7 +65,7 @@
   }
 
   /* -------------------------------- estado -------------------------------- */
-  var CURVE_COLORS = ['#4ade80', '#38bdf8', '#c084fc', '#fbbf24', '#fb7185', '#2dd4bf'];
+  var CURVE_COLORS = ['#8a6a45', '#4a6f8a', '#7d6a94', '#a67c33', '#a4553f', '#5b7a63'];
   var LS_KEY = 'trazador.escena.v3';
 
   function defaultState() {
@@ -77,8 +77,8 @@
       arena: { w: 160, h: 160, show: true },
       player: { x: -55, y: -25 },
       others: [
-        { id: uid(), name: 'Rival A', x: 55, y: 15, color: '#38bdf8' },
-        { id: uid(), name: 'Rival B', x: 10, y: 55, color: '#c084fc' }
+        { id: uid(), name: 'Rival A', x: 55, y: 15, color: '#4a6f8a' },
+        { id: uid(), name: 'Rival B', x: 10, y: 55, color: '#7d6a94' }
       ],
       obstacles: [
         { id: uid(), type: 'tri', name: 'Bloque 1', x: -15, y: -40, w: 24, h: 20 },
@@ -234,6 +234,566 @@
   }
 
   state.curves.forEach(compileCurve);
+/* =========================================================================
+   Trazador — curva a mano (puntos móviles -> ecuación del juego)
+   ========================================================================= */
+
+  /* --------------------------- curvas a mano ------------------------------ */
+  // Una curva a mano la define el jugador con puntos: de ahí sale una spline
+  // (lo que ve) y, sobre todo, una ECUACIÓN que el juego entiende de verdad.
+  // Se ajusta con recta, polinomio o suma de ondas y se emite en el dialecto
+  // de Math Wars: x, números, + - * / y cos(x).
+  var FREE_MAX_LEN = 190;   // el chat de Roblox corta alrededor de 200 caracteres
+
+  function freeData(c) {
+    if (!c.free) c.free = { pts: [], fit: 'auto', deg: 6, terms: 3 };
+    if (!Array.isArray(c.free.pts)) c.free.pts = [];
+    if (!c.free.fit) c.free.fit = 'auto';
+    if (!(c.free.deg >= 1)) c.free.deg = 6;
+    if (!(c.free.terms >= 1)) c.free.terms = 3;
+    return c.free;
+  }
+
+  function sortPoints(pts) {
+    pts.sort(function (a, b) { return a.x - b.x; });
+    return pts;
+  }
+
+  // copia ordenada por x (la que usa la spline y el ajuste)
+  function sortedPts(c) {
+    return freePoints(c).slice().sort(function (a, b) { return a.x - b.x; });
+  }
+
+  // spline monótona (Fritsch–Carlson): pasa por los puntos sin rebotar
+  function freeSpline(pts) {
+    var n = pts.length, i;
+    if (!n) return null;
+    if (n === 1) return { xs: [pts[0].x], ys: [pts[0].y], ms: [0] };
+    var xs = [], ys = [], h = [], d = [], m = [];
+    for (i = 0; i < n; i++) { xs.push(pts[i].x); ys.push(pts[i].y); }
+    for (i = 0; i < n - 1; i++) {
+      h[i] = (xs[i + 1] - xs[i]) || 1e-6;
+      d[i] = (ys[i + 1] - ys[i]) / h[i];
+    }
+    m[0] = d[0];
+    for (i = 1; i < n - 1; i++) {
+      if (d[i - 1] * d[i] <= 0) { m[i] = 0; }
+      else {
+        var w1 = 2 * h[i] + h[i - 1], w2 = h[i] + 2 * h[i - 1];
+        m[i] = (w1 + w2) / (w1 / d[i - 1] + w2 / d[i]);
+      }
+    }
+    m[n - 1] = d[n - 2];
+    return { xs: xs, ys: ys, ms: m };
+  }
+
+  function splineAt(sp, x) {
+    var xs = sp.xs, n = xs.length;
+    if (!sp) return NaN;
+    if (n === 1) return sp.ys[0];
+    if (x <= xs[0]) return sp.ys[0];
+    if (x >= xs[n - 1]) return sp.ys[n - 1];
+    var i = 0;
+    while (i < n - 2 && x > xs[i + 1]) i++;
+    var hh = (xs[i + 1] - xs[i]) || 1e-6;
+    var t = (x - xs[i]) / hh, t2 = t * t, t3 = t2 * t;
+    var h00 = 2 * t3 - 3 * t2 + 1;
+    var h10 = t3 - 2 * t2 + t;
+    var h01 = -2 * t3 + 3 * t2;
+    var h11 = t3 - t2;
+    return h00 * sp.ys[i] + h10 * hh * sp.ms[i] + h01 * sp.ys[i + 1] + h11 * hh * sp.ms[i + 1];
+  }
+
+  // muestras para el ajuste: la spline, con un poco de margen plano a los lados
+  // (así la ecuación no se dispara hacia arriba fuera de los puntos)
+  function freeSamples(c) {
+    var pts = sortedPts(c);
+    if (pts.length < 2) return null;
+    var sp = freeSpline(pts);
+    var x0 = sp.xs[0], x1 = sp.xs[sp.xs.length - 1];
+    var span = x1 - x0;
+    if (!(span > 1e-6)) return null;
+    var pad = Math.max(span * 0.18, 2.5);
+    var left = x0 - pad, right = x1 + pad;
+    var n = 110, samples = [];
+    for (var i = 0; i <= n; i++) {
+      var x = left + (right - left) * (i / n);
+      var inside = x >= x0 - 1e-9 && x <= x1 + 1e-9;
+      samples.push({ x: x, y: splineAt(sp, x), w: inside ? 1 : 0.4 });
+    }
+    return { samples: samples, x0: x0, x1: x1, span: span, left: left, right: right, sp: sp };
+  }
+
+  function freePoints(c) { return freeData(c).pts; }
+
+  /* --------------------------- álgebra del ajuste -------------------------- */
+  function solveLinear(A, b) {
+    var n = b.length, i, j, k;
+    for (i = 0; i < n; i++) {
+      var piv = i;
+      for (j = i + 1; j < n; j++) if (Math.abs(A[j][i]) > Math.abs(A[piv][i])) piv = j;
+      if (piv !== i) {
+        var tr = A[i]; A[i] = A[piv]; A[piv] = tr;
+        var tb = b[i]; b[i] = b[piv]; b[piv] = tb;
+      }
+      var pv = A[i][i];
+      if (Math.abs(pv) < 1e-13) return null;
+      for (j = i + 1; j < n; j++) {
+        var f = A[j][i] / pv;
+        if (!f) continue;
+        for (k = i; k < n; k++) A[j][k] -= f * A[i][k];
+        b[j] -= f * b[i];
+      }
+    }
+    var out = new Array(n);
+    for (i = n - 1; i >= 0; i--) {
+      var s = b[i];
+      for (j = i + 1; j < n; j++) s -= A[i][j] * out[j];
+      out[i] = s / A[i][i];
+    }
+    return out;
+  }
+
+  // mínimos cuadrados: filas = [phi0, phi1, ...] para cada muestra
+  function leastSquares(rows, ys) {
+    var m = rows[0].length, i, j, k;
+    var AtA = [], Atb = [];
+    for (i = 0; i < m; i++) { AtA.push(new Array(m).fill(0)); Atb.push(0); }
+    for (k = 0; k < rows.length; k++) {
+      var r = rows[k], y = ys[k];
+      for (i = 0; i < m; i++) {
+        Atb[i] += r[i] * y;
+        for (j = i; j < m; j++) AtA[i][j] += r[i] * r[j];
+      }
+    }
+    for (i = 0; i < m; i++) {
+      for (j = 0; j < i; j++) AtA[i][j] = AtA[j][i];
+      AtA[i][i] += 1e-10 * (1 + AtA[i][i]);
+    }
+    return solveLinear(AtA, Atb);
+  }
+
+  function polyMul(a, b) {
+    var out = new Array(a.length + b.length - 1).fill(0);
+    for (var i = 0; i < a.length; i++) {
+      if (!a[i]) continue;
+      for (var j = 0; j < b.length; j++) out[i + j] += a[i] * b[j];
+    }
+    return out;
+  }
+
+  // coeficientes en x (ascendente) de P(u) con u = (x - origen) / L
+  function polyToX(cu, origen, L) {
+    var u = [-origen / L, 1 / L];
+    var acc = [0], cur = [1];
+    for (var k = 0; k < cu.length; k++) {
+      for (var i = 0; i < cur.length; i++) acc[i] = (acc[i] || 0) + cu[k] * cur[i];
+      cur = polyMul(cur, u);
+    }
+    while (acc.length > 1 && Math.abs(acc[acc.length - 1]) < 1e-14) acc.pop();
+    return acc;
+  }
+
+  // número compacto y sin notación científica: en el juego "2e-3" se lee
+  // como "2 * e - 3" (e = número de Euler), así que ahí nunca usamos "e".
+  function nf(v, sig) {
+    sig = sig || 5;
+    if (!isFinite(v) || v === 0) return '0';
+    var a = Math.abs(v);
+    var dec = Math.max(0, Math.min(9, sig - 1 - Math.floor(Math.log10(a))));
+    var t = v.toFixed(dec);
+    t = t.replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '');
+    if (t === '-0' || t === '' || t === '-') t = '0';
+    return t;
+  }
+
+  // Horner: compacto y sin ^ ("((a*x + b)*x + c)")
+  function hornerText(coef, sig) {
+    var n = coef.length - 1, i;
+    var maxAbs = 0;
+    for (i = 0; i < coef.length; i++) maxAbs = Math.max(maxAbs, Math.abs(coef[i]));
+    while (n > 0 && Math.abs(coef[n]) < Math.max(1e-13, maxAbs * 1e-9)) n--;
+    if (!(maxAbs > 0)) return '0';
+    if (n === 0) return nf(coef[0], sig);
+    if (n === 1) {
+      var a = coef[1], b0 = coef[0];
+      var txt = Math.abs(a - 1) < 1e-12 ? 'x' : (Math.abs(a + 1) < 1e-12 ? '-x' : nf(a, sig) + '*x');
+      if (Math.abs(b0) > maxAbs * 1e-9) txt += (b0 < 0 ? ' - ' : ' + ') + nf(Math.abs(b0), sig);
+      return txt;
+    }
+    var out = nf(coef[n], sig);
+    for (i = n - 1; i >= 0; i--) {
+      var c = coef[i];
+      var negligible = Math.abs(c) < maxAbs * 1e-9;
+      if (negligible) { out = '(' + out + ')*x'; continue; }
+      out = '(' + out + ')*x' + (c < 0 ? ' - ' + nf(-c, sig) : ' + ' + nf(c, sig));
+    }
+    return out;
+  }
+
+  function fourierText(co, origen, L, sig) {
+    var parts = [nf(co[0], sig)];
+    var k = 1;
+    while (2 * k < co.length + 1) {
+      var A = co[2 * k - 1], B = co[2 * k];
+      if (A == null || B == null) break;
+      var R = Math.sqrt(A * A + B * B);
+      if (R > 1e-7) {
+        var w = Math.PI * k / L;
+        var psi = -w * origen - Math.atan2(B, A);
+        parts.push(nf(R, sig) + '*cos(' + nf(w, 5) + '*x' +
+          (psi >= 0 ? ' + ' : ' - ') + nf(Math.abs(psi), 4) + ')');
+      }
+      k++;
+    }
+    if (parts.length === 1) return '0';
+    return parts.join(' + ');
+  }
+
+  function evalExprAt(expr, x, cache) {
+    try {
+      var fn = cache.value;
+      if (!fn || cache.src !== expr) {
+        fn = MathEval.compile(expr).fn;
+        cache.src = expr; cache.value = fn;
+      }
+      var v = fn(x, {});
+      return typeof v === 'number' ? v : NaN;
+    } catch (e) { return NaN; }
+  }
+
+  // ajusta los puntos y deja c.expr listo (mundo) + c._export (para el juego)
+  function fitFree(c) {
+    if (!c || c.kind !== 'free') return;
+    var data = freeData(c);
+    var pts = sortedPts(c);
+    c._export = '';
+    c._fit = null;
+
+    if (pts.length < 2) {
+      c.expr = '';
+      c._src = null; c._compiled = null;
+      c._error = pts.length ? 'Añade otro punto para trazar la curva' : 'Coloca al menos 2 puntos';
+      c._screen = [];
+      return;
+    }
+
+    var box = freeSamples(c);
+    if (!box) {
+      c._error = 'Los puntos están todos a la misma altura de x';
+      c._compiled = null; c._screen = [];
+      return;
+    }
+
+    var samples = box.samples;
+    var x0 = box.x0, L = box.span;
+    var shift = state.player.x || 0;          // el juego dispara desde x = 0
+    var ymin = 1e9, ymax = -1e9;
+    samples.forEach(function (s) { if (s.y < ymin) ymin = s.y; if (s.y > ymax) ymax = s.y; });
+    var flatTol = Math.max(8, (ymax - ymin) * 0.8);
+    var want = data.fit || 'auto';
+    var cache = { src: null, value: null };
+    var best = null;
+
+    function consider(kind, co, worldTxt, gameTxt, tag) {
+      if (!gameTxt || gameTxt.length > FREE_MAX_LEN) return;
+      var err = 0, out = 0, bad = false;
+      for (var i = 0; i < samples.length; i++) {
+        var v = evalExprAt(worldTxt, samples[i].x, cache);
+        if (!isFinite(v)) { bad = true; break; }
+        var e = Math.abs(v - samples[i].y);
+        if (samples[i].w < 1) { if (e > out) out = e; }
+        else if (e > err) err = e;
+      }
+      if (bad) return;
+      // castigo suave si la ecuación se dispara fuera de los puntos
+      var score = err + 0.25 * Math.max(0, out - flatTol) +
+        0.045 * (gameTxt.length / 100) + (tag.penal || 0);
+      if (!best || score < best.score) {
+        best = { score: score, err: err, out: out, world: worldTxt, game: gameTxt, tag: tag };
+      }
+    }
+
+    // ajusta con una base dos veces: exacta dentro del tramo y ponderada
+    function tryFit(builder, textFn, tag) {
+      var n = builder(x0).length;
+      [false, true].forEach(function (weighted) {
+        var rows = [], vals = [], i, j;
+        for (i = 0; i < samples.length; i++) {
+          var sm = samples[i];
+          if (!weighted && sm.w < 1) continue;
+          var sw = weighted ? Math.sqrt(sm.w || 1) : 1;
+          var row = builder(sm.x);
+          for (j = 0; j < row.length; j++) row[j] *= sw;
+          rows.push(row);
+          vals.push(sm.y * sw);
+        }
+        if (rows.length < n) return;
+        var co = leastSquares(rows, vals);
+        if (!co) return;
+        var t = { kind: tag.kind, deg: tag.deg, k: tag.k, penal: tag.penal, plain: !weighted };
+        consider(tag.kind, co, textFn(co, x0), textFn(co, x0 - shift), t);
+      });
+    }
+
+    function polyBuilder(deg) {
+      return function (x) {
+        var u = (x - x0) / L, row = [], p = 1;
+        for (var k = 0; k <= deg; k++) { row.push(p); p *= u; }
+        return row;
+      };
+    }
+    function fourBuilder(K) {
+      return function (x) {
+        var u = (x - x0) / L, row = [1];
+        for (var k = 1; k <= K; k++) row.push(Math.cos(Math.PI * k * u), Math.sin(Math.PI * k * u));
+        return row;
+      };
+    }
+    function polyText(co, origin) { return hornerText(polyToX(co, origin, L)); }
+    function fourText(co, origin) { return fourierText(co, origin, L); }
+
+    // --- polinomios (recta, parábola, ...) ---
+    var degs = [];
+    if (want === 'poly') degs = [clamp(Math.round(data.deg), 1, 8)];
+    else {
+      var top = clamp(pts.length + 1, 1, 8);
+      for (var d = 1; d <= top; d++) degs.push(d);
+    }
+    degs.forEach(function (deg) {
+      tryFit(polyBuilder(deg), polyText, { kind: 'poly', deg: deg, penal: 0.012 * deg });
+    });
+
+    // --- ondas (cosenos desfasados) ---
+    var ks = [];
+    if (want === 'four') ks = [clamp(Math.round(data.terms), 1, 5)];
+    else ks = [1, 2, 3, 4, 5];
+    ks.forEach(function (K) {
+      tryFit(fourBuilder(K), fourText, { kind: 'four', k: K, penal: 0.02 * K });
+    });
+
+    if (!best) {
+      c.expr = '';
+      c._src = null; c._compiled = null;
+      c._error = 'No se pudo ajustar (prueba con más puntos)';
+      c._screen = [];
+      return;
+    }
+
+    c.expr = best.world;
+    c._export = best.game;
+    c._fit = { err: best.err, out: best.out, len: best.game.length, kind: best.tag.kind, deg: best.tag.deg, k: best.tag.k };
+    c.dx = 0; c.dy = 0;
+    c._src = null; c._compiled = null;
+    compileCurve(c);
+  }
+
+  // la ecuación que se copia al juego (ya en el marco del disparo)
+  function gameExpr(c) {
+    if (!c) return '';
+    if (c.kind === 'free') return c._export || '';
+    return effectiveExpr(c);
+  }
+
+  function freeAddPoint(c, x, y) {
+    var data = freeData(c);
+    data.pts.push({ x: Math.round(x / 0.5) * 0.5, y: Math.round(y / 0.5) * 0.5 });
+    fitFree(c);
+  }
+
+  function freeDeletePoint(c, index) {
+    var data = freeData(c);
+    if (index < 0 || index >= data.pts.length) return;
+    data.pts.splice(index, 1);
+    fitFree(c);
+  }
+
+  function freePointAt(px, py) {
+    var best = null, bestD = 15 * 15;
+    state.curves.forEach(function (c) {
+      if (c.kind !== 'free' || !c.visible) return;
+      var pts = freePoints(c);
+      for (var i = 0; i < pts.length; i++) {
+        var d = dist2(px, py, X(pts[i].x), Y(pts[i].y));
+        if (d <= bestD) { bestD = d; best = { curve: c, index: i }; }
+      }
+    });
+    return best;
+  }
+
+  // la curva a mano activa (si la hay)
+  function freeActive() {
+    var c = activeCurve();
+    return c && c.kind === 'free' ? c : null;
+  }
+
+  // devuelve la curva a mano activa o crea una nueva
+  function makeFreeCurve(seedX, seedY) {
+    var cur = freeActive();
+    if (cur) return cur;
+    var x = seedX == null ? state.player.x + 4 : seedX;
+    var y = seedY == null ? state.player.y + 2 : seedY;
+    var c = {
+      id: uid(), expr: '', params: {}, ranges: {}, dx: 0, dy: 0,
+      visible: true, color: CURVE_COLORS[state.curves.length % CURVE_COLORS.length],
+      kind: 'free',
+      free: {
+        pts: [
+          { x: x, y: y },
+          { x: x + 16, y: y + 7 },
+          { x: x + 34, y: y + 2 }
+        ],
+        fit: 'auto', deg: 6, terms: 3
+      }
+    };
+    state.curves.push(c);
+    state.activeId = c.id;
+    fitFree(c);
+    renderCurves(); renderParams(); refresh();
+    return c;
+  }
+
+  /* ------------------------ panel de la curva a mano ---------------------- */
+  function renderCurveUI() {
+    var c = freeActive();
+    var fold = $('#freeFold');
+    var note = $('#freeNote');
+    var wrap = $('.expr-wrap');
+    if (wrap) wrap.classList.toggle('is-free', !!c);
+    if (note) note.hidden = !c;
+    if (!fold) return;
+    fold.hidden = !c;
+    if (!c) return;
+
+    var data = freeData(c);
+    $('#freeCount').textContent = data.pts.length;
+    $$('#freeModes button').forEach(function (b) {
+      b.classList.toggle('on', (b.dataset.fit || 'auto') === data.fit);
+    });
+    $('#freeDegWrap').hidden = data.fit !== 'poly';
+    $('#freeTermsWrap').hidden = data.fit !== 'four';
+    $('#freeDeg').value = data.deg; $('#freeDegVal').textContent = data.deg;
+    $('#freeTerms').value = data.terms; $('#freeTermsVal').textContent = data.terms;
+
+    var stat = $('#freeStat');
+    if (!c._fit) {
+      stat.className = 'free-stat warn';
+      stat.textContent = c._error || 'Coloca al menos 2 puntos';
+    } else {
+      var f = c._fit;
+      var how = f.kind === 'poly'
+        ? (f.deg === 1 ? 'una recta' : 'polinomio de grado ' + f.deg)
+        : f.k + ' onda' + (f.k > 1 ? 's' : '');
+      var q = f.err < 0.25 ? 'exacta' : f.err < 1.2 ? 'muy buena' : f.err < 3 ? 'buena' : 'aproximada';
+      stat.className = 'free-stat ' + (f.err < 1.2 ? 'ok' : 'warn');
+      stat.innerHTML = 'Ajustada con ' + how + ' · <b>' + fmt(f.err, 2) + ' u</b> de error máx (' + q + ')' +
+        '<span class="muted">' + f.len + '/200 caracteres</span>';
+    }
+
+    var list = $('#freePtList');
+    var sig = 'n' + data.pts.length;
+    if (list.dataset.sig !== sig) {
+      list.dataset.sig = sig;
+      list.innerHTML = '';
+      data.pts.forEach(function (pt, i) {
+        var row = document.createElement('div');
+        row.className = 'pt-row';
+        row.dataset.i = i;
+        row.innerHTML =
+          '<span class="pt-i">' + (i + 1) + '</span>' +
+          '<input class="pt-x" type="number" step="0.5" inputmode="decimal" aria-label="x del punto ' + (i + 1) + '">' +
+          '<input class="pt-y" type="number" step="0.5" inputmode="decimal" aria-label="y del punto ' + (i + 1) + '">' +
+          '<button class="pt-del" title="Quitar punto">✕</button>';
+        list.appendChild(row);
+      });
+    }
+    $$('#freePtList .pt-row').forEach(function (row) {
+      var i = +row.dataset.i, pt = data.pts[i];
+      if (!pt) return;
+      var ix = row.querySelector('.pt-x'), iy = row.querySelector('.pt-y');
+      if (document.activeElement !== ix) ix.value = fmt(pt.x, 1);
+      if (document.activeElement !== iy) iy.value = fmt(pt.y, 1);
+    });
+  }
+
+  function bindCurveUI() {
+    var modes = $('#freeModes');
+    if (modes) modes.addEventListener('click', function (e) {
+      var b = e.target.closest('button');
+      var c = freeActive();
+      if (!b || !c) return;
+      freeData(c).fit = b.dataset.fit || 'auto';
+      fitFree(c); renderCurves(); renderCurveUI(); refresh();
+    });
+    var deg = $('#freeDeg');
+    if (deg) deg.addEventListener('input', function () {
+      var c = freeActive(); if (!c) return;
+      freeData(c).deg = clamp(Math.round(num(this.value, 6)), 1, 8);
+      fitFree(c); renderCurveUI(); refresh();
+    });
+    var terms = $('#freeTerms');
+    if (terms) terms.addEventListener('input', function () {
+      var c = freeActive(); if (!c) return;
+      freeData(c).terms = clamp(Math.round(num(this.value, 3)), 1, 5);
+      fitFree(c); renderCurveUI(); refresh();
+    });
+    var add = $('#freeAddBtn');
+    if (add) add.addEventListener('click', function () {
+      var c = makeFreeCurve(); if (!c) return;
+      var pts = freePoints(c);
+      var last = pts.length ? pts[pts.length - 1] : { x: state.player.x, y: state.player.y };
+      freeAddPoint(c, last.x + 12, last.y + 4);
+      renderCurves(); renderCurveUI(); refresh();
+    });
+    var clr = $('#freeClearBtn');
+    if (clr) clr.addEventListener('click', function () {
+      var c = freeActive(); if (!c) return;
+      freeData(c).pts = [];
+      fitFree(c); renderCurves(); renderCurveUI(); refresh();
+      toast('Puntos borrados: toca el plano para volver a trazarla');
+    });
+    var toF = $('#freeToFormula');
+    if (toF) toF.addEventListener('click', function () {
+      var c = freeActive(); if (!c) return;
+      if (!c._export) { toast('Todavía no hay ecuación'); return; }
+      c.expr = c._export;
+      c.kind = 'formula';
+      c.free = null;
+      c.dx = 0; c.dy = 0;
+      c._src = null; c._compiled = null; c._paramNames = [];
+      compileCurve(c);
+      setPlaceMode(null);
+      renderCurves(); renderParams(); refresh();
+      toast('Convertida en fórmula: ya puedes editarla a mano');
+    });
+    var makeBtn = $('#makeFree');
+    if (makeBtn) makeBtn.addEventListener('click', function () {
+      setPlaceMode('curve');
+      if (window.innerWidth <= 760) { /* en móvil dejamos el panel abierto */ }
+      toast('Lápiz activo: toca el plano para añadir puntos');
+    });
+    var list = $('#freePtList');
+    if (list) {
+      list.addEventListener('input', function (e) {
+        var c = freeActive(); if (!c) return;
+        var row = e.target.closest('.pt-row'); if (!row) return;
+        var i = +row.dataset.i, pts = freePoints(c), pt = pts[i];
+        if (!pt) return;
+        var v = parseFloat(e.target.value);
+        if (!isFinite(v)) return;
+        if (e.target.classList.contains('pt-x')) pt.x = v; else pt.y = v;
+        fitFree(c);
+        renderCurves(); refresh();
+      });
+      list.addEventListener('click', function (e) {
+        var c = freeActive(); if (!c) return;
+        var b = e.target.closest('.pt-del'); if (!b) return;
+        var i = +e.target.closest('.pt-row').dataset.i;
+        freeDeletePoint(c, i);
+        renderCurves(); renderCurveUI(); refresh();
+      });
+    }
+  }
 
   /* --------------------------- geometría / choques ------------------------- */
   function segRectT(a, b, ob) {
@@ -442,7 +1002,7 @@
         py = Math.round(Y(i * minor)) + 0.5;
         ctx.moveTo(0, py); ctx.lineTo(W, py);
       }
-      ctx.strokeStyle = 'rgba(120,165,210,.06)';
+      ctx.strokeStyle = 'rgba(96,80,60,.07)';
       ctx.lineWidth = 1;
       ctx.stroke();
     }
@@ -456,7 +1016,7 @@
       py = Math.round(Y(i * major)) + 0.5;
       ctx.moveTo(0, py); ctx.lineTo(W, py);
     }
-    ctx.strokeStyle = 'rgba(120,165,210,.14)';
+    ctx.strokeStyle = 'rgba(96,80,60,.16)';
     ctx.stroke();
 
     // ejes
@@ -464,14 +1024,14 @@
     var axisVisibleX = ax > -1 && ax < W + 1;
     var axisVisibleY = ay > -1 && ay < H + 1;
 
-    ctx.strokeStyle = 'rgba(150,200,240,.42)';
+    ctx.strokeStyle = 'rgba(78,64,46,.45)';
     ctx.lineWidth = 1.4;
     if (axisVisibleY) { ctx.beginPath(); ctx.moveTo(0, ay); ctx.lineTo(W, ay); ctx.stroke(); }
     if (axisVisibleX) { ctx.beginPath(); ctx.moveTo(ax, 0); ctx.lineTo(ax, H); ctx.stroke(); }
 
     // etiquetas
     ctx.font = '11px ' + MONO;
-    ctx.fillStyle = 'rgba(170,205,235,.62)';
+    ctx.fillStyle = 'rgba(92,78,58,.72)';
 
     var labelY = clamp(ay + 11, 3, H - 16);
     ctx.textAlign = 'center';
@@ -514,7 +1074,7 @@
     var px = X(state.player.x), py = Y(state.player.y);
     ctx.save();
     ctx.setLineDash([3, 7]);
-    ctx.strokeStyle = 'rgba(74,222,128,.16)';
+    ctx.strokeStyle = 'rgba(74,106,86,.22)';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.arc(px, py, r, 0, TAU);
@@ -530,17 +1090,17 @@
     if (x1 < 0 || x0 > W || y1 < 0 || y0 > H) return;
 
     ctx.save();
-    ctx.fillStyle = 'rgba(56,189,248,.028)';
+    ctx.fillStyle = 'rgba(74,111,138,.05)';
     ctx.fillRect(x0, y0, x1 - x0, y1 - y0);
     ctx.setLineDash([7, 6]);
-    ctx.strokeStyle = 'rgba(56,189,248,.34)';
+    ctx.strokeStyle = 'rgba(74,111,138,.40)';
     ctx.lineWidth = 1.4;
     ctx.strokeRect(x0 + 0.5, y0 + 0.5, x1 - x0, y1 - y0);
     ctx.restore();
 
     ctx.save();
     ctx.font = '600 10px ' + MONO;
-    ctx.fillStyle = 'rgba(125,200,240,.55)';
+    ctx.fillStyle = 'rgba(74,111,138,.72)';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'bottom';
     ctx.fillText('ARENA ' + fmt(a.w, 0) + ' × ' + fmt(a.h, 0), x0 + 4, y0 - 4);
@@ -553,7 +1113,7 @@
     var c = document.createElement('canvas');
     c.width = 12; c.height = 12;
     var g = c.getContext('2d');
-    g.strokeStyle = 'rgba(249,115,22,.30)';
+    g.strokeStyle = 'rgba(164,85,63,.34)';
     g.lineWidth = 2;
     g.beginPath();
     g.moveTo(-3, 15); g.lineTo(15, -3);
@@ -588,14 +1148,14 @@
         ctx.beginPath();
         ctx.arc(X(ob.cx), Y(ob.cy), ob.r * view.scale, 0, TAU);
       }
-      ctx.fillStyle = 'rgba(249,115,22,.13)';
+      ctx.fillStyle = 'rgba(164,85,63,.13)';
       ctx.fill();
       ctx.fillStyle = stripePattern();
       ctx.globalAlpha = 0.55;
       ctx.fill();
       ctx.globalAlpha = 1;
 
-      ctx.strokeStyle = sel ? '#fdba74' : hov ? 'rgba(251,146,60,.8)' : 'rgba(249,115,22,.55)';
+      ctx.strokeStyle = sel ? '#a4553f' : hov ? 'rgba(164,85,63,.85)' : 'rgba(164,85,63,.58)';
       ctx.lineWidth = sel ? 2 : 1.4;
       if (sel) ctx.setLineDash([6, 4]);
       ctx.stroke();
@@ -610,9 +1170,9 @@
     ctx.save();
     for (var i = 0; i < pts.length; i++) {
       roundRectPath(ctx, pts[i].x - 5, pts[i].y - 5, 10, 10, 3);
-      ctx.fillStyle = '#fdba74';
+      ctx.fillStyle = '#a4553f';
       ctx.fill();
-      ctx.strokeStyle = '#7c2d12';
+      ctx.strokeStyle = '#ffffff';
       ctx.lineWidth = 1.5;
       ctx.stroke();
     }
@@ -674,16 +1234,117 @@
         ctx.shadowColor = withAlpha(c.color, .5);
         ctx.shadowBlur = 10;
       }
-      ctx.strokeStyle = active ? c.color : withAlpha(c.color, .42);
-      ctx.lineWidth = active ? 2.4 : 1.5;
+      function strokePolys() {
+        ctx.beginPath();
+        for (var p = 0; p < polys.length; p++) {
+          var poly = polys[p];
+          if (!poly.length) continue;
+          ctx.moveTo(poly[0].x, poly[0].y);
+          for (var k = 1; k < poly.length; k++) ctx.lineTo(poly[k].x, poly[k].y);
+        }
+        ctx.stroke();
+      }
+
+      var zone = null;
+      if (c.kind === 'free') {
+        var zp = sortedPts(c);
+        if (zp.length > 1) zone = [X(zp[0].x), X(zp[zp.length - 1].x)];
+      }
+
+      if (zone) {
+        // dentro de los puntos: la curva manda
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(zone[0], -4000, Math.max(0, zone[1] - zone[0]), H + 8000);
+        ctx.clip();
+        ctx.strokeStyle = active ? c.color : withAlpha(c.color, .42);
+        ctx.lineWidth = active ? 2.4 : 1.5;
+        strokePolys();
+        ctx.restore();
+        // fuera de los puntos: la ecuación se descontrola, se ve tenue
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(-60, -4000, Math.max(0, zone[0] + 60), H + 8000);
+        ctx.rect(zone[1], -4000, Math.max(0, W - zone[1] + 60), H + 8000);
+        ctx.clip();
+        ctx.setLineDash([5, 6]);
+        ctx.strokeStyle = withAlpha(c.color, active ? .38 : .2);
+        ctx.lineWidth = active ? 1.6 : 1.2;
+        strokePolys();
+        ctx.setLineDash([]);
+        ctx.restore();
+      } else {
+        ctx.strokeStyle = active ? c.color : withAlpha(c.color, .42);
+        ctx.lineWidth = active ? 2.4 : 1.5;
+        strokePolys();
+      }
+      ctx.restore();
+
+      if (c.kind === 'free') drawFreeHandles(c);
+    }
+  }
+
+  // puntos y spline de una curva a mano
+  function drawFreeHandles(c) {
+    var pts = freePoints(c);
+    if (!pts.length) return;
+    var active = c.id === state.activeId;
+    var sp = freeSpline(pts);
+
+    if (pts.length > 1 && sp) {
+      ctx.save();
+      ctx.setLineDash([3, 5]);
+      ctx.lineWidth = 1.3;
+      ctx.strokeStyle = withAlpha(c.color, active ? .55 : .28);
       ctx.beginPath();
-      for (var p = 0; p < polys.length; p++) {
-        var poly = polys[p];
-        ctx.moveTo(poly[0].x, poly[0].y);
-        for (var k = 1; k < poly.length; k++) ctx.lineTo(poly[k].x, poly[k].y);
+      var x0 = pts[0].x, x1 = pts[pts.length - 1].x, steps = 70;
+      for (var i = 0; i <= steps; i++) {
+        var x = x0 + (x1 - x0) * (i / steps);
+        var px = X(x), py = Y(splineAt(sp, x));
+        if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
       }
       ctx.stroke();
       ctx.restore();
+    }
+
+    if (active && pts.length > 1) {
+      var sp2 = sortedPts(c);
+      [sp2[0], sp2[sp2.length - 1]].forEach(function (e) {
+        ctx.save();
+        ctx.setLineDash([2, 6]);
+        ctx.strokeStyle = withAlpha(c.color, .3);
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(X(e.x), 0);
+        ctx.lineTo(X(e.x), H);
+        ctx.stroke();
+        ctx.restore();
+      });
+    }
+
+    for (var k = 0; k < pts.length; k++) {
+      var hx = X(pts[k].x), hy = Y(pts[k].y);
+      var sel = selection && selection.type === 'curve' && selection.id === c.id && selection.point === k;
+      var hov = hover && hover.type === 'fpoint' && hover.id === c.id && hover.index === k;
+      var r = sel ? 7 : hov ? 6.5 : (active ? 5.5 : 4.5);
+      ctx.beginPath();
+      ctx.arc(hx, hy, r + 2.5, 0, TAU);
+      ctx.fillStyle = 'rgba(255,253,248,.92)';
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(hx, hy, r, 0, TAU);
+      ctx.fillStyle = sel ? c.color : '#ffffff';
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = c.color;
+      ctx.stroke();
+      if (sel) {
+        ctx.beginPath();
+        ctx.arc(hx, hy, r + 6, 0, TAU);
+        ctx.strokeStyle = withAlpha(c.color, .35);
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      }
     }
   }
 
@@ -724,14 +1385,14 @@
     var ax = X(p.x), ay = Y(p.y), bx = X(s0.x), by = Y(s0.y);
     ctx.save();
     ctx.setLineDash([4, 5]);
-    ctx.strokeStyle = 'rgba(251,191,36,.55)';
+    ctx.strokeStyle = 'rgba(154,123,46,.6)';
     ctx.lineWidth = 1.4;
     ctx.beginPath();
     ctx.moveTo(ax, ay);
     ctx.lineTo(bx, by);
     ctx.stroke();
     ctx.restore();
-    label(ax, ay + 16, 'la curva no pasa por ti · ' + fmt(dist, 1) + ' u', '#fbbf24');
+    label(ax, ay + 16, 'la curva no pasa por ti · ' + fmt(dist, 1) + ' u', '#9a7b2e');
   }
 
   function drawImpact() {
@@ -741,7 +1402,7 @@
     if (px < -60 || px > W + 60 || py < -60 || py > H + 60) return;
 
     ctx.save();
-    ctx.strokeStyle = '#fb7185';
+    ctx.strokeStyle = '#a4553f';
     ctx.lineWidth = 2.4;
     ctx.lineCap = 'round';
     ctx.beginPath();
@@ -750,12 +1411,12 @@
     ctx.stroke();
     ctx.beginPath();
     ctx.arc(px, py, 13, 0, TAU);
-    ctx.strokeStyle = 'rgba(251,113,133,.45)';
+    ctx.strokeStyle = 'rgba(164,85,63,.45)';
     ctx.lineWidth = 1.4;
     ctx.stroke();
     ctx.restore();
 
-    label(px, py - 27, 'CHOQUE · ' + fmt(hit.dist, 1) + ' u', '#fb7185');
+    label(px, py - 27, 'CHOQUE · ' + fmt(hit.dist, 1) + ' u', '#a4553f');
   }
 
   function label(x, y, text, color, above) {
@@ -769,7 +1430,7 @@
     ly = clamp(ly, 2, H - h - 2);
 
     roundRectPath(ctx, lx, ly, w, h, 6);
-    ctx.fillStyle = 'rgba(7,12,18,.86)';
+    ctx.fillStyle = 'rgba(255,252,246,.94)';
     ctx.fill();
     ctx.strokeStyle = withAlpha(color, .45);
     ctx.lineWidth = 1;
@@ -800,7 +1461,7 @@
       roundRectPath(ctx, -size, -size, size * 2, size * 2, 2);
       ctx.fillStyle = withAlpha(o.color, .85);
       ctx.fill();
-      ctx.strokeStyle = '#05090d';
+      ctx.strokeStyle = '#ffffff';
       ctx.lineWidth = 2;
       ctx.stroke();
       ctx.restore();
@@ -825,7 +1486,7 @@
     if (insideOb) {
       ctx.save();
       ctx.setLineDash([4, 4]);
-      ctx.strokeStyle = 'rgba(251,113,133,.75)';
+      ctx.strokeStyle = 'rgba(164,85,63,.8)';
       ctx.lineWidth = 1.6;
       ctx.beginPath();
       ctx.arc(px, py, 18, 0, TAU);
@@ -835,13 +1496,13 @@
     ctx.save();
     ctx.beginPath();
     ctx.arc(px, py, pSel ? 15 : 12, 0, TAU);
-    ctx.fillStyle = 'rgba(74,222,128,.13)';
+    ctx.fillStyle = 'rgba(74,106,86,.14)';
     ctx.fill();
     ctx.beginPath();
     ctx.arc(px, py, 6.5, 0, TAU);
-    ctx.fillStyle = '#4ade80';
+    ctx.fillStyle = '#3f6f4b';
     ctx.fill();
-    ctx.strokeStyle = '#04140a';
+    ctx.strokeStyle = '#ffffff';
     ctx.lineWidth = 2;
     ctx.stroke();
 
@@ -853,13 +1514,13 @@
     ctx.lineTo(px + dir * 13, py - 4);
     ctx.moveTo(px + dir * 17, py);
     ctx.lineTo(px + dir * 13, py + 4);
-    ctx.strokeStyle = 'rgba(74,222,128,.85)';
+    ctx.strokeStyle = 'rgba(74,106,86,.9)';
     ctx.lineWidth = 1.6;
     ctx.lineCap = 'round';
     ctx.stroke();
     ctx.restore();
 
-    label(px, py - 26, 'Tú (' + fmt(p.x, 1) + ', ' + fmt(p.y, 1) + ')' + (insideOb ? ' ⚠ dentro' : ''), insideOb ? '#fb7185' : '#4ade80');
+    label(px, py - 26, 'Tú (' + fmt(p.x, 1) + ', ' + fmt(p.y, 1) + ')' + (insideOb ? ' ⚠ dentro' : ''), insideOb ? '#a4553f' : '#3f6f4b');
   }
 
   /* ------------------------------- bala ----------------------------------- */
@@ -926,9 +1587,9 @@
       if (first) { ctx.moveTo(px, py); first = false; } else ctx.lineTo(px, py);
     }
     if (bullet.pos) ctx.lineTo(X(bullet.pos.x), Y(bullet.pos.y));
-    ctx.strokeStyle = 'rgba(254,240,138,.85)';
+    ctx.strokeStyle = 'rgba(154,110,58,.95)';
     ctx.lineWidth = 2.2;
-    ctx.shadowColor = 'rgba(254,240,138,.8)';
+    ctx.shadowColor = 'rgba(154,110,58,.3)';
     ctx.shadowBlur = 12;
     ctx.stroke();
 
@@ -936,11 +1597,11 @@
       var bx = X(bullet.pos.x), by = Y(bullet.pos.y);
       ctx.beginPath();
       ctx.arc(bx, by, 5.5, 0, TAU);
-      ctx.fillStyle = '#fef08a';
+      ctx.fillStyle = '#c08a3e';
       ctx.fill();
       ctx.beginPath();
       ctx.arc(bx, by, 11, 0, TAU);
-      ctx.strokeStyle = 'rgba(254,240,138,.45)';
+      ctx.strokeStyle = 'rgba(154,110,58,.4)';
       ctx.lineWidth = 1.4;
       ctx.stroke();
     }
@@ -968,7 +1629,7 @@
     var c = curveById(selection.id);
     if (!c || !c._screen) return;
     ctx.save();
-    ctx.strokeStyle = 'rgba(255,255,255,.12)';
+    ctx.strokeStyle = 'rgba(43,38,32,.14)';
     ctx.lineWidth = 6;
     ctx.lineJoin = 'round';
     ctx.beginPath();
@@ -988,6 +1649,7 @@
   var drag = null;
   var pointer = { x: -100, y: -100 };
   var placeMode = null;
+  var curveTool = false;
 
   function localPoint(e) {
     var r = canvas.getBoundingClientRect();
@@ -1039,11 +1701,32 @@
   }
 
   function onPointerDown(e) {
-    if (e.button === 2) return;
     var pt = localPoint(e);
     pointer.x = pt.x; pointer.y = pt.y;
 
+    // clic derecho sobre un punto de una curva a mano: lo quita
+    if (e.button === 2) {
+      var del = freePointAt(pt.x, pt.y);
+      if (del) {
+        freeDeletePoint(del.curve, del.index);
+        selection = { type: 'curve', id: del.curve.id };
+        renderCurves(); renderCurveUI(); refresh();
+        toast('Punto quitado');
+      }
+      return;
+    }
+
     try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* noop */ }
+
+    // puntos de una curva a mano (tienen prioridad)
+    var fp = freePointAt(pt.x, pt.y);
+    if (fp) {
+      if (fp.curve.id !== state.activeId) setActive(fp.curve.id);
+      selection = { type: 'curve', id: fp.curve.id, point: fp.index };
+      drag = { type: 'freepoint', id: fp.curve.id, index: fp.index };
+      renderCurves(); renderCurveUI(); needsDraw = true;
+      return;
+    }
 
     if (placeMode) {
       placeAt(placeMode, snapVal(WX(pt.x)), snapVal(WY(pt.y)));
@@ -1106,7 +1789,8 @@
         type: 'curve',
         id: c.id,
         start: { x: WX(pt.x), y: WY(pt.y) },
-        orig: { dx: c.dx, dy: c.dy }
+        orig: { dx: c.dx, dy: c.dy },
+        origPts: c.kind === 'free' ? freePoints(c).map(function (q) { return { x: q.x, y: q.y }; }) : null
       };
       needsDraw = true;
       return;
@@ -1115,7 +1799,7 @@
     // 5. fondo → mover vista
     selection = null;
     renderLists();
-    drag = { type: 'pan', sx: pt.x, sy: pt.y, cx: view.cx, cy: view.cy };
+    drag = { type: 'pan', sx: pt.x, sy: pt.y, cx: view.cx, cy: view.cy, moved: false };
     canvas.style.cursor = 'grabbing';
     needsDraw = true;
   }
@@ -1133,6 +1817,7 @@
     var wx = WX(pt.x), wy = WY(pt.y);
 
     if (drag.type === 'pan') {
+      if (!drag.moved && Math.abs(pt.x - drag.sx) + Math.abs(pt.y - drag.sy) > 6) drag.moved = true;
       view.cx = drag.cx - (pt.x - drag.sx) / view.scale;
       view.cy = drag.cy + (pt.y - drag.sy) / view.scale;
       needsDraw = true;
@@ -1140,9 +1825,32 @@
       return;
     }
 
+    if (drag.type === 'freepoint') {
+      var fc = curveById(drag.id);
+      if (!fc) return;
+      var fpts = freePoints(fc);
+      var moved = fpts[drag.index];
+      if (!moved) return;
+      moved.x = snapVal(wx);
+      moved.y = snapVal(wy);
+      fitFree(fc);
+      refresh();
+      return;
+    }
+
     if (drag.type === 'curve') {
       var c = curveById(drag.id);
       if (!c) return;
+      if (c.kind === 'free' && drag.origPts) {
+        var gpts = freePoints(c);
+        for (var gi = 0; gi < gpts.length && gi < drag.origPts.length; gi++) {
+          gpts[gi].x = drag.origPts[gi].x + (wx - drag.start.x);
+          gpts[gi].y = drag.origPts[gi].y + (wy - drag.start.y);
+        }
+        fitFree(c);
+        refresh();
+        return;
+      }
       c.dx = drag.orig.dx + (wx - drag.start.x);
       c.dy = drag.orig.dy + (wy - drag.start.y);
       refresh();
@@ -1197,7 +1905,18 @@
   }
 
   function onPointerUp() {
-    if (drag && drag.type === 'pan') canvas.style.cursor = 'crosshair';
+    if (drag && drag.type === 'pan') {
+      canvas.style.cursor = 'crosshair';
+      // con el lápiz activo, un toque sin arrastre añade un punto
+      if (curveTool && !drag.moved) {
+        var c = makeFreeCurve();
+        if (c) {
+          freeAddPoint(c, WX(drag.sx), WY(drag.sy));
+          selection = { type: 'curve', id: c.id };
+          renderCurves(); renderCurveUI(); refresh();
+        }
+      }
+    }
     drag = null;
     save();
   }
@@ -1205,8 +1924,10 @@
   function updateHover(pt) {
     var prev = hover;
     hover = null;
+    var fp = freePointAt(pt.x, pt.y);
     var mk = markerAt(pt.x, pt.y);
-    if (mk) hover = mk;
+    if (fp) hover = { type: 'fpoint', id: fp.curve.id, index: fp.index };
+    else if (mk) hover = mk;
     else {
       var ob = obstacleAtScreen(pt.x, pt.y);
       if (ob) hover = { type: 'obstacle', id: ob.id };
@@ -1247,7 +1968,7 @@
       state.player.x = x; state.player.y = y;
       selection = { type: 'player' };
     } else if (kind === 'rival') {
-      var colors = ['#38bdf8', '#c084fc', '#fbbf24', '#fb7185', '#2dd4bf'];
+      var colors = ['#4a6f8a', '#7d6a94', '#a67c33', '#a4553f', '#5b7a63'];
       var o = {
         id: uid(), name: 'Rival ' + (state.others.length + 1),
         x: x, y: y, color: colors[state.others.length % colors.length]
@@ -1289,13 +2010,30 @@
     return n;
   }
 
+  // en el móvil el panel es una hoja inferior: al elegir herramienta se cierra
+  function closeSheet() {
+    if (typeof window === 'undefined' || window.innerWidth > 760) return;
+    var sb = $('#sidebar'), sc = $('#scrim');
+    if (sb) sb.classList.remove('open');
+    if (sc) sc.classList.remove('show');
+  }
+
   function setPlaceMode(mode) {
-    placeMode = mode;
+    curveTool = mode === 'curve';
+    placeMode = curveTool ? null : mode;
+    if (curveTool) makeFreeCurve();
     $$('#toolbar .tb[data-tool]').forEach(function (b) {
       b.classList.toggle('active', (b.dataset.tool === 'select' && !mode) || b.dataset.tool === mode);
     });
     var hint = $('#placeHint');
-    if (!mode) { hint.hidden = true; return; }
+    if (curveTool) {
+      hint.textContent = 'Toca el plano para añadir puntos · arrastra un punto o la curva entera';
+      hint.hidden = false;
+      renderCurveUI();
+      return;
+    }
+    if (!mode) { hint.hidden = true; renderCurveUI(); return; }
+    if (mode) closeSheet();
     var txt = {
       player: 'Haz clic en el mapa para poner tu punto',
       rival: 'Haz clic para colocar un rival',
@@ -1433,6 +2171,7 @@
   // ecuación lista para pegar en el juego: parámetros con su valor numérico
   function effectiveExpr(c) {
     if (!c) return '';
+    if (c.kind === 'free') return c._export || '';
     var src = String(c.expr || '').replace(/^\s*(y|f\s*\(\s*x\s*\))\s*=/i, '').trim();
     if (!src) return '';
 
@@ -1507,13 +2246,18 @@
       var el = document.createElement('div');
       el.className = 'item' + (c.id === state.activeId ? ' active' : '');
       el.dataset.id = c.id;
+      var isFree = c.kind === 'free';
+      var head = isFree ? '✎ a mano · ' + freePoints(c).length + ' puntos' : 'y = ' + c.expr;
+      var sub = isFree
+        ? (c._fit ? 'error ' + fmt(c._fit.err, 2) + ' u' : (c._error || 'sin ecuación'))
+        : ('Δx ' + signed(c.dx) + ' · Δy ' + signed(c.dy) + (c._error ? ' · ⚠ error' : ''));
       el.innerHTML =
         '<button class="act" data-act="vis" title="Mostrar / ocultar">' +
           '<span class="swatch" style="background:' + c.color + ';opacity:' + (c.visible ? 1 : 0.25) + '"></span>' +
         '</button>' +
         '<div class="item-body">' +
-          '<code class="exprcode" style="color:' + c.color + '">y = ' + escapeHtml(c.expr) + '</code>' +
-          '<small>Δx ' + signed(c.dx) + ' · Δy ' + signed(c.dy) + (c._error ? ' · ⚠ error' : '') + '</small>' +
+          '<code class="exprcode" style="color:' + c.color + '">' + escapeHtml(head) + '</code>' +
+          '<small>' + escapeHtml(sub) + '</small>' +
         '</div>' +
         '<button class="act del" data-act="del" title="Eliminar">✕</button>';
       list.appendChild(el);
@@ -1734,7 +2478,7 @@
       var nearTxt = '';
       if (near && near.d < 22) {
         nearTxt = near.d < 4
-          ? '<br><b style="color:#86efac">🎯 pasa por ' + escapeHtml(near.o.name) + '</b>'
+          ? '<br><b style="color:#3f6f4b">🎯 pasa por ' + escapeHtml(near.o.name) + '</b>'
           : '<br>pasa a ' + fmt(near.d, 1) + ' u de ' + escapeHtml(near.o.name);
       }
       card.classList.add('free');
@@ -1757,7 +2501,7 @@
     });
     if (inside) {
       hint.textContent = '⚠ Estás dentro de «' + inside.name + '». Muévete para no empezar el tiro dentro de un obstáculo.';
-      hint.style.color = '#fda4af';
+      hint.style.color = '#a4553f';
     } else {
       hint.style.color = '';
       var nearest = null, nd = Infinity;
@@ -1774,12 +2518,16 @@
   function refresh(opts) {
     opts = opts || {};
     var c = activeCurve();
+    // si te mueves, la ecuación del juego se recoloca (x = 0 en tu posición)
+    if (c && c.kind === 'free' && c._shift !== state.player.x) { c._shift = state.player.x; fitFree(c); }
     if (c) compileCurve(c);
     activeTraj = buildTrajectory(c);
     if (!bullet.active) { bullet.path = []; bullet.done = false; }
     updateStatus();
     syncInputs();
     if (!opts.noRenderParams) updateParamValues();
+    updateEffective();
+    renderCurveUI();
     needsDraw = true;
     if (!opts.noSave) save();
   }
@@ -1827,6 +2575,7 @@
 
   /* ------------------------------- eventos UI ----------------------------- */
   function bindUI() {
+    bindCurveUI();
     $('#playerX').addEventListener('input', function () {
       state.player.x = num(this.value, state.player.x);
       refresh();
@@ -1842,7 +2591,7 @@
 
     $('#expr').addEventListener('input', function () {
       var c = activeCurve();
-      if (!c) return;
+      if (!c || c.kind === 'free') return;
       c.expr = this.value;
       compileCurve(c);
       renderParams();
@@ -1916,6 +2665,16 @@
 
     $('#anchorBtn').addEventListener('click', function () {
       var c = activeCurve();
+      if (c && c.kind === 'free') {
+        var pts = freePoints(c);
+        if (pts.length < 2) { toast('Necesitas al menos 2 puntos'); return; }
+        var y0 = splineAt(freeSpline(sortedPts(c)), state.player.x);
+        var d = state.player.y - y0;
+        pts.forEach(function (q) { q.y += d; });
+        fitFree(c); renderCurveUI(); refresh();
+        toast('Curva anclada a tu posición');
+        return;
+      }
       if (!c || !c._compiled) { toast('La ecuación no es válida'); return; }
       var y0 = evalCurve(c, state.player.x);
       if (!isFinite(y0)) { toast('No se puede anclar aquí'); return; }
@@ -1932,7 +2691,7 @@
     });
 
     $('#addRival').addEventListener('click', function () {
-      var colors = ['#38bdf8', '#c084fc', '#fbbf24', '#fb7185', '#2dd4bf'];
+      var colors = ['#4a6f8a', '#7d6a94', '#a67c33', '#a4553f', '#5b7a63'];
       state.others.push({
         id: uid(),
         name: 'Rival ' + (state.others.length + 1),
@@ -2024,6 +2783,26 @@
       toast(state.snapOn ? 'Imán activado (paso ' + state.snap + ')' : 'Movimiento libre');
     });
 
+    var sheetBtn = $('#sheetBtn');
+    if (sheetBtn) sheetBtn.addEventListener('click', function () {
+      var sb = $('#sidebar');
+      sb.classList.toggle('open');
+      $('#scrim').classList.toggle('show', sb.classList.contains('open'));
+    });
+    var scrim = $('#scrim');
+    if (scrim) scrim.addEventListener('click', function () {
+      $('#sidebar').classList.remove('open');
+      scrim.classList.remove('show');
+    });
+    var brand = $('.brand');
+    if (brand) brand.addEventListener('click', function (e) {
+      if (e.target.closest('button')) return;
+      if (window.innerWidth > 760) return;
+      var sb2 = $('#sidebar');
+      sb2.classList.toggle('open');
+      $('#scrim').classList.toggle('show', sb2.classList.contains('open'));
+    });
+
     $('#menuBtn').addEventListener('click', function () {
       $('#sidebar').classList.toggle('open');
       $('#scrim').classList.toggle('show', $('#sidebar').classList.contains('open'));
@@ -2100,6 +2879,8 @@
         shoot();
       } else if (k === 'v') {
         setPlaceMode(null);
+      } else if (k === 'c') {
+        setPlaceMode(curveTool ? null : 'curve');
       } else if (k === 'p') {
         setPlaceMode('player');
       } else if (e.key === '+' || e.key === '=') {
@@ -2129,7 +2910,10 @@
       }
     } else if (selection && selection.type === 'curve') {
       var c = curveById(selection.id);
-      if (c) { c.dx += dx; c.dy += dy; renderCurves(); }
+      if (c && c.kind === 'free') {
+        freePoints(c).forEach(function (q) { q.x += dx; q.y += dy; });
+        fitFree(c); renderCurves();
+      } else if (c) { c.dx += dx; c.dy += dy; renderCurves(); }
     } else {
       view.cx += dx / view.scale * 8;
       view.cy += dy / view.scale * 8;
@@ -2150,6 +2934,13 @@
       selection = null;
       renderObstacles(); refresh();
     } else if (selection.type === 'curve') {
+      var selC = curveById(selection.id);
+      if (selC && selC.kind === 'free' && typeof selection.point === 'number') {
+        freeDeletePoint(selC, selection.point);
+        selection = { type: 'curve', id: selC.id };
+        renderCurves(); renderCurveUI(); refresh();
+        return;
+      }
       if (state.curves.length <= 1) { toast('Necesitas al menos una trayectoria'); return; }
       state.curves = state.curves.filter(function (c) { return c.id !== selection.id; });
       state.activeId = state.curves[0].id;
@@ -2260,6 +3051,7 @@
 
   function init() {
     resize();
+    state.curves.forEach(function (c) { if (c.kind === 'free') { c._shift = state.player.x; fitFree(c); } });
     renderFunciones();
     bindUI();
     refreshAll();

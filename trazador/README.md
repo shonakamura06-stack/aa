@@ -21,13 +21,36 @@ Todo ocurre en el navegador: sin servidor, sin dependencias y sin conectarse a l
    coordenadas del plano, escala ±80).
 2. **Coloca a los rivales** (diamantes) y los **obstáculos**: bloques triangulares, muros y rocas.
    Todo se arrastra y se estira.
-3. **Elige el tipo de función de la ronda** (lineal, cuadrático, seno, valor absoluto…) o escribe
+3. **Dibuja la curva con puntos** (el lápiz ✎ de la barra, o la tecla `C`): cada toque en el plano
+   añade un punto, arrástralo donde quieras y la app **busca sola la ecuación** que mejor encaja
+   (recta, polinomio u ondas). Vale para cualquier forma: recta, parábola, zigzag, ola…
+4. **O elige el tipo de función de la ronda** (lineal, cuadrático, seno, valor absoluto…) o escribe
    la ecuación a mano. Los parámetros (`m`, `b`, `a`, `h`, `k`…) aparecen como deslizadores.
-4. **Ajusta** hasta que la línea pase por ti y esquive los bloques. La franja roja indica choque,
+5. **Ajusta** hasta que la curva pase por ti y esquive los bloques. La franja roja indica choque,
    con el punto exacto y la distancia.
-5. **Copia la ecuación** del recuadro inferior y pégala tal cual en el chat del juego: ya lleva
+6. **Copia la ecuación** del recuadro inferior y pégala tal cual en el chat del juego: ya lleva
    los números puestos y el desplazamiento si moviste la curva.
-6. **Disparar** (`D`) para ver el recorrido de la bala.
+7. **Disparar** (`D`) para ver el recorrido de la bala.
+
+## Curva a mano (puntos → ecuación)
+
+| Acción | Cómo |
+|---|---|
+| Añadir punto | Con el lápiz activo, toca/clic en el plano |
+| Mover un punto | Arrástralo (se ordena solo por X) |
+| Mover toda la curva | Arrastra la línea |
+| Quitar un punto | Clic derecho sobre él, o `Supr`, o la ✕ de la lista |
+| Ajuste fino | Panel «Curva a mano»: Automático / Polinomio (grado 1-8) / Ondas (1-5) |
+| Pasar a fórmula editable | Botón «Convertir en fórmula» |
+
+Detalles que importan:
+
+- La app mide el error del ajuste y lo muestra (`0,4 u` de error máximo). Si sube, añade puntos.
+- **Solo la zona entre el primer y el último punto está controlada**: ahí la curva se dibuja sólida;
+  fuera se dibuja punteada porque la ecuación puede desviarse.
+- La ecuación se genera **con `x = 0` en tu posición** y sin notación científica (en el juego
+  `2e-3` se leería como `2 · e − 3`), y siempre por debajo de 200 caracteres para que quepa en el chat.
+- Todo el ajuste es álgebra de mínimos cuadrados en el navegador: sin servidor y sin enviar nada.
 
 ## Funciones incluidas
 
