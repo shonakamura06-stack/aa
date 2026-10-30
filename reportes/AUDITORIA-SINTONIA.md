@@ -21,7 +21,7 @@
 | DATA-01 | P1 | Almacenamiento base usa `try/catch` que puede ocultar fallos | Interfaz podría afirmar persistencia sin escritura durable | Detectar error sin destruir datos y avisar cuando corresponda | Inyectar error de Storage y comprobar respuesta |
 | HOLD-01 | P2 | Coexisten gestos de pulsación y toque en capas históricas | Eventos duplicados o temporizadores interfieren | Mantener gesto vigente sin liberar prematuramente ni quedar atascado | Entrada real ratón y táctil, cancelación, pérdida de foco |
 | UI-01 | P2 | Necesaria inspección visual por cada vista; resultados anteriores no cubren todas | Desbordes o jerarquía inconsistente | Sin contenido crítico cortado; controles visibles con texto largo | Capturas y mediciones de desktop y móvil |
-| BAN-01 | P2 | No existe inventario `reportes/PENDIENTES.md` en esta rama | Objetivo de 12.000/1.000 no está confirmado aquí | Recontar datos y bolsas activas sin inventar objetivos ni añadir contenido de relleno | Inventario reproducible y pruebas de consumo |
+| BAN-01 | P2 | No existe inventario `reportes/PENDIENTES.md` en esta rama | Objetivos confirmados por el usuario: 12.000 global y 1.000 para cinco bancos identificados | Recontar datos y bolsas activas sin inventar objetivos ni añadir contenido de relleno | Inventario reproducible y pruebas de consumo |
 | TEST-01 | P2 | 58 casos previos no equivalen a ciclos completos de 11 juegos × 2/3/4 | Cobertura parcial | Identificar explícitamente aprobados, fallos, bloqueos y no ejecutados | Repetir suite y ampliar pruebas críticas |
 | DEP-01 | P1 | Navegador anterior no alcanzaba Vercel desde sandbox; producción es pública | Restricción de red de ejecución | No publicar cambios a producción si no se pueden superar las puertas exigidas | Estado Vercel, URL y humo real cuando sea posible |
 
@@ -47,7 +47,7 @@ Estado inicial pendiente de ejecución en esta intervención: los once juegos �
 
 Los bancos activos estructuralmente válidos se contabilizan usando `reportes/inventario-bancos.cjs`, en un perfil de navegador limpio con la API `V14.__v67.destino`, su validador y clave de deduplicación. No equivale a examen humano de exactitud, seguridad o calidad, y no incluye importaciones de otros perfiles. El archivo generado `inventario-bancos.json` se puede reproducir con las variables de Chromium/Playwright documentadas abajo. Ranking cuenta conjuntos objetivos aceptados por el validador, no tarjetas históricas rechazadas; Precio son datos históricos aproximados y no se añadieron datos nuevos. Hay dos duplicados de Dial y uno de Trivia según clave actual; el motor elimina duplicados al preparar la bolsa.
 
-No hay documento de objetivos 12.000/1.000 en la rama o en `main` que se haya encontrado. No se afirma cumplimiento ni se añadieron textos repetitivos para cubrir cifras. Confirmar al usuario objetivos y método de aceptación sin bloquear avances independientes.
+El usuario confirmó 12.000 elementos globales y 1.000 para los cinco bancos detallados abajo. El documento de misión encontrado en Drive habla de aproximadamente mil cuando corresponda y de doce mil globales, pero no enumera una meta específica para Personaje; `reportes/PENDIENTES.md` sigue sin encontrarse. No se afirma cumplimiento ni se cuentan como validadas manualmente todas las entradas heredadas.
 
 ## Matriz honesta de partidas completas
 
@@ -61,7 +61,7 @@ No hay documento de objetivos 12.000/1.000 en la rama o en `main` que se haya en
 | Personaje | No ejecutado integral | No ejecutado integral | No ejecutado integral | pistas y privacidad parcialmente comprobadas |
 | Trivia | No ejecutado integral | No ejecutado integral | No ejecutado integral | importación y vistas, no sincronización integral |
 | Verdad o Reto | No ejecutado integral | No ejecutado integral | No ejecutado integral | importación y regresiones parciales |
-| Yo Nunca Nunca | No ejecutado integral | No ejecutado integral | No ejecutado integral | modo local y banco probados parcialmente |
+| Yo Nunca Nunca | Parcial | No ejecutado integral | No ejecutado integral | apertura/votos/confesión con dos mandos; fase inicial preparada por API; autorización negativa y pago probado, no partida integral |
 | Más probable | Parcial | No ejecutado integral | No ejecutado integral | recuperación y doble recarga con dos mandos locales emulados; no equivale a ciclo completo certificado |
 | Historia en cadena | No ejecutado integral | No ejecutado integral | No ejecutado integral | importación y vistas parciales |
 
@@ -86,3 +86,41 @@ Estas rutas son efímeras de este sandbox, no dependencias garantizadas para ter
 ## Estimación de avance
 
 Estimación de esta misión, no porcentaje de calidad del producto ni resultado automático: diez entregables de igual peso (10 puntos cada uno), puntuados 10 completado en el alcance indicado, 5 parcial, 0 no demostrado. Inspección/resguardo 10; tres correcciones focales 10; inventario reproducible 10; regresión general 5; pruebas de sala/multimando 5; revisión visual 5; informe y matriz 5; ciclos completos de once juegos por cantidad/modo 0; seguridad y recuperación integral 0; puerta de producción 0. **Total 50/100**. Las pruebas focales no dan por cerradas áreas más amplias; el avance cambiará al completar y verificar lo pendiente. Los objetivos de contenido pendientes pueden alterar el alcance.
+
+## Continuación: objetivos confirmados y contenido integrado
+
+El usuario confirmó el objetivo de **12.000 elementos válidos globales** y de **1.000** para Retos General, Historia en cadena, Yo Nunca Nunca, Más probable y palabras de Impostor. No se asume que esa cifra aplique automáticamente a otros bancos. Tras obtener el historial completo disponible (259 commits), no apareció `reportes/PENDIENTES.md`; los commits que contienen `index.html` son los de la rama de Sintonía. En Google Drive, la búsqueda de texto completo encontró el [documento de la misión](https://docs.google.com/document/d/1FgRiWPLV6e4sXz6DzfLecplk-7TNsYrhRkctasJOvVs/edit), que confirma el objetivo general y la ampliación aproximada por banco pero no fija un número para Personaje; las búsquedas de título en Notion no devolvieron páginas para Sintonía o PENDIENTES. Esto no demuestra que no existan otros documentos fuera de esas búsquedas y permisos.
+
+| Banco activo General | Antes: únicas por esquema | Incorporadas | Ahora: únicas por esquema | Meta confirmada | Diferencia estructural mínima |
+|---|---:|---:|---:|---:|---:|
+| Retos | 480 | 50 | 530 | 1.000 | 470 |
+| Historia | 40 | 50 | 90 | 1.000 | 910 |
+| Yo Nunca Nunca | 65 | 50 | 115 | 1.000 | 885 |
+| Más probable | 70 | 50 | 120 | 1.000 | 880 |
+| Impostor: palabras | 40 | 50 | 90 | 1.000 | 910 |
+| Personaje | 34 | 0 | 34 | No confirmada | No calculada |
+
+Los dos lotes `contenido/lote-general-01.json` y `contenido/lote-general-02.json` contienen **250 entradas nuevas**, redactadas y revisadas durante la intervención, no generadas mediante combinaciones automáticas. Para cada lote, `V14.__v67.analizarImportacion` notificó 125 nuevas, cero inválidas, cero duplicadas y cero similares por su heurística antes de integrarlo; la heurística no sustituye la revisión editorial independiente. Están embebidas en `index.html`, añadidas al origen General en el módulo existente v43 y alcanzan las bolsas reales; no se añadió contenido a Precio. `tests/contenido-lote-general.cjs` comprueba presencia, validación, sincronización idempotente, agotamiento y persistencia después de recargar, para las 50 entradas de cada banco. No borra los duplicados originales; la selección los filtra.
+
+El inventario reproducible actualizado suma **4.533 entradas estructuralmente válidas y únicas dentro de sus respectivos bancos**. Si cada conjunto de Ranking y cada mercado de Precio se contaran como elementos independientes, faltarían **al menos 7.467** para 12.000 bajo esa convención; no equivale al número final de contenido de calidad validada, ya que falta revisión humana de los bancos heredados y puede haber coincidencias entre bancos y mercados. No se cuentan importaciones de otros perfiles. Personaje conserva 34 objetos con `who` y un arreglo de pistas; no hay evidencia suficiente para asignarle una meta numérica específica.
+
+El código actualmente retira Picante (`__v43api.banco(...,'spicy')` devuelve vacío y el importador solo acepta General); se mantuvo ese comportamiento, sin mezclar contenido ni activar un modo retirado unilateralmente. Esto **no** demuestra una separación funcional de bolsas de dos modalidades activas: si se decide recuperar Picante, exige revisar la fuente histórica, reglas, privacidad, edad y persistencia por separado.
+
+## Seguridad: decisión de Yo Nunca Nunca
+
+Se reprodujo con dos mandos WebRTC emulados un fallo P1: un segundo mando envió `yn:nego` y decidió por el acusado, provocando un descuento en el marcador. Se corrigió el control de conexión, asiento, fase y número de ronda en el servidor; solamente el acusado puede confesar, negar o enviar su contexto. Los mensajes de otra ronda y sin identificador de ronda se rechazan; los botones de mando llevan el identificador. `tests/yonunca-autorizacion.cjs` prueba la votación desde ambos mandos, el intento ajeno, el rechazo de mensajes viejos y la decisión y envío legítimos desde la interfaz. La fase inicial se prepara por API y la prueba no equivale a partida completa ni autenticación fuerte. La mecánica y puntuación no se modificaron. Los mandos con código anterior necesitan recargar para recibir el protocolo nuevo.
+
+### Regresión posterior a esta continuación
+
+- Suite completa con el HTML que incluye ambos lotes y la autorización: **63/64** en 378,5 s, `suite-contenido-y-autorizacion.tap`. El único fallo fue SIGSEGV al lanzar Chromium antes de `Trivia en solitario permite responder en pantalla y resuelve una vez`; el reintento aislado pasó **1/1**, `reintento-trivia.tap`. No se considera que la suite completa haya pasado limpiamente. Las pruebas de contenido y autorización aprobaron dentro de la suite.
+- No se ha modernizado integralmente la interfaz ni recorrido todas sus variantes en esta continuación. El hallazgo del HUD que puede tapar contenido permanece pendiente. Faltan pruebas críticas de once juegos por modalidad, red pública y recuperación íntegra; no publicar a producción.
+
+## Seguridad: mensajes atrasados de Historia
+
+Con dos mandos WebRTC emulados se reprodujo que, tras guardar y recargar el anfitrión, una nueva historia podía reutilizar el número de ronda y de turno de la anterior. Al reenviar una frase vieja con esos datos, la historia nueva la aceptaba. El identificador de la ronda ahora se inicia con una generación nueva al cargar la página y sigue incrementándose por partida. `tests/cadena-ronda-recarga.cjs` comprobó que la frase anterior se rechaza y una nueva frase legítima se acepta; se prueba la cancelación segura de la historia anterior, no recuperación exacta de su estado. La prueba usa PeerServer local y preparación por API.
+
+También se buscaron los términos «Sintonía», «Sintonia» y «PENDIENTES» en Dropbox sin resultados. Las búsquedas documentadas de fuentes conectadas se limitan al acceso concedido y no prueban que no exista otro documento.
+
+### Suite repetida tras ajustar la prueba de tutorial
+
+La primera ejecución posterior a la corrección de Historia terminó **64/65**: `tests/multijugador.cjs` no pudo pulsar Precio porque el tutorial diferido interceptaba el clic, no por una aserción de juego. Se ajustó únicamente la prueba para esperar el tutorial y cerrarlo por la interfaz; el archivo afectado pasó **1/1** en `reintento-multijugador.tap`. La siguiente suite completa terminó **65/65**, 398,7 s, `suite-ultima.tap`. Los ensayos siguen siendo Chromium y PeerServer locales, y los dos resultados anteriores y sus fallos permanecen registrados; esta suite no prueba todos los ciclos ni satisface por sí sola la puerta de producción.

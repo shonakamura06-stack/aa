@@ -2,7 +2,7 @@
 
 ## Sintonía (trabajo en curso)
 
-**Auditoría más reciente:** la suite posterior a los cambios terminó 60/62; dos casos no iniciaron por SIGSEGV de Chromium y sus archivos pasaron 4/4 al reintentarlos. El resultado histórico 58/58 mencionado más abajo corresponde a otra ejecución. Ver `reportes/AUDITORIA-SINTONIA.md` para matriz, capturas, inventario y límites. No se ha aprobado la puerta estricta de producción.
+**Auditoría más reciente:** la suite completa del HTML actual pasó 65/65 en Chromium y señalización local. Una ejecución previa terminó 64/65 al interceptar un tutorial un clic; se corrigió la espera de la prueba y se repitió. Hay 250 entradas General nuevas y correcciones de autorización y de mensajes atrasados. Los ensayos no certifican todos los juegos ni la puerta de producción; ver `reportes/AUDITORIA-SINTONIA.md` para matriz y límites.
 
 El repositorio no contenía la aplicación de Sintonía; `index.html` parte del
 `actual.html` proporcionado por el usuario. La copia intacta se encuentra en

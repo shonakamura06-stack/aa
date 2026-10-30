@@ -1,5 +1,8 @@
 {
-  "nota": "Bancos base activos; validez estructural según la API actual, no revisión humana ni inventario de importaciones.",
+  "nota": "Bancos base activos; validez estructural según la API actual, no revisión humana ni inventario de importaciones. La suma cuenta mercados y conjuntos por separado y no deduplica entre bancos.",
+  "objetivoGlobal": 12000,
+  "sumaPorBanco": 4533,
+  "diferenciaMinimaBajoEstaConvencion": 7467,
   "filas": [
     {
       "juego": "dial",
@@ -9,7 +12,9 @@
       "validas": 2125,
       "unicas": 2123,
       "duplicadas": 2,
-      "invalidas": 0
+      "invalidas": 0,
+      "objetivo": null,
+      "faltanEstructurales": null
     },
     {
       "juego": "verdad",
@@ -19,17 +24,21 @@
       "validas": 1040,
       "unicas": 1040,
       "duplicadas": 0,
-      "invalidas": 0
+      "invalidas": 0,
+      "objetivo": null,
+      "faltanEstructurales": null
     },
     {
       "juego": "reto",
       "variante": "general",
       "id": "verdad:general:RETO",
-      "total": 480,
-      "validas": 480,
-      "unicas": 480,
+      "total": 530,
+      "validas": 530,
+      "unicas": 530,
       "duplicadas": 0,
-      "invalidas": 0
+      "invalidas": 0,
+      "objetivo": 1000,
+      "faltanEstructurales": 470
     },
     {
       "juego": "tabu",
@@ -39,47 +48,57 @@
       "validas": 74,
       "unicas": 74,
       "duplicadas": 0,
-      "invalidas": 0
+      "invalidas": 0,
+      "objetivo": null,
+      "faltanEstructurales": null
     },
     {
       "juego": "palabras",
       "variante": "general",
       "id": "impostor:general:palabras",
-      "total": 40,
-      "validas": 40,
-      "unicas": 40,
+      "total": 90,
+      "validas": 90,
+      "unicas": 90,
       "duplicadas": 0,
-      "invalidas": 0
+      "invalidas": 0,
+      "objetivo": 1000,
+      "faltanEstructurales": 910
     },
     {
       "juego": "probable",
       "variante": "general",
       "id": "probable:general",
-      "total": 70,
-      "validas": 70,
-      "unicas": 70,
+      "total": 120,
+      "validas": 120,
+      "unicas": 120,
       "duplicadas": 0,
-      "invalidas": 0
+      "invalidas": 0,
+      "objetivo": 1000,
+      "faltanEstructurales": 880
     },
     {
       "juego": "yonunca",
       "variante": "general",
       "id": "yonunca:general",
-      "total": 65,
-      "validas": 65,
-      "unicas": 65,
+      "total": 115,
+      "validas": 115,
+      "unicas": 115,
       "duplicadas": 0,
-      "invalidas": 0
+      "invalidas": 0,
+      "objetivo": 1000,
+      "faltanEstructurales": 885
     },
     {
       "juego": "cadena",
       "variante": "general",
       "id": "cadena:general",
-      "total": 40,
-      "validas": 40,
-      "unicas": 40,
+      "total": 90,
+      "validas": 90,
+      "unicas": 90,
       "duplicadas": 0,
-      "invalidas": 0
+      "invalidas": 0,
+      "objetivo": 1000,
+      "faltanEstructurales": 910
     },
     {
       "juego": "ranking",
@@ -89,7 +108,9 @@
       "validas": 30,
       "unicas": 30,
       "duplicadas": 0,
-      "invalidas": 0
+      "invalidas": 0,
+      "objetivo": null,
+      "faltanEstructurales": null
     },
     {
       "juego": "trivia",
@@ -99,7 +120,9 @@
       "validas": 53,
       "unicas": 52,
       "duplicadas": 1,
-      "invalidas": 0
+      "invalidas": 0,
+      "objetivo": null,
+      "faltanEstructurales": null
     },
     {
       "juego": "personaje",
@@ -109,7 +132,9 @@
       "validas": 34,
       "unicas": 34,
       "duplicadas": 0,
-      "invalidas": 0
+      "invalidas": 0,
+      "objetivo": null,
+      "faltanEstructurales": null
     },
     {
       "juego": "precio",
@@ -119,7 +144,9 @@
       "validas": 46,
       "unicas": 46,
       "duplicadas": 0,
-      "invalidas": 0
+      "invalidas": 0,
+      "objetivo": null,
+      "faltanEstructurales": null
     },
     {
       "juego": "precio",
@@ -129,7 +156,9 @@
       "validas": 39,
       "unicas": 39,
       "duplicadas": 0,
-      "invalidas": 0
+      "invalidas": 0,
+      "objetivo": null,
+      "faltanEstructurales": null
     },
     {
       "juego": "precio",
@@ -139,7 +168,9 @@
       "validas": 38,
       "unicas": 38,
       "duplicadas": 0,
-      "invalidas": 0
+      "invalidas": 0,
+      "objetivo": null,
+      "faltanEstructurales": null
     },
     {
       "juego": "precio",
@@ -149,7 +180,9 @@
       "validas": 36,
       "unicas": 36,
       "duplicadas": 0,
-      "invalidas": 0
+      "invalidas": 0,
+      "objetivo": null,
+      "faltanEstructurales": null
     },
     {
       "juego": "precio",
@@ -159,7 +192,9 @@
       "validas": 37,
       "unicas": 37,
       "duplicadas": 0,
-      "invalidas": 0
+      "invalidas": 0,
+      "objetivo": null,
+      "faltanEstructurales": null
     },
     {
       "juego": "precio",
@@ -169,7 +204,9 @@
       "validas": 39,
       "unicas": 39,
       "duplicadas": 0,
-      "invalidas": 0
+      "invalidas": 0,
+      "objetivo": null,
+      "faltanEstructurales": null
     }
   ]
 }

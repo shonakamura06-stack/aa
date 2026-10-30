@@ -35024,6 +35024,485 @@ body.v40-solo #hub-view .hub-card:is([data-game="dial"],[data-game="tabu"],[data
   var PROBABLE_EXTRA = [];
   var YONUNCA_EXTRA = [];
 
+  /* Lote General 01: contenido original redactado y revisado para esta edición.
+     Fuente mantenible: contenido/lote-general-01.json; no pertenece a Picante. */
+  var LOTE_GENERAL_01 = {
+  "reto": [
+    "Inventa un saludo para una expedición al fondo del mar y enséñalo a la mesa.",
+    "Describe una nube como si fuera una noticia de última hora.",
+    "Presenta un objeto cercano como si fuera una pieza de museo.",
+    "Explica cómo preparar una merienda usando solo gestos durante veinte segundos.",
+    "Improvisa una canción breve sobre una media que perdió a su pareja.",
+    "Cuenta una aventura de una cuchara que quiere conocer el mundo.",
+    "Dibuja una casa con la mano no dominante y muestra el resultado.",
+    "Nombra cinco cosas que podrías encontrar en una estación de tren imaginaria.",
+    "Inventa un eslogan para una biblioteca que abre de noche.",
+    "Da un discurso de agradecimiento por haber ganado el premio al mejor bostezo.",
+    "Imita a una persona que intenta abrir un paraguas bajo techo sin hablar.",
+    "Explica a un extraterrestre para qué sirve una fila de espera.",
+    "Inventa tres nombres para una heladería que solo vende sabores de colores.",
+    "Cuenta en tres frases cómo sería una competencia entre una tortuga y un caracol.",
+    "Haz una pequeña coreografía sentado usando únicamente manos y hombros.",
+    "Menciona cuatro usos imaginarios para una caja vacía.",
+    "Describe una montaña sin usar las palabras altura, piedra ni nieve.",
+    "Representa una conversación entre dos calcetines recién salidos de la lavadora.",
+    "Inventa el pronóstico del tiempo para un planeta hecho de gelatina.",
+    "Haz una pregunta absurda y responde como si fueras especialista en el tema.",
+    "Cuenta una historia breve en la que una llave decide cambiar de profesión.",
+    "Presenta a la persona de tu derecha como protagonista de una película de detectives.",
+    "Crea un ritmo con palmas y deja que la mesa lo repita si quiere.",
+    "Inventa el nombre y las reglas de un deporte que se juega en una hamaca.",
+    "Da indicaciones para llegar a un lugar imaginario sin mencionar calles ni números."
+  ],
+  "cadena": [
+    "La panadería abrió como siempre, pero esta vez los panes tenían etiquetas con destinos de viaje.",
+    "Al mover una maceta, apareció un mapa dibujado por alguien que todavía no había nacido.",
+    "Cada vez que sonaba la campana del tranvía, una persona recordaba una canción distinta.",
+    "El concurso de cometas comenzó sin viento y terminó con una carta en el cielo.",
+    "Una bibliotecaria encontró un libro que devolvía los marcapáginas perdidos.",
+    "La feria del barrio recibió una visita inesperada: un relojero que reparaba recuerdos.",
+    "En la parada del autobús había un banco reservado para las conversaciones pendientes.",
+    "La primera lluvia del año dejó pequeñas huellas luminosas en la plaza.",
+    "Un equipo de exploradores descubrió que la cueva tenía una puerta de oficina.",
+    "La orquesta ensayaba en silencio porque su directora había perdido una nota musical.",
+    "En el mercado apareció un puesto donde se intercambiaban buenas ideas por abrazos imaginarios.",
+    "A medianoche, las farolas comenzaron a encenderse siguiendo una melodía desconocida.",
+    "Un repartidor recibió un paquete dirigido al dueño de una isla que no figuraba en los mapas.",
+    "El jardín comunitario produjo una calabaza con una invitación escrita en la cáscara.",
+    "Dos hermanas encontraron una brújula que apuntaba hacia la mejor pregunta del día.",
+    "El ascenso al faro parecía sencillo hasta que cada escalón contó una historia diferente.",
+    "Una inventora probó su nueva máquina y todas las ventanas mostraron paisajes distintos.",
+    "El cartero dejó en la plaza una carta demasiado grande para cualquier buzón.",
+    "Durante la función de teatro, el telón se abrió y reveló una estación espacial.",
+    "Una tortuga llegó a la escuela con una mochila llena de entradas para un festival secreto.",
+    "La cafetería ofrecía una bebida especial que cambiaba de nombre según quien la pidiera.",
+    "El equipo de arqueología desenterró una maleta llena de fotografías del día siguiente.",
+    "Cuando se apagó el proyector, los personajes de la película siguieron conversando.",
+    "En la azotea del edificio apareció un pequeño observatorio que nadie recordaba haber construido.",
+    "El primer visitante del acuario esa mañana fue un pingüino que buscaba a su guía."
+  ],
+  "yonunca": [
+    "he intentado aprender una canción en un idioma que no conozco",
+    "he construido una torre con objetos que tenía en el escritorio",
+    "he llevado una planta de un lugar a otro buscando la luz adecuada",
+    "he preparado una receta siguiendo instrucciones de memoria",
+    "he enviado una postal durante un viaje",
+    "he observado las estrellas para buscar una constelación",
+    "he guardado una piedra o concha como recuerdo de un paseo",
+    "he aprendido a doblar una figura de papel",
+    "he inventado un nombre para una mascota imaginaria",
+    "he entrado a una librería solo para mirar las portadas",
+    "he escrito una lista de lugares que me gustaría visitar",
+    "he practicado un trabalenguas hasta decirlo sin equivocarme",
+    "he hecho un dibujo para agradecer algo a otra persona",
+    "he seguido las instrucciones de un mapa de papel",
+    "he cambiado la disposición de los muebles de una habitación",
+    "he plantado semillas y esperado a que broten",
+    "he escuchado un álbum entero de principio a fin",
+    "he inventado una receta con ingredientes que ya tenía en casa",
+    "he aprendido las reglas de un juego viendo jugar a otras personas",
+    "he coleccionado entradas o boletos de eventos",
+    "he observado cómo cambia un paisaje a lo largo del día",
+    "he reparado un objeto sencillo en lugar de reemplazarlo",
+    "he participado en un intercambio de libros",
+    "he escrito una carta para leerla en el futuro",
+    "he intentado identificar el canto de un pájaro"
+  ],
+  "probable": [
+    "llevar una libreta para anotar ideas durante un paseo",
+    "aprender a preparar un plato típico de otro lugar",
+    "organizar una búsqueda del tesoro para sus amistades",
+    "crear un club para intercambiar libros",
+    "poner nombre a todas las plantas de una casa",
+    "reconocer una canción con solo escuchar el comienzo",
+    "proponer una excursión para observar estrellas",
+    "construir una maqueta con materiales reciclados",
+    "guardar un mapa de papel como recuerdo de un viaje",
+    "inventar un saludo especial para el grupo",
+    "dedicar una tarde a aprender una técnica de dibujo",
+    "convertir una caja vacía en un juego de mesa",
+    "recordar el nombre de una película por un detalle pequeño",
+    "planear una cena temática inspirada en una novela",
+    "encontrar una ruta alternativa durante una caminata",
+    "ofrecerse para explicar las reglas de un juego nuevo",
+    "llevar una cámara para fotografiar puertas interesantes",
+    "escribir una reseña entusiasta de una biblioteca",
+    "aprender a reconocer árboles por sus hojas",
+    "organizar una colección de objetos por colores",
+    "inventar un personaje para una historia compartida",
+    "escuchar un podcast completo mientras cocina",
+    "preparar una lista de canciones para un trayecto largo",
+    "aprender a saludar en varios idiomas antes de viajar",
+    "conservar una entrada de teatro dentro de un libro"
+  ],
+  "palabras": [
+    {
+      "word": "BRÚJULA",
+      "category": "Exploración",
+      "clueHint": "Aguja, norte y orientación"
+    },
+    {
+      "word": "ASTROLABIO",
+      "category": "Instrumentos",
+      "clueHint": "Cielo, navegación y medición antigua"
+    },
+    {
+      "word": "TELAR",
+      "category": "Oficios",
+      "clueHint": "Hilos, tejido y lanzadera"
+    },
+    {
+      "word": "ACORDEÓN",
+      "category": "Música",
+      "clueHint": "Fuelle, teclas y melodía"
+    },
+    {
+      "word": "OBSERVATORIO",
+      "category": "Lugares",
+      "clueHint": "Telescopio, cúpula y estrellas"
+    },
+    {
+      "word": "LABERINTO",
+      "category": "Lugares",
+      "clueHint": "Caminos, giros y salida"
+    },
+    {
+      "word": "VOLCÁN",
+      "category": "Naturaleza",
+      "clueHint": "Cráter, lava y montaña"
+    },
+    {
+      "word": "CASCADA",
+      "category": "Naturaleza",
+      "clueHint": "Agua, altura y caída"
+    },
+    {
+      "word": "COLIBRÍ",
+      "category": "Animales",
+      "clueHint": "Ave pequeña, néctar y vuelo"
+    },
+    {
+      "word": "CASTOR",
+      "category": "Animales",
+      "clueHint": "Río, madera y dique"
+    },
+    {
+      "word": "HORMIGUERO",
+      "category": "Naturaleza",
+      "clueHint": "Túneles, colonia y suelo"
+    },
+    {
+      "word": "PAPALOTE",
+      "category": "Juguetes",
+      "clueHint": "Viento, hilo y cielo"
+    },
+    {
+      "word": "CALEIDOSCOPIO",
+      "category": "Objetos",
+      "clueHint": "Cristales, reflejos y figuras"
+    },
+    {
+      "word": "TERMÓMETRO",
+      "category": "Instrumentos",
+      "clueHint": "Temperatura, escala y medición"
+    },
+    {
+      "word": "PERISCOPIO",
+      "category": "Instrumentos",
+      "clueHint": "Espejos, submarino y superficie"
+    },
+    {
+      "word": "INVERNADERO",
+      "category": "Lugares",
+      "clueHint": "Plantas, cubierta y cultivo"
+    },
+    {
+      "word": "ROMPECABEZAS",
+      "category": "Juegos",
+      "clueHint": "Piezas, imagen y encaje"
+    },
+    {
+      "word": "ACUARELA",
+      "category": "Arte",
+      "clueHint": "Pintura, agua y papel"
+    },
+    {
+      "word": "MARIONETA",
+      "category": "Teatro",
+      "clueHint": "Hilos, personaje y escenario"
+    },
+    {
+      "word": "MOLINO",
+      "category": "Construcciones",
+      "clueHint": "Aspas, viento y grano"
+    },
+    {
+      "word": "CANDELABRO",
+      "category": "Objetos",
+      "clueHint": "Velas, brazos y luz"
+    },
+    {
+      "word": "ECLIPSE",
+      "category": "Astronomía",
+      "clueHint": "Sol, Luna y sombra"
+    },
+    {
+      "word": "FÓSIL",
+      "category": "Ciencia",
+      "clueHint": "Roca, restos y pasado"
+    },
+    {
+      "word": "ACUEDUCTO",
+      "category": "Construcciones",
+      "clueHint": "Agua, arcos y transporte"
+    },
+    {
+      "word": "ANCLA",
+      "category": "Navegación",
+      "clueHint": "Barco, cadena y fondo"
+    }
+  ]
+};
+
+  /* Lote General 02: misma procedencia y controles que el primer lote. */
+  var LOTE_GENERAL_02 = {
+  "reto": [
+    "Cuenta una leyenda inventada sobre la primera persona que usó una bufanda.",
+    "Nombra cinco objetos que podrían caber en el bolsillo de un gigante.",
+    "Haz una entrevista imaginaria a una lámpara que nunca se apaga.",
+    "Explica una receta fantástica cuyos ingredientes sean sonidos.",
+    "Dibuja un animal imaginario con tres formas geométricas diferentes.",
+    "Describe cómo se sentiría un barco al ver la montaña por primera vez.",
+    "Inventa un nuevo nombre para el color de una tarde lluviosa.",
+    "Cuenta una anécdota ficticia desde el punto de vista de una bicicleta.",
+    "Propón tres títulos para un libro sobre la vida secreta de las nubes.",
+    "Presenta una mascota imaginaria y explica qué le gusta desayunar.",
+    "Inventa una contraseña divertida que no sirva para ninguna cuenta real.",
+    "Haz de guía de una exposición dedicada a los sombreros invisibles.",
+    "Representa con gestos cómo una semilla se convierte en árbol.",
+    "Inventa una celebración para el día internacional de los zapatos cómodos.",
+    "Describe un viaje en globo usando tres palabras elegidas por la mesa.",
+    "Crea un anuncio para una tienda que alquila sueños de aventura.",
+    "Cuenta una historia de detectives que termine con una galleta encontrada.",
+    "Explica por qué un pingüino imaginario decidió aprender a tocar el violín.",
+    "Inventa un menú de tres platos para una fiesta en la Luna.",
+    "Haz una lista de cuatro regalos posibles para un dragón aficionado a la jardinería.",
+    "Di una frase alegre como si anunciaras la llegada de un tren.",
+    "Describe un paisaje inventado en el que el cielo tenga dos colores.",
+    "Propón una misión amistosa para dos exploradores de una isla pequeña.",
+    "Inventa una palabra para describir la alegría de encontrar algo perdido.",
+    "Muestra con mímica cómo se prepara una mochila para visitar otro planeta."
+  ],
+  "cadena": [
+    "La noche anterior a la inauguración, las esculturas del museo cambiaron de lugar.",
+    "Al recibir su diploma, la nueva exploradora encontró un acertijo en el reverso.",
+    "El puente del pueblo amaneció cubierto de pequeñas notas de agradecimiento.",
+    "En la tienda de instrumentos, un tambor empezó a marcar el ritmo de los pasos.",
+    "La persona encargada del correo encontró una carta escrita en cinco idiomas inventados.",
+    "En medio del lago flotaba una mesa preparada para una reunión que nadie había anunciado.",
+    "El museo de inventos abrió una sala dedicada a las cosas que aún no se habían pensado.",
+    "Una cocinera descubrió que su cuaderno de recetas tenía una página nueva cada domingo.",
+    "La última pieza del rompecabezas mostraba un lugar que toda la familia reconocía.",
+    "Una viajera encontró en el tren un paraguas que señalaba el camino de regreso.",
+    "El campeonato de ajedrez se detuvo cuando una ficha pidió un descanso.",
+    "La primera persona en entrar al parque recibió una llave envuelta en una hoja.",
+    "En un edificio antiguo había un buzón que aceptaba únicamente preguntas.",
+    "Al terminar la tormenta, apareció una escalera dibujada sobre el arcoíris.",
+    "La radio anunció una canción dedicada a alguien que todavía no había llegado.",
+    "En la feria de ciencias una niña presentó un invento que traducía el silencio.",
+    "El guardabosques encontró huellas que empezaban en la copa de un árbol.",
+    "El reloj de la estación se detuvo justo cuando un músico abrió su estuche.",
+    "Una mañana, las puertas de la ciudad aparecieron pintadas con escenas del futuro.",
+    "El equipo de rescate recibió un mensaje de una cometa atrapada en una nube.",
+    "Al levantar la tapa de la caja de música, apareció una invitación para cruzar el océano.",
+    "En el taller de costura alguien había dejado un traje hecho de mapas antiguos.",
+    "Una caja de lápices decidió elegir a su próxima dueña mediante un concurso.",
+    "El grupo llegó a la cima y descubrió allí una mesa con cinco tazas calientes.",
+    "La nueva vecina de la calle coleccionaba sonidos y había perdido su favorito."
+  ],
+  "yonunca": [
+    "he elegido una ruta distinta solo para conocer un barrio",
+    "he aprendido a saludar a alguien en lengua de señas",
+    "he preparado una merienda para compartir con mis vecinos",
+    "he visitado un museo dedicado a un tema poco habitual",
+    "he escuchado una historia contada por una persona mayor de mi familia",
+    "he intentado cultivar una hierba aromática en una maceta",
+    "he organizado una caja de recuerdos de mi infancia",
+    "he escrito una reseña de un libro que terminé",
+    "he usado una aplicación para reconocer una canción",
+    "he participado en una actividad para limpiar un espacio público",
+    "he aprendido a reparar un botón de una prenda",
+    "he hecho un recorrido en bicicleta por un camino nuevo",
+    "he descubierto una película por recomendación de alguien más joven",
+    "he intentado reconocer una fruta por su aroma",
+    "he preparado un regalo hecho a mano",
+    "he visitado una exposición de fotografías",
+    "he tomado notas sobre una conversación que quería recordar",
+    "he aprendido las reglas de un deporte que nunca practiqué",
+    "he hecho una lista de canciones para animar a otra persona",
+    "he visto una obra de teatro al aire libre",
+    "he participado en un taller de cocina",
+    "he aprendido a utilizar una herramienta nueva con ayuda",
+    "he visitado una biblioteca en otra ciudad",
+    "he compartido un paraguas durante una lluvia inesperada",
+    "he escuchado una leyenda local durante un viaje"
+  ],
+  "probable": [
+    "aprender los nombres de las constelaciones visibles desde su ventana",
+    "guardar una receta familiar en un cuaderno especial",
+    "buscar un lugar tranquilo para leer durante una tarde libre",
+    "proponer que el grupo visite una exposición de fotografía",
+    "preparar un juego de pistas para una celebración",
+    "conocer las historias detrás de los nombres de las calles",
+    "devolver a la biblioteca un libro con una nota de agradecimiento",
+    "crear un huerto pequeño en un balcón",
+    "preguntar a una persona mayor cómo era su barrio antes",
+    "elegir un recuerdo de viaje hecho por artesanos locales",
+    "comenzar a aprender un instrumento musical por curiosidad",
+    "encontrar un poema apropiado para una ocasión especial",
+    "organizar una tarde para reparar objetos en compañía",
+    "probar una actividad creativa que nunca había intentado",
+    "fotografiar el mismo paisaje en diferentes estaciones",
+    "planear un recorrido para visitar varios mercados de libros",
+    "inventar una historia sobre una fotografía antigua",
+    "aprender a preparar pan para compartirlo con sus amistades",
+    "investigar el origen de una expresión que escucha a menudo",
+    "hacer una lista de aves vistas durante una caminata",
+    "llevar un juego de cartas a una espera larga",
+    "escribir instrucciones claras para enseñar una habilidad",
+    "descubrir una banda nueva escuchando una radio local",
+    "recordar llevar bolsas reutilizables al hacer compras",
+    "recomendar un documental que le hizo cambiar de opinión"
+  ],
+  "palabras": [
+    {
+      "word": "BITÁCORA",
+      "category": "Exploración",
+      "clueHint": "Registro, viaje y anotaciones"
+    },
+    {
+      "word": "BINOCULARES",
+      "category": "Instrumentos",
+      "clueHint": "Lentes, distancia y observación"
+    },
+    {
+      "word": "CARTÓGRAFO",
+      "category": "Oficios",
+      "clueHint": "Mapas, territorios y dibujo"
+    },
+    {
+      "word": "FARO",
+      "category": "Construcciones",
+      "clueHint": "Luz, costa y navegación"
+    },
+    {
+      "word": "PÉNDULO",
+      "category": "Ciencia",
+      "clueHint": "Oscilación, cuerda y tiempo"
+    },
+    {
+      "word": "CARACOL",
+      "category": "Animales",
+      "clueHint": "Concha, antenas y lentitud"
+    },
+    {
+      "word": "MANDOLINA",
+      "category": "Música",
+      "clueHint": "Cuerdas, púa e instrumento"
+    },
+    {
+      "word": "ATLAS",
+      "category": "Libros",
+      "clueHint": "Mapas, países y consulta"
+    },
+    {
+      "word": "ARBORÉTUM",
+      "category": "Lugares",
+      "clueHint": "Árboles, colección y jardín"
+    },
+    {
+      "word": "BORRADOR",
+      "category": "Papelería",
+      "clueHint": "Lápiz, goma y corrección"
+    },
+    {
+      "word": "TINTA",
+      "category": "Arte",
+      "clueHint": "Escritura, pigmento y pluma"
+    },
+    {
+      "word": "ORIGAMI",
+      "category": "Arte",
+      "clueHint": "Papel, pliegues y figuras"
+    },
+    {
+      "word": "VIDRIERA",
+      "category": "Arte",
+      "clueHint": "Cristales, colores y luz"
+    },
+    {
+      "word": "PUPITRE",
+      "category": "Muebles",
+      "clueHint": "Escritorio, escuela y estudio"
+    },
+    {
+      "word": "BALANZA",
+      "category": "Instrumentos",
+      "clueHint": "Peso, platillos y comparación"
+    },
+    {
+      "word": "PARACAÍDAS",
+      "category": "Aventura",
+      "clueHint": "Tela, descenso y aire"
+    },
+    {
+      "word": "SENDERISMO",
+      "category": "Aire libre",
+      "clueHint": "Caminata, ruta y naturaleza"
+    },
+    {
+      "word": "FAROL",
+      "category": "Objetos",
+      "clueHint": "Luz, vidrio y asa"
+    },
+    {
+      "word": "TELESCOPIO",
+      "category": "Astronomía",
+      "clueHint": "Lentes, cielo y distancia"
+    },
+    {
+      "word": "ACANTILADO",
+      "category": "Geografía",
+      "clueHint": "Roca, costa y altura"
+    },
+    {
+      "word": "MURCIÉLAGO",
+      "category": "Animales",
+      "clueHint": "Mamífero, alas y noche"
+    },
+    {
+      "word": "PAPIRO",
+      "category": "Materiales",
+      "clueHint": "Planta, escritura y antigüedad"
+    },
+    {
+      "word": "CERÁMICA",
+      "category": "Oficios",
+      "clueHint": "Arcilla, torno y horno"
+    },
+    {
+      "word": "MARCAPÁGINAS",
+      "category": "Lectura",
+      "clueHint": "Libro, página y señal"
+    },
+    {
+      "word": "MONOCICLO",
+      "category": "Transporte",
+      "clueHint": "Una rueda, equilibrio y pedales"
+    }
+  ]
+};
+
   /* ===================================================== CÓMO SE APLICA ==== */
 
   var estado = { modo: null, listo: false };
@@ -35074,6 +35553,15 @@ body.v40-solo #hub-view .hub-card:is([data-game="dial"],[data-game="tabu"],[data
       personaje: V.DB.personaje.slice(),
       precio: V.DB.precio.slice()
     };
+    /* Agregar al origen antes de sincronizar: las vistas y el importador usan
+       las mismas bolsas; no se mezclan las variantes General y Picante. */
+    [LOTE_GENERAL_01, LOTE_GENERAL_02].forEach(function (lote) {
+      pushUnico(ORIG.retos, lote.reto);
+      pushUnico(ORIG.cadena, lote.cadena);
+      pushUnico(ORIG.palabras, lote.palabras, 'word');
+      pushUnico(V.DB.yonunca.general, lote.yonunca);
+      pushUnico(V.DB.probable.general, lote.probable);
+    });
     /* el picante nuevo entra UNA vez, al guardar el original */
     pushUnico(ORIG.vverd, VERDADES_EXTRA);
     pushUnico(ORIG.vretos, RETOS_EXTRA);
@@ -39104,7 +39592,8 @@ html.v50-hub #hub-view #v-play-chip { display:none !important; }
   if (V.__v59) return;
 
   var MAX = 180;
-  var CAD = { on: false, fase: 'apagada', semilla: '', orden: [], ronda: 0, turno: 0, frases: [], recibido: false, nota: '' };
+  // Una recarga cancela la partida, pero no debe reutilizar identificadores.
+  var CAD = { on: false, fase: 'apagada', semilla: '', orden: [], ronda: Date.now() * 1000 + Math.floor(Math.random() * 1000), turno: 0, frases: [], recibido: false, nota: '' };
 
   function $(id) { return document.getElementById(id); }
   function G() { try { return V.G(); } catch (e) { return null; } }
@@ -40097,7 +40586,7 @@ html.v50-hub #hub-view #v-play-chip { display:none !important; }
   var COSTE = 0.5;
   /* fase: apagada | frase | votando | acusado | contexto | resultado */
   var YN = {
-    on: false, fase: 'apagada', frase: '', ronda: 0,
+    on: false, fase: 'apagada', frase: '', ronda: Date.now() * 1000 + Math.floor(Math.random() * 1000),
     votos: {},            // slot que vota -> slot acusado
     acusado: null,        // slot acusado
     confeso: null,        // true / false / null
@@ -40405,7 +40894,7 @@ html.v50-hub #hub-view #v-play-chip { display:none !important; }
     if (YN.fase === 'frase') {
       sc.text = 'Votación de acusaciones: cada uno elige a quién acusa.';
       sc.sub = 'Un voto por jugador.';
-      sc.actions = [{ id: 'yn:abrir', label: 'Empezar acusaciones', kind: 'primary', by: 'all' }];
+      sc.actions = [{ id: 'yn:abrir:' + YN.ronda, label: 'Empezar acusaciones', kind: 'primary', by: 'all' }];
       return true;
     }
     if (YN.fase === 'votando') {
@@ -40417,7 +40906,7 @@ html.v50-hub #hub-view #v-play-chip { display:none !important; }
         sc.text = '¿A quién acusas?';
         sc.sub = 'Toca un nombre: tu voto no se puede cambiar.';
         sc.actions = roster().map(function (p) {
-          return { id: 'yn:panel:' + p.slot, label: nick(p.slot), kind: 'voto', by: 'all' };
+          return { id: 'yn:panel:' + YN.ronda + ':' + p.slot, label: nick(p.slot), kind: 'voto', by: 'all' };
         });
       }
       return true;
@@ -40427,8 +40916,8 @@ html.v50-hub #hub-view #v-play-chip { display:none !important; }
         sc.text = 'Te acusaron ' + votosDelAcusado() + ' vez/veces. ¿Confiesas?';
         sc.sub = 'Si confiesas pierdes 0,5 en total; si no, 0,5 por cada voto.';
         sc.actions = [
-          { id: 'yn:conf', label: 'Confieso', kind: 'primary', by: 'all' },
-          { id: 'yn:nego', label: 'No confieso', kind: 'danger', by: 'all' }
+          { id: 'yn:conf:' + YN.ronda, label: 'Confieso', kind: 'primary', by: 'all' },
+          { id: 'yn:nego:' + YN.ronda, label: 'No confieso', kind: 'danger', by: 'all' }
         ];
       } else {
         sc.text = 'Acusado: ' + nick(YN.acusado) + '.';
@@ -40441,7 +40930,7 @@ html.v50-hub #hub-view #v-play-chip { display:none !important; }
       if (mismo(slot, YN.acusado)) {
         sc.text = 'Confesaste. Cuenta el contexto en voz alta y escríbelo en la pantalla.';
         sc.sub = 'Al enviarlo se descuentan 0,5 (una sola vez).';
-        sc.actions = [{ id: 'yn:enviar', label: 'Enviar contexto (se escribe en la PC)', kind: 'primary', by: 'all' }];
+        sc.actions = [{ id: 'yn:enviar:' + YN.ronda, label: 'Enviar contexto (se escribe en la PC)', kind: 'primary', by: 'all' }];
       } else {
         sc.text = nick(YN.acusado) + ' está contando el contexto…';
         sc.sub = 'Escucha la historia.';
@@ -40454,7 +40943,7 @@ html.v50-hub #hub-view #v-play-chip { display:none !important; }
       var per = YN.confeso ? COSTE : vot * COSTE;
       sc.text = nick(YN.acusado) + ' ' + (YN.confeso ? 'confesó' : 'no confesó') + ': ' + num(-per) + '.';
       sc.sub = YN.confeso ? 'Pierde 0,5 en total.' : (vot + ' voto(s) × 0,5.');
-      sc.actions = [{ id: 'yn:seguir', label: 'Siguiente frase', kind: 'primary', by: 'all' }];
+      sc.actions = [{ id: 'yn:seguir:' + YN.ronda, label: 'Siguiente frase', kind: 'primary', by: 'all' }];
       return true;
     }
     sc.actions = [];
@@ -40462,17 +40951,25 @@ html.v50-hub #hub-view #v-play-chip { display:none !important; }
   });
 
   S.accion('yn:', function (id, rec) {
-    if (!YN.on) return false;
-    var slot = rec && rec.slot;
-    if (id === 'yn:abrir') { abrirVotacion(); return true; }
-    if (id === 'yn:seguir') { siguiente(); return true; }
-    if (slot == null) return false;
-    if (id.indexOf('yn:panel:') === 0) { votar(slot, Number(id.slice(9))); return true; }
-    if (id === 'yn:conf') { votar(slot, YN.acusado); decidir(true); return true; }
-    if (id === 'yn:nego') { decidir(false); return true; }
-    if (id === 'yn:enviar') { enviarContexto(YN.contexto); return true; }
-    if (id === 'yn:fin') { terminar(slot); return true; }
-    return false;
+    // El mando solo puede enviar acciones de la ronda y fase que está viendo.
+    // Nunca aceptar una decisión o contexto enviado por otro participante.
+    if (!YN.on || S.juego() !== 'yonunca' || !rec || !rec.id || !rec.online ||
+        !rec.conn || !rec.conn.open || !V.net || !V.net.conns || V.net.conns.get(rec.id) !== rec) return true;
+    var slot = rec.slot;
+    if (slot == null || !roster().some(function (p) { return mismo(p.slot, slot); })) return true;
+    var m = /^yn:(abrir|seguir|panel|conf|nego|enviar|fin):(\d+)(?::(\d+))?$/.exec(id);
+    if (!m || Number(m[2]) !== YN.ronda) return true;
+    var accion = m[1];
+    if (accion === 'abrir' && YN.fase === 'frase' && m[3] == null) abrirVotacion();
+    else if (accion === 'seguir' && YN.fase === 'resultado' && m[3] == null) siguiente();
+    else if (accion === 'panel' && YN.fase === 'votando' && m[3] != null) votar(slot, Number(m[3]));
+    else if (m[3] == null && mismo(slot, YN.acusado)) {
+      if (accion === 'conf' && YN.fase === 'acusado') decidir(true);
+      else if (accion === 'nego' && YN.fase === 'acusado') decidir(false);
+      else if (accion === 'enviar' && YN.fase === 'contexto') enviarContexto(YN.contexto);
+      else if (accion === 'fin' && YN.fase === 'contexto') terminar(slot);
+    }
+    return true;
   });
 
   V.RENDER = V.RENDER || {};

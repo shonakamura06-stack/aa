@@ -1,0 +1,416 @@
+TAP version 13
+# Subtest: Un fallo al guardar la sesión se comunica, conserva el estado en memoria y permite reintentar
+ok 1 - Un fallo al guardar la sesión se comunica, conserva el estado en memoria y permite reintentar
+  ---
+  duration_ms: 1725.324346
+  type: 'test'
+  ...
+# Subtest: El aviso permite reintentar y no revive una eliminación fallida
+ok 2 - El aviso permite reintentar y no revive una eliminación fallida
+  ---
+  duration_ms: 1731.806116
+  type: 'test'
+  ...
+# Subtest: El lote General está integrado, no duplica al sincronizar y no se repite tras recargar
+ok 3 - El lote General está integrado, no duplica al sincronizar y no se repite tras recargar
+  ---
+  duration_ms: 1420.253525
+  type: 'test'
+  ...
+# Subtest: El Dial conserva parejas elegidas y distribuye fases por conexión
+ok 4 - El Dial conserva parejas elegidas y distribuye fases por conexión
+  ---
+  duration_ms: 37933.589087
+  type: 'test'
+  ...
+# Subtest: Modo local configura jugadores reales sin red y abre el catálogo
+ok 5 - Modo local configura jugadores reales sin red y abre el catálogo
+  ---
+  duration_ms: 5096.09243
+  type: 'test'
+  ...
+# Subtest: Servidor y dos mandos atraviesan la sala previa con conexiones reales
+ok 6 - Servidor y dos mandos atraviesan la sala previa con conexiones reales
+  ---
+  duration_ms: 9513.987867
+  type: 'test'
+  ...
+# Subtest: Votación local de Más probable entrega un voto privado por participante
+ok 7 - Votación local de Más probable entrega un voto privado por participante
+  ---
+  duration_ms: 3684.873787
+  type: 'test'
+  ...
+# Subtest: Tabú local recoge propuesta sin transmitir ni mostrar la carta al participante
+ok 8 - Tabú local recoge propuesta sin transmitir ni mostrar la carta al participante
+  ---
+  duration_ms: 4239.901001
+  type: 'test'
+  ...
+# Subtest: Dial local divide el resultado entre las personas de la pareja elegida
+ok 9 - Dial local divide el resultado entre las personas de la pareja elegida
+  ---
+  duration_ms: 1864.822456
+  type: 'test'
+  ...
+# Subtest: CSV: comas, comillas, saltos internos, líneas originales y errores
+ok 10 - CSV: comas, comillas, saltos internos, líneas originales y errores
+  ---
+  duration_ms: 848.222252
+  type: 'test'
+  ...
+# Subtest: Cada destino y mercado admite CSV, valida y consume su propio banco
+ok 11 - Cada destino y mercado admite CSV, valida y consume su propio banco
+  ---
+  duration_ms: 1020.948072
+  type: 'test'
+  ...
+# Subtest: Archivo CSV se analiza en la interfaz y no duplica al pulsar dos veces
+ok 12 - Archivo CSV se analiza en la interfaz y no duplica al pulsar dos veces
+  ---
+  duration_ms: 3944.177265
+  type: 'test'
+  ...
+# Subtest: Importación revisa, guarda, conserva acentos y llega al banco real del Impostor
+ok 13 - Importación revisa, guarda, conserva acentos y llega al banco real del Impostor
+  ---
+  duration_ms: 3794.977499
+  type: 'test'
+  ...
+# Subtest: Migración de historial legado conserva claves estructuradas y solo reinicia al pedirlo
+ok 14 - Migración de historial legado conserva claves estructuradas y solo reinicia al pedirlo
+  ---
+  duration_ms: 659.992441
+  type: 'test'
+  ...
+# Subtest: Importación detecta similitud y exige revisión antes de guardar
+ok 15 - Importación detecta similitud y exige revisión antes de guardar
+  ---
+  duration_ms: 886.034815
+  type: 'test'
+  ...
+# Subtest: El marcador global huérfano no desplaza las vistas y el marcador del juego sigue disponible
+ok 16 - El marcador global huérfano no desplaza las vistas y el marcador del juego sigue disponible
+  ---
+  duration_ms: 2487.14967
+  type: 'test'
+  ...
+# Subtest: Servidor y dos teléfonos: reconexión, historia, aislamiento y desempate
+ok 17 - Servidor y dos teléfonos: reconexión, historia, aislamiento y desempate
+  ---
+  duration_ms: 62446.079822
+  type: 'test'
+  ...
+# Subtest: Catálogo usa solo la tarjeta para abrir el juego
+ok 18 - Catálogo usa solo la tarjeta para abrir el juego
+  ---
+  duration_ms: 2145.419023
+  type: 'test'
+  ...
+# Subtest: El inicio no promete funcionamiento offline ni un número incorrecto de juegos
+ok 19 - El inicio no promete funcionamiento offline ni un número incorrecto de juegos
+  ---
+  duration_ms: 2101.990868
+  type: 'test'
+  ...
+# Subtest: Cada tarjeta abre su juego desde ambos extremos en escritorio y móvil
+ok 20 - Cada tarjeta abre su juego desde ambos extremos en escritorio y móvil
+  ---
+  duration_ms: 26075.160472
+  type: 'test'
+  ...
+# Subtest: La tarjeta de Precio refleja la regla por defecto y el juego individual
+ok 21 - La tarjeta de Precio refleja la regla por defecto y el juego individual
+  ---
+  duration_ms: 2350.752563
+  type: 'test'
+  ...
+# Subtest: El tutorial de Más probable no promete puntos
+ok 22 - El tutorial de Más probable no promete puntos
+  ---
+  duration_ms: 2043.598465
+  type: 'test'
+  ...
+# Subtest: Verdad muestra controles de elección en fila en PC y columna en móvil
+ok 23 - Verdad muestra controles de elección en fila en PC y columna en móvil
+  ---
+  duration_ms: 2588.747677
+  type: 'test'
+  ...
+# Subtest: Verdad no avanza antes del veredicto y avanza una vez después
+ok 24 - Verdad no avanza antes del veredicto y avanza una vez después
+  ---
+  duration_ms: 8726.579022
+  type: 'test'
+  ...
+# Subtest: Verdad cancela el avance al salir del juego
+ok 25 - Verdad cancela el avance al salir del juego
+  ---
+  duration_ms: 7422.215253
+  type: 'test'
+  ...
+# Subtest: Trivia resuelve una vez y avanza después de mostrar el resultado
+ok 26 - Trivia resuelve una vez y avanza después de mostrar el resultado
+  ---
+  duration_ms: 7935.864837
+  type: 'test'
+  ...
+# Subtest: Trivia avanza tras agotarse el tiempo y cancela al salir
+ok 27 - Trivia avanza tras agotarse el tiempo y cancela al salir
+  ---
+  duration_ms: 13055.945001
+  type: 'test'
+  ...
+# Subtest: En modo servidor solo cuentan conexiones reales, no el anfitrión
+ok 28 - En modo servidor solo cuentan conexiones reales, no el anfitrión
+  ---
+  duration_ms: 2183.482208
+  type: 'test'
+  ...
+# Subtest: Al identificarse, un jugador nuevo no recibe provisionalmente el marcador ajeno
+ok 29 - Al identificarse, un jugador nuevo no recibe provisionalmente el marcador ajeno
+  ---
+  duration_ms: 2037.270809
+  type: 'test'
+  ...
+# Subtest: Si el último jugador se desconecta, el anfitrión todavía puede volver al hub
+ok 30 - Si el último jugador se desconecta, el anfitrión todavía puede volver al hub
+  ---
+  duration_ms: 2423.934508
+  type: 'test'
+  ...
+# Subtest: Avisos conservan texto legible, fondo translúcido y dejan pasar el clic
+ok 31 - Avisos conservan texto legible, fondo translúcido y dejan pasar el clic
+  ---
+  duration_ms: 4355.390096
+  type: 'test'
+  ...
+# Subtest: Al recargar durante el Dial se recupera el marcador individual sin perder el resultado de equipo
+ok 32 - Al recargar durante el Dial se recupera el marcador individual sin perder el resultado de equipo
+  ---
+  duration_ms: 2671.292764
+  type: 'test'
+  ...
+# Subtest: Precio Justo no atribuye una referencia de otro mercado
+ok 33 - Precio Justo no atribuye una referencia de otro mercado
+  ---
+  duration_ms: 2080.347119
+  type: 'test'
+  ...
+# Subtest: La entrada ofrece anfitrión, local y mando, sin formar equipos automáticamente
+ok 34 - La entrada ofrece anfitrión, local y mando, sin formar equipos automáticamente
+  ---
+  duration_ms: 2225.070913
+  type: 'test'
+  ...
+# Subtest: Precio Justo muestra la misma escala proporcional en PC y teléfono
+ok 35 - Precio Justo muestra la misma escala proporcional en PC y teléfono
+  ---
+  duration_ms: 3070.189152
+  type: 'test'
+  ...
+# Subtest: Importador de Ranking valida y guarda una tarjeta objetiva desde la interfaz
+ok 36 - Importador de Ranking valida y guarda una tarjeta objetiva desde la interfaz
+  ---
+  duration_ms: 3422.312373
+  type: 'test'
+  ...
+# Subtest: La lista de sala conserva su scroll al actualizar y se adapta a móvil
+ok 37 - La lista de sala conserva su scroll al actualizar y se adapta a móvil
+  ---
+  duration_ms: 3985.282367
+  type: 'test'
+  ...
+# Subtest: Precio usa decimales exactos, seis categorías y empates configurables
+ok 38 - Precio usa decimales exactos, seis categorías y empates configurables
+  ---
+  duration_ms: 2456.37825
+  type: 'test'
+  ...
+# Subtest: Precio importa cifras grandes sin perder decimales y permite configurar reglas
+ok 39 - Precio importa cifras grandes sin perder decimales y permite configurar reglas
+  ---
+  duration_ms: 4778.592454
+  type: 'test'
+  ...
+# Subtest: Escala Precio mantiene márgenes y posiciones para decimales cercanos y enormes
+ok 40 - Escala Precio mantiene márgenes y posiciones para decimales cercanos y enormes
+  ---
+  duration_ms: 2061.165403
+  type: 'test'
+  ...
+# Subtest: Personaje entrega pistas acumuladas a dos mandos y limpia la ronda
+ok 41 - Personaje entrega pistas acumuladas a dos mandos y limpia la ronda
+  ---
+  duration_ms: 11502.079725
+  type: 'test'
+  ...
+# Subtest: Precio compara umbrales proporcionales exactos, cero y cifras enormes
+ok 42 - Precio compara umbrales proporcionales exactos, cero y cifras enormes
+  ---
+  duration_ms: 777.265705
+  type: 'test'
+  ...
+# Subtest: Entrada de jugar solo permite una persona y juega Precio en el dispositivo
+ok 43 - Entrada de jugar solo permite una persona y juega Precio en el dispositivo
+  ---
+  duration_ms: 6856.238438
+  type: 'test'
+  ...
+# Subtest: Trivia en solitario permite responder en pantalla y resuelve una vez
+not ok 44 - Trivia en solitario permite responder en pantalla y resuelve una vez
+  ---
+  duration_ms: 39.976027
+  type: 'test'
+  location: '/home/user/aa/tests/precio-porcentaje.cjs:4:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    browserType.launch: Target page, context or browser has been closed
+    Browser logs:
+    
+    <launching> /tmp/chromium --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-edgeupdater --disable-extensions --disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,AvoidCorsURLLoaderRestartOnRedirect,Translate,AutoDeElevate,OptimizationHints,NetworkTimeServiceQuerying,AimEnabled,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --disable-updater-scheduler --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --no-sandbox --no-zygote --single-process --user-data-dir=/tmp/playwright_chromiumdev_profile-kHhAdA --remote-debugging-pipe --no-startup-window
+    <launched> pid=29758
+    Call log:
+      - <launching> /tmp/chromium --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-edgeupdater --disable-extensions --disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,AvoidCorsURLLoaderRestartOnRedirect,Translate,AutoDeElevate,OptimizationHints,NetworkTimeServiceQuerying,AimEnabled,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --disable-updater-scheduler --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --no-sandbox --no-zygote --single-process --user-data-dir=/tmp/playwright_chromiumdev_profile-kHhAdA --remote-debugging-pipe --no-startup-window
+      - <launched> pid=29758
+      - [pid=29758] <gracefully close start>
+      - [pid=29758] <kill>
+      - [pid=29758] <will force kill>
+      - [pid=29758] <process did exit: exitCode=null, signal=SIGSEGV>
+      - [pid=29758] starting temporary directories cleanup
+      - [pid=29758] finished temporary directories cleanup
+      - [pid=29758] <gracefully close end>
+    
+  code: 'ERR_TEST_FAILURE'
+  stack: |-
+    TestContext.<anonymous> (/home/user/aa/tests/precio-porcentaje.cjs:4:127)
+  ...
+# Subtest: Modo solo atenúa los juegos para grupos y explica el cambio de modo
+ok 45 - Modo solo atenúa los juegos para grupos y explica el cambio de modo
+  ---
+  duration_ms: 2811.618577
+  type: 'test'
+  ...
+# Subtest: Ranking y Personaje funcionan con una persona en la pantalla
+ok 46 - Ranking y Personaje funcionan con una persona en la pantalla
+  ---
+  duration_ms: 6803.213707
+  type: 'test'
+  ...
+# Subtest: Más probable local conserva votación y resultado, rechaza voto repetido y no cambia puntos
+ok 47 - Más probable local conserva votación y resultado, rechaza voto repetido y no cambia puntos
+  ---
+  duration_ms: 10069.859931
+  type: 'test'
+  ...
+# Subtest: Más probable local rechaza un guardado alterado sin tocar el marcador
+ok 48 - Más probable local rechaza un guardado alterado sin tocar el marcador
+  ---
+  duration_ms: 5559.303664
+  type: 'test'
+  ...
+# Subtest: Más probable recupera votos y resultado después de dos recargas del anfitrión
+ok 49 - Más probable recupera votos y resultado después de dos recargas del anfitrión
+  ---
+  duration_ms: 21620.490503
+  type: 'test'
+  ...
+# Subtest: Tabú no transmite las palabras prohibidas en el reloj público
+ok 50 - Tabú no transmite las palabras prohibidas en el reloj público
+  ---
+  duration_ms: 5.80094
+  type: 'test'
+  ...
+# Subtest: Probable cierra la votación con resultado sin adjudicar puntos
+ok 51 - Probable cierra la votación con resultado sin adjudicar puntos
+  ---
+  duration_ms: 6.404336
+  type: 'test'
+  ...
+# Subtest: Probable muestra empates y rechaza votos de jugadores inexistentes
+ok 52 - Probable muestra empates y rechaza votos de jugadores inexistentes
+  ---
+  duration_ms: 5.752483
+  type: 'test'
+  ...
+# Subtest: Historia en cadena personaliza la última frase para el siguiente jugador
+ok 53 - Historia en cadena personaliza la última frase para el siguiente jugador
+  ---
+  duration_ms: 5.244748
+  type: 'test'
+  ...
+# Subtest: Todos los bloques JavaScript del HTML se pueden analizar
+ok 54 - Todos los bloques JavaScript del HTML se pueden analizar
+  ---
+  duration_ms: 45.513269
+  type: 'test'
+  ...
+# Subtest: Un voto atrasado de una ronda anterior no se aplica en la siguiente
+ok 55 - Un voto atrasado de una ronda anterior no se aplica en la siguiente
+  ---
+  duration_ms: 5.385692
+  type: 'test'
+  ...
+# Subtest: El registro compartido no inventa jugadores cuando la sala está vacía
+ok 56 - El registro compartido no inventa jugadores cuando la sala está vacía
+  ---
+  duration_ms: 4.680807
+  type: 'test'
+  ...
+# Subtest: Probable permite desempatar entre los empatados sin puntuar ni aceptar votos antiguos
+ok 57 - Probable permite desempatar entre los empatados sin puntuar ni aceptar votos antiguos
+  ---
+  duration_ms: 4.727661
+  type: 'test'
+  ...
+# Subtest: El Dial respeta las parejas elegidas, no el orden de conexión
+ok 58 - El Dial respeta las parejas elegidas, no el orden de conexión
+  ---
+  duration_ms: 5.670783
+  type: 'test'
+  ...
+# Subtest: Ranking usa criterios con datos y fuente y rechaza acciones viejas o ajenas
+ok 59 - Ranking usa criterios con datos y fuente y rechaza acciones viejas o ajenas
+  ---
+  duration_ms: 15.948383
+  type: 'test'
+  ...
+# Subtest: Las ilustraciones de los juegos conservan la imagen correspondiente
+ok 60 - Las ilustraciones de los juegos conservan la imagen correspondiente
+  ---
+  duration_ms: 55.892019
+  type: 'test'
+  ...
+# Subtest: Recarga del anfitrión recupera sala y marcadores sin continuar una ronda incompleta
+ok 61 - Recarga del anfitrión recupera sala y marcadores sin continuar una ronda incompleta
+  ---
+  duration_ms: 21593.046562
+  type: 'test'
+  ...
+# Subtest: Catálogo y vistas activas sin franja redundante en escritorio y móvil
+ok 62 - Catálogo y vistas activas sin franja redundante en escritorio y móvil
+  ---
+  duration_ms: 7692.255683
+  type: 'test'
+  ...
+# Subtest: Tres mandos emulados excluyen al anfitrión y rechazan asientos inválidos
+ok 63 - Tres mandos emulados excluyen al anfitrión y rechazan asientos inválidos
+  ---
+  duration_ms: 10256.796435
+  type: 'test'
+  ...
+# Subtest: Solo el mando acusado puede tomar su decisión en Yo Nunca Nunca
+ok 64 - Solo el mando acusado puede tomar su decisión en Yo Nunca Nunca
+  ---
+  duration_ms: 9185.854842
+  type: 'test'
+  ...
+1..64
+# tests 64
+# suites 0
+# pass 63
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 378512.75909

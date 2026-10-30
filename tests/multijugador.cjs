@@ -228,6 +228,10 @@ test('Servidor y dos teléfonos: reconexión, historia, aislamiento y desempate'
     assert.deepEqual(await host.evaluate(()=>V14.G().teams.map(t=>t.score)),[puntos[0],puntos[1]+1]);
     puntos=await host.evaluate(()=>V14.G().teams.map(t=>t.score));
     await host.evaluate(()=>{V14.exitGame();V14.openGame('precio')});
+    // El tutorial se monta de forma diferida; esperar y cerrarlo por UI evita
+    // que intercepte el inicio aunque el clic haya comenzado antes de abrirse.
+    await host.waitForFunction(()=>V14.settings.onboarded.precio || !!document.querySelector('#v26-tour'),null,{timeout:10000});
+    if (await host.locator('#v26-tour .v26-skip').isVisible()) await host.locator('#v26-tour .v26-skip').click({timeout:5000});
     await host.locator('#precio-stage [data-iniciar-ronda]').click({timeout:10000});
     await host.evaluate(()=>{V14.precioState.item.a='20.10';V14.settings.autoPoints=true;V14.setScorePrecision(4)});
     await host.locator('#precio-stage [data-start]').click({timeout:10000});
