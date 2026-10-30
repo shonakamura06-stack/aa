@@ -34,7 +34,7 @@ test('Personaje entrega pistas acumuladas a dos mandos y limpia la ronda', {time
     const panel=host.locator('.modal-backdrop.open').filter({hasText:'Jugar con celulares'});
     if(await panel.isVisible())await panel.locator('[data-close]').first().click();
     await host.evaluate(()=>{V14.DB.personaje=[{who:'SECRETO_A_867',clues:['PISTA_A_UNO','PISTA_A_DOS','PISTA_A_TRES']},{who:'SECRETO_B_867',clues:['PISTA_B_UNO','PISTA_B_DOS','PISTA_B_TRES']}];V14.openGame('personaje')});
-    if(await host.locator('#v26-tour .v26-skip').isVisible())await host.locator('#v26-tour .v26-skip').click();
+    await host.locator('#v26-tour .v26-skip').waitFor({state:'visible',timeout:6000});await host.locator('#v26-tour .v26-skip').click();
     await host.locator('#personaje-stage [data-iniciar-ronda]').click({timeout:10000});
     const pista=await host.locator('#v70-pistas .v70-pista').first().innerText();
     for (const p of [ana,luis]) await p.waitForFunction(pista=>document.querySelector('#rm-actions')?.innerText.includes(pista.split('\n').pop()),pista,{timeout:5000});

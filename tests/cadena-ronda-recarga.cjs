@@ -45,11 +45,12 @@ test('Una frase atrasada de Historia no se acepta tras recargar al anfitrión',{
     await host.evaluate(()=>{V14.settings.onboarded.cadena=true;V14.openGame('cadena');V14.__v59.empezar()});
     await host.waitForFunction(()=>V14.gameOf()==='cadena'&&V14.__v59.estado().fase==='escribir',null,{timeout:10000});
     const actual=await host.evaluate(()=>V14.__v59.estado());
-    assert.equal(actual.slot,anterior.slot);assert.equal(actual.turno,anterior.turno);
-    await players[0].evaluate(c=>V14.net._debugRemote().conn.send({t:'secrettext',v:'Texto que pertenece a la ronda anterior',round:c.ronda,turn:c.turno}),anterior);
+    assert.equal(actual.turno,anterior.turno);
+    const slots=await Promise.all(players.map(p=>p.evaluate(()=>V14.net._debugRemote().slot)));assert.equal(new Set(slots).size,2);const actor=players[slots.indexOf(actual.slot)];assert.ok(actor,'hay un mando autorizado para el turno actual');
+    await actor.evaluate(c=>V14.net._debugRemote().conn.send({t:'secrettext',v:'Texto que pertenece a la ronda anterior',round:c.ronda,turn:c.turno}),anterior);
     await host.waitForTimeout(400);
     assert.equal((await host.evaluate(()=>V14.__v59.estado())).frases.length,0,'la frase anterior no altera la historia nueva');
-    await players[0].evaluate(c=>V14.net._debugRemote().conn.send({t:'secrettext',v:'La frase legítima de esta historia',round:c.ronda,turn:c.turno}),actual);
+    await actor.evaluate(c=>V14.net._debugRemote().conn.send({t:'secrettext',v:'La frase legítima de esta historia',round:c.ronda,turn:c.turno}),actual);
     await host.waitForFunction(()=>V14.__v59.estado().frases.length===1,null,{timeout:5000});
     assert.equal((await host.evaluate(()=>V14.__v59.estado())).frases[0].texto,'La frase legítima de esta historia');
   }finally{if(b)await b.close();if(server.exitCode===null&&server.signalCode===null)await new Promise(resolve=>{server.once('exit',resolve);server.kill('SIGTERM')})}
