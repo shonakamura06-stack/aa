@@ -1,0 +1,52 @@
+{
+  "name": "@sandbox/devkit",
+  "version": "0.1.0",
+  "description": "Entorno de desarrollo verificado: navegador real, auditoría de diseño medida, tokens accesibles, regresión visual y gate de CI.",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "doctor": "node bin/devkit.mjs doctor",
+    "setup": "bash ../toolkit/bootstrap.sh",
+    "test": "node --test test/*.test.mjs",
+    "audit": "node bin/devkit.mjs audit",
+    "check": "node bin/devkit.mjs check",
+    "vdiff": "node bin/devkit.mjs vdiff"
+  },
+  "keywords": [
+    "design-system",
+    "accessibility",
+    "wcag",
+    "apca",
+    "visual-regression",
+    "lighthouse",
+    "axe-core",
+    "puppeteer",
+    "satori"
+  ],
+  "author": "",
+  "license": "MIT",
+  "type": "module",
+  "private": true,
+  "dependencies": {
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "@radix-ui/colors": "^3.0.0",
+    "@resvg/resvg-js": "^2.6.2",
+    "@sparticuz/chromium": "^153.0.0",
+    "axe-core": "^4.14.0",
+    "chrome-launcher": "^1.2.2",
+    "lighthouse": "^13.6.0",
+    "pixelmatch": "^8.0.0",
+    "pngjs": "^7.0.0",
+    "puppeteer-core": "^25.16.0",
+    "satori": "^0.63.2"
+  },
+  "bin": {
+    "devkit": "./bin/devkit.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

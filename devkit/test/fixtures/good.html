@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Fixture de referencia: interfaz construida con los design tokens generados por devkit.">
+  <title>Fixture: interfaz con tokens correctos</title>
+  <link rel="stylesheet" href="../../reference/tokens.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--app-bg); color: var(--text);
+      font-family: var(--font-sans); font-size: var(--text-base);
+      line-height: 1.6; -webkit-font-smoothing: antialiased;
+    }
+    .wrap { max-width: 1080px; margin: 0 auto; padding: var(--space-12) var(--space-6); }
+    header { display: flex; align-items: center; justify-content: space-between; gap: var(--space-6); margin-bottom: var(--space-12); }
+    .brand { display: flex; align-items: center; gap: var(--space-3); font-weight: 700; letter-spacing: -0.01em; }
+    .dot { width: 28px; height: 28px; border-radius: var(--radius-sm); background: var(--solid-accent); }
+    nav { display: flex; gap: var(--space-2); }
+    nav a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 var(--space-4);
+      border-radius: var(--radius); color: var(--text-subtle); text-decoration: none;
+      font-size: var(--text-sm); font-weight: 500; transition: background var(--dur) var(--ease-out), color var(--dur) var(--ease-out);
+    }
+    nav a:hover { background: var(--ui-bg-hover); color: var(--text); }
+    h1 { font-size: var(--text-4xl); line-height: 1.15; letter-spacing: -0.03em; margin: 0 0 var(--space-4); max-width: 20ch; }
+    h2 { font-size: var(--text-xl); letter-spacing: -0.01em; margin: 0 0 var(--space-4); }
+    .lead { color: var(--text-subtle); font-size: var(--text-lg); max-width: 62ch; margin: 0 0 var(--space-8); }
+    .hero { margin-bottom: var(--space-16); }
+    .actions { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
+      min-height: 44px; padding: 0 var(--space-6); border: 0; border-radius: var(--radius);
+      background: var(--solid-accent); color: var(--solid-fg-accent); font: inherit; font-size: var(--text-sm);
+      font-weight: 600; cursor: pointer; transition: background var(--dur) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+    }
+    .btn:hover { background: var(--solid-hover-accent); }
+    .btn:active { transform: translateY(1px); }
+    .btn--ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+    .btn--ghost:hover { background: var(--ui-bg-hover); }
+    .btn:focus-visible, a:focus-visible, input:focus-visible {
+      outline: 2px solid var(--solid-accent); outline-offset: 2px; border-radius: var(--radius-sm);
+    }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--space-6); }
+    .card {
+      background: var(--ui-bg); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg);
+      padding: var(--space-6); box-shadow: var(--shadow-sm);
+    }
+    .card p { margin: 0; color: var(--text-subtle); font-size: var(--text-sm); line-height: 1.6; max-width: 46ch; }
+    .kpi { font-size: var(--text-3xl); font-weight: 700; letter-spacing: -0.02em; display: block; margin-bottom: var(--space-1); }
+    .muted { color: var(--text-subtle); font-size: var(--text-sm); }
+    form { display: flex; flex-direction: column; gap: var(--space-4); max-width: 420px; margin-top: var(--space-16); }
+    label { font-size: var(--text-sm); font-weight: 600; }
+    input {
+      min-height: 44px; padding: 0 var(--space-4); border-radius: var(--radius);
+      border: 1px solid var(--border); background: var(--subtle-bg); color: var(--text);
+      font: inherit; font-size: var(--text-base);
+    }
+    footer { margin-top: var(--space-16); padding-top: var(--space-6); border-top: 1px solid var(--border-subtle); }
+    @media (max-width: 640px) {
+      .wrap { padding: var(--space-6) var(--space-4); }
+      header { flex-direction: column; align-items: flex-start; }
+      h1 { font-size: var(--text-3xl); }
+    }
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand"><span class="dot" aria-hidden="true"></span> devkit</div>
+      <nav aria-label="Principal">
+        <a href="#">Panorama</a>
+        <a href="#">Informes</a>
+        <a href="#">Ajustes</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <h1>Interfaces medidas, no adivinadas</h1>
+        <p class="lead">Esta página se construyó únicamente con los tokens generados por <code>devkit tokens</code>: escala modular 1.200, retícula de 4 px y los 12 pasos semánticos de Radix. El motor de auditoría la usa como referencia de lo que sí pasa.</p>
+        <div class="actions">
+          <button class="btn" type="button">Ejecutar auditoría</button>
+          <button class="btn btn--ghost" type="button">Ver informe</button>
+        </div>
+      </section>
+
+      <section aria-labelledby="metricas">
+        <h2 id="metricas">Métricas del último análisis</h2>
+        <div class="grid">
+          <article class="card">
+            <span class="kpi">0</span>
+            <p class="muted">errores de contraste WCAG&nbsp;AA detectados</p>
+          </article>
+          <article class="card">
+            <span class="kpi">7</span>
+            <p class="muted">pasos en la escala tipográfica</p>
+          </article>
+          <article class="card">
+            <span class="kpi">44px</span>
+            <p class="muted">objetivo táctil mínimo en todos los controles</p>
+          </article>
+        </div>
+      </section>
+
+      <form>
+        <h2>Suscribirse al informe</h2>
+        <label for="email">Correo electrónico</label>
+        <input id="email" name="email" type="email" autocomplete="email" placeholder="tu@dominio.com" required>
+        <button class="btn" type="submit">Recibir</button>
+      </form>
+    </main>
+
+    <footer class="muted">Generado en el sandbox con devkit · tokens Radix (MIT)</footer>
+  </div>
+</body>
+</html>

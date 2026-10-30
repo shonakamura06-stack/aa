@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Fixture: interfaz con defectos</title>
+  <!-- a propósito: sin meta viewport, sin lang, sin meta description -->
+  <style>
+    body { margin: 0; font-family: Arial, sans-serif; }
+    .nav { background: #6b7cff; padding: 4px; }
+    .nav a { color: #8b96ff; font-size: 11px; text-decoration: none; padding: 1px; } /* contraste bajo + tap target mínimo */
+    .hero { background: #fafafa; padding: 12px; }
+    h1 { font-size: 26px; margin: 0 0 7px; }
+    h3 { font-size: 17px; margin: 0; } /* salto h1 -> h3 */
+    p { color: #b9b9b9; font-size: 18px; width: 1400px; } /* contraste bajo + medida ancha + overflow */
+    .btn { background: #6b7cff; color: #fff; border: 0; padding: 2px; font-size: 11px; border-radius: 2px; }
+    .row { display: flex; gap: 13px; padding: 7px; }
+    .row > div { padding: 9px 3px; margin-bottom: 5px; }
+    a:focus, button:focus { outline: none; }
+    .tiny { font-size: 13px; }
+    .mini { font-size: 14px; }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <a href="#">Inicio</a>
+    <a href="#">Producto</a>
+    <a href="#">Precio</a>
+  </nav>
+  <div class="hero">
+    <h1>Título principal de la página</h1>
+    <h3>Subtítulo que se salta un nivel</h3>
+    <p>Este párrafo es demasiado ancho, tiene poco contraste y sirve para comprobar que el motor de auditoría detecta problemas reales de legibilidad, jerarquía y layout en una interfaz con defectos deliberados.</p>
+    <button class="btn">Comprar</button>
+    <a href="#">enlace</a>
+    <img src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==">
+  </div>
+  <div class="row"><div class="tiny">a</div><div class="mini">b</div><div>c</div></div>
+</body>
+</html>

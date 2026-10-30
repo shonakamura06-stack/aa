@@ -1,0 +1,56 @@
+{
+  "$schema": "devkit/design-audit@1",
+  "generatedAt": "2026-10-30T14:28:59.774Z",
+  "target": "test/fixtures/good.html",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "lighthouse": null,
+  "axe": [],
+  "screenshot": "/tmp/audit-desktop.png",
+  "summary": {
+    "error": 0,
+    "warning": 0,
+    "info": 0,
+    "score": 100
+  },
+  "findings": [],
+  "metrics": {
+    "fonts": {
+      "Inter": 19,
+      "monospace": 1
+    },
+    "sizes": {
+      "16px": 1,
+      "13.33px": 11,
+      "39.81px": 1,
+      "19.2px": 2,
+      "23.04px": 2,
+      "33.18px": 3
+    },
+    "spacing": {
+      "4": 3,
+      "8": 12,
+      "12": 6,
+      "16": 14,
+      "24": 27,
+      "40": 1,
+      "96": 3
+    },
+    "density": {
+      "coverage": 2.081
+    },
+    "doc": {
+      "scrollWidth": 1440,
+      "clientWidth": 1440,
+      "scrollHeight": 1056,
+      "horizontalScroll": false
+    },
+    "counts": {
+      "elements": 34,
+      "textNodes": 20,
+      "interactive": 7
+    }
+  }
+}

@@ -1,0 +1,8 @@
+# dependencias
+node_modules
+# salidas regenerables
+devkit/reports/
+devkit/baselines/*.diff.png
+# temporales del sandbox
+*.log
+.DS_Store

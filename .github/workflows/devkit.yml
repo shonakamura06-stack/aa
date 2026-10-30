@@ -1,0 +1,83 @@
+name: devkit
+
+# Lo que el sandbox no puede hacer, lo hace el CI: navegador del sistema,
+# matrices de Node, y verificación independiente de los mismos tests.
+on:
+  push:
+    branches: [main, 'arena/**']
+    paths: ['devkit/**', 'toolkit/**', '.github/workflows/devkit.yml']
+  pull_request:
+    paths: ['devkit/**', 'toolkit/**']
+  workflow_dispatch:
+
+concurrency:
+  group: devkit-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: tests (${{ matrix.os }} · node ${{ matrix.node }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest, node: 22 }
+          - { os: ubuntu-latest, node: 20 }
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+          cache-dependency-path: devkit/package-lock.json
+
+      # En CI se usa el Chromium del sistema en lugar del binario del sandbox.
+      - name: Instalar dependencias
+        working-directory: devkit
+        run: npm ci --no-audit --no-fund
+
+      - name: Instalar Chromium del sistema
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq chromium-browser || sudo apt-get install -y -qq chromium || true
+          command -v chromium-browser || command -v chromium || command -v google-chrome
+
+      - name: Fuentes para que el render sea reproducible
+        run: |
+          sudo apt-get install -y -qq fonts-inter fonts-jetbrains-mono || true
+
+      - name: Tests unitarios y de integración
+        working-directory: devkit
+        env:
+          CHROME_PATH: ${{ vars.CHROME_PATH }}
+        run: npm test
+
+      - name: Regenerar tokens y comprobar que no hay deriva
+        working-directory: devkit
+        run: |
+          node bin/tokens.mjs
+          git diff --exit-code reference/ || (echo "::error::los tokens cambiaron; ejecuta 'devkit tokens' y commitea" && exit 1)
+
+      - name: Gate de diseño (interfaz de referencia debe puntuar 100)
+        working-directory: devkit
+        run: node bin/devkit.mjs check test/fixtures/good.html --min-score 100 --max-errors 0
+
+  gate:
+    name: puerta de calidad
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm, cache-dependency-path: devkit/package-lock.json }
+      - working-directory: devkit
+        run: npm ci --no-audit --no-fund
+      - name: Verificar que el repositorio no tiene binarios pesados fuera de toolkit/lib
+        run: |
+          limite=$((3 * 1024 * 1024))
+          malos=$(git ls-files -z | xargs -0 -I{} sh -c 'test -f "{}" && s=$(wc -c <"{}") && [ "$s" -gt '"$limite"' ] && echo "{} $s"' || true)
+          if [ -n "$malos" ]; then echo "::warning::archivos > 3 MB:"; echo "$malos"; fi
+      - name: Resumen
+        run: echo "devkit verificado en CI" >> $GITHUB_STEP_SUMMARY
