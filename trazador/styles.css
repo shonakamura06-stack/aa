@@ -312,6 +312,72 @@ input[type=range]::-moz-range-thumb {
 .params { display: flex; flex-direction: column; gap: 7px; }
 .params:empty { display: none; }
 
+/* plegables */
+.fold { border: 1px solid var(--line-soft); border-radius: 9px; background: #0a1119; overflow: hidden; }
+.fold > summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 7px 10px;
+  font-size: 10.5px;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  user-select: none;
+}
+.fold > summary::-webkit-details-marker { display: none; }
+.fold > summary::before { content: "▸"; font-size: 9px; color: var(--muted-2); transition: transform .15s; }
+.fold[open] > summary::before { transform: rotate(90deg); }
+.fold > summary:hover { color: #cfe0f0; }
+.fold[open] > summary { border-bottom: 1px solid var(--line-soft); }
+.fold .func-grid { padding: 8px; }
+
+/* tipos de función */
+.func-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+.func {
+  padding: 8px 4px;
+  border-radius: 8px;
+  border: 1px solid var(--line-soft);
+  background: #0b121a;
+  color: #9db0c4;
+  font-size: 11px;
+  line-height: 1.15;
+  text-align: center;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.func:hover { color: #d9f7e4; border-color: rgba(74, 222, 128, .35); background: rgba(74, 222, 128, .07); }
+.func.on { color: #86efac; border-color: rgba(74, 222, 128, .5); background: rgba(74, 222, 128, .12); }
+
+/* ecuación para copiar */
+.eq-out {
+  background: #0a1119;
+  border: 1px solid var(--line-soft);
+  border-radius: 10px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.eq-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 9.5px;
+  text-transform: uppercase;
+  letter-spacing: .09em;
+  color: var(--muted-2);
+}
+.eq-out code {
+  background: none;
+  color: #bdf3d2;
+  font-size: 11.5px;
+  line-height: 1.5;
+  padding: 0;
+  word-break: break-word;
+}
+
 .param {
   display: grid;
   grid-template-columns: 26px 1fr 62px;
@@ -389,6 +455,7 @@ input[type=range]::-moz-range-thumb {
 }
 .item .swatch.round { border-radius: 50%; }
 .item .swatch.diamond { border-radius: 3px; transform: rotate(45deg); }
+.item .swatch.tri { border: 0; border-radius: 0; clip-path: polygon(50% 4%, 100% 100%, 0 100%); }
 
 .item .item-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
 .item code.exprcode {

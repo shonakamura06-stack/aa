@@ -46,7 +46,25 @@
       if (isAlpha(ch)) {
         var k = i;
         while (k < src.length && (isAlpha(src[k]) || isDigit(src[k]))) k++;
-        out.push({ t: 'id', v: src.slice(i, k) });
+        var word = src.slice(i, k);
+        var low = word.toLowerCase();
+
+        if (Object.prototype.hasOwnProperty.call(FUNCS, low) ||
+            Object.prototype.hasOwnProperty.call(CONSTS, low) || low === 'x') {
+          out.push({ t: 'id', v: word });
+          i = k;
+          continue;
+        }
+
+        // constante pegada a otra cosa: "pix" -> pi * x, "ex" -> e * x
+        var glued = /^(pi|tau|e)([a-z_][a-z0-9_]*)$/.exec(low);
+        if (glued) {
+          out.push({ t: 'id', v: word.slice(0, glued[1].length) });
+          i += glued[1].length;
+          continue;
+        }
+
+        out.push({ t: 'id', v: word });
         i = k;
         continue;
       }
@@ -203,8 +221,20 @@
   }
 
   /* ------------------------------- API -------------------------------- */
+  function normalize(src) {
+    // simbolos que se copian del chat del juego
+    return String(src)
+      .replace(/\u03c0/g, 'pi')
+      .replace(/[\u00d7\u00b7]/g, '*')
+      .replace(/\u00f7/g, '/')
+      .replace(/[\u2212\u2013\u2014]/g, '-')
+      .replace(/^\s*(?:f\s*\(\s*x\s*\)|y)\s*=/i, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
   function compile(src) {
-    var tokens = tokenize(String(src == null ? '' : src));
+    var tokens = tokenize(normalize(src));
     var ast = parse(tokens);
     var params = collectParams(ast, []);
     var js = toJS(ast);

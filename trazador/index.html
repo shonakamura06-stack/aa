@@ -54,11 +54,22 @@
           <input id="expr" class="expr" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="0.5*x + 1">
         </div>
 
-        <div class="chips" id="templates"></div>
+        <p class="hint syntax">x, números y <code>+ - * / ^</code> · funciones <code>sin cos tan sqrt abs ln log</code> · constantes <code>pi π e</code> · tus letras (<code>m</code>, <code>b</code>) se vuelven deslizadores. Acepta <code>f(x) = …</code> y <code>y = …</code>.</p>
 
-        <p class="hint syntax">x, números y <code>+ - * / ^</code> · funciones <code>sin cos tan sqrt abs ln log</code> · constantes <code>pi e</code> · tus letras (<code>m</code>, <code>b</code>) se vuelven deslizadores.</p>
+        <details class="fold" open>
+          <summary>Tipos de función del juego</summary>
+          <div class="func-grid" id="funcGrid"></div>
+        </details>
 
         <div class="params" id="params"></div>
+
+        <div class="eq-out" id="eqOut">
+          <div class="eq-head">
+            <span>Copia esto en el juego</span>
+            <button class="mini" id="copyEq" title="Copiar ecuación">⧉</button>
+          </div>
+          <code id="eqEffective">f(x) = …</code>
+        </div>
 
         <div class="error" id="exprError" hidden></div>
 
@@ -118,6 +129,7 @@
           <span class="tag" id="obstacleCount">0</span>
         </header>
         <div class="row">
+          <button class="btn ghost small" id="addTri">△ Bloque</button>
           <button class="btn ghost small" id="addRect">▭ Muro</button>
           <button class="btn ghost small" id="addCircle">◯ Roca</button>
         </div>
@@ -126,11 +138,19 @@
 
       <!-- ---------------- AJUSTES ---------------- -->
       <section class="panel">
-        <header class="panel-head"><h2>Escena</h2></header>
+        <header class="panel-head"><h2>Arena y escena</h2></header>
         <div class="row">
+          <label class="field"><span>An</span><input type="number" id="arenaW" step="10" value="160"></label>
+          <label class="field"><span>Al</span><input type="number" id="arenaH" step="10" value="160"></label>
+          <button class="btn ghost small" id="fitArenaBtn" title="Ver la arena completa">⤢</button>
+        </div>
+        <div class="row">
+          <button class="btn ghost small" id="arenaToggle">◻ Borde</button>
           <button class="btn ghost small" id="exportBtn">↓ Guardar</button>
           <button class="btn ghost small" id="importBtn">↑ Cargar</button>
-          <button class="btn ghost small danger" id="resetBtn">Reiniciar</button>
+        </div>
+        <div class="row">
+          <button class="btn ghost small danger" id="resetBtn">Reiniciar escena</button>
         </div>
         <input type="file" id="importFile" accept="application/json,.json" hidden>
         <p class="hint">Todo se guarda solo en este navegador.</p>
@@ -158,6 +178,9 @@
         </button>
         <button class="tb" data-tool="rival" title="Colocar rival">
           <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l7 9-7 9-7-9z" fill="currentColor" fill-opacity=".35"/></svg>
+        </button>
+        <button class="tb" data-tool="tri" title="Añadir bloque triangular">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor" fill-opacity=".35" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 4l8 16H4z"/></svg>
         </button>
         <button class="tb" data-tool="rect" title="Añadir muro (rectángulo)">
           <svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor" fill-opacity=".35" stroke="currentColor" stroke-width="2"><rect x="4" y="6" width="16" height="12" rx="2"/></svg>
@@ -203,13 +226,14 @@
   <div class="modal-card">
     <button class="modal-x" id="closeHelp" aria-label="Cerrar">✕</button>
     <h2>¿Cómo se usa?</h2>
-    <p class="lead">Este es un plano cartesiano para <b>planear tus tiros</b> en juegos tipo Roblox donde escribes una ecuación y la bala sigue esa curva.</p>
+    <p class="lead">Un plano cartesiano para <b>planear tus tiros en Math Wars</b> (Roblox): escribes <code>f(x)</code> y la bala sigue esa curva desde tu posición.</p>
     <ol class="steps">
       <li><b>Marca dónde estás.</b> Arrastra el punto verde (<span class="inline-dot"></span>) o escribe tus coordenadas X e Y. Si sabes más o menos dónde estás, esto ya te sirve.</li>
       <li><b>Coloca a los demás y los obstáculos.</b> Usa la barra de herramientas: diamante = rival, rectángulo = muro, círculo = roca. Todo se arrastra y se estira.</li>
-      <li><b>Escribe tu ecuación</b> arriba (por ejemplo <code>0.5*x</code>, <code>-0.15*(x-2)^2+4</code> o <code>m*x+b</code>). Lo que escribas se dibuja al instante.</li>
+      <li><b>Elige el tipo de función de la ronda</b> (lineal, cuadrático, seno, valor absoluto…) o escribe tu ecuación a mano. Se dibuja al instante.</li>
       <li><b>Muévela con el mouse:</b> agárrala y arrástrala. Si usas parámetros como <code>m</code> o <code>b</code>, aparecen deslizadores para moverla en tiempo real.</li>
       <li><b>Mira el semáforo:</b> si la trayectoria se pone roja, choca con un obstáculo. Te dice exactamente dónde y a qué distancia.</li>
+      <li><b>Copia la ecuación</b> del recuadro «Copia esto en el juego» y pégala tal cual en el chat de Math Wars.</li>
       <li><b>Pulsa Disparar</b> para ver la bala recorrer el camino y el punto de impacto.</li>
     </ol>
     <div class="note">

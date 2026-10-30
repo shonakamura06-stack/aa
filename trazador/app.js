@@ -66,30 +66,31 @@
 
   /* -------------------------------- estado -------------------------------- */
   var CURVE_COLORS = ['#4ade80', '#38bdf8', '#c084fc', '#fbbf24', '#fb7185', '#2dd4bf'];
-  var LS_KEY = 'trazador.escena.v2';
+  var LS_KEY = 'trazador.escena.v3';
 
   function defaultState() {
     return {
-      view: { cx: 0, cy: 0.5, scale: 42 },
+      view: { cx: 0, cy: 0, scale: 7 },
       showGrid: true,
       snapOn: true,
-      snap: 0.5,
-      player: { x: -8, y: -4 },
+      snap: 1,
+      arena: { w: 160, h: 160, show: true },
+      player: { x: -55, y: -25 },
       others: [
-        { id: uid(), name: 'Rival A', x: 8, y: 4, color: '#38bdf8' },
-        { id: uid(), name: 'Rival B', x: -2, y: 6, color: '#c084fc' }
+        { id: uid(), name: 'Rival A', x: 55, y: 15, color: '#38bdf8' },
+        { id: uid(), name: 'Rival B', x: 10, y: 55, color: '#c084fc' }
       ],
       obstacles: [
-        { id: uid(), type: 'rect', name: 'Muro 1', x: -4, y: -7.5, w: 6, h: 4 },
-        { id: uid(), type: 'rect', name: 'Muro 2', x: 2, y: -9, w: 5, h: 5 },
-        { id: uid(), type: 'circle', name: 'Roca', cx: 5.5, cy: 6.5, r: 1.8 },
-        { id: uid(), type: 'circle', name: 'Barril', cx: 1, cy: 2.5, r: 1.1 }
+        { id: uid(), type: 'tri', name: 'Bloque 1', x: -15, y: -40, w: 24, h: 20 },
+        { id: uid(), type: 'tri', name: 'Bloque 2', x: 10, y: 25, w: 22, h: 18 },
+        { id: uid(), type: 'tri', name: 'Bloque 3', x: 40, y: -15, w: 20, h: 16 },
+        { id: uid(), type: 'circle', name: 'Roca', cx: -40, cy: 20, r: 8 }
       ],
       curves: [
-        { id: uid(), expr: '0.5*x', params: {}, dx: 0, dy: 0, visible: true, color: CURVE_COLORS[0] }
+        { id: uid(), expr: '0.3636*x - 5', params: {}, ranges: {}, dx: 0, dy: 0, visible: true, color: CURVE_COLORS[0] }
       ],
       activeId: null,
-      shot: { dir: 1, speed: 14, range: 60 }
+      shot: { dir: 1, speed: 45, range: 220 }
     };
   }
 
@@ -127,6 +128,7 @@
       s.shot = s.shot || { dir: 1, speed: 14, range: 60 };
       s.others = s.others || [];
       s.obstacles = s.obstacles || [];
+      s.arena = s.arena || { w: 160, h: 160, show: true };
       if (typeof s.showGrid !== 'boolean') s.showGrid = true;
       if (typeof s.snapOn !== 'boolean') s.snapOn = true;
       if (typeof s.snap !== 'number') s.snap = 0.5;
@@ -173,7 +175,15 @@
 
   /* ------------------------------ ecuaciones ------------------------------ */
   function defaultParam(name) {
-    return String(name).toLowerCase() === 'b' ? 0 : 1;
+    return ['b', 'c', 'd', 'h', 'k'].indexOf(String(name).toLowerCase()) >= 0 ? 0 : 1;
+  }
+
+  function autoRange(v) {
+    if (!isFinite(v) || v === 0) return [-5, 5, 0.1];
+    var mag = Math.pow(10, Math.floor(Math.log10(Math.abs(v))));
+    var lo = +(v - 2 * mag).toFixed(6);
+    var hi = +(v + 2 * mag).toFixed(6);
+    return [lo, hi, Math.max(mag / 100, 1e-6)];
   }
 
   function compileCurve(c) {
@@ -199,13 +209,22 @@
       }
     }
 
-    // sincronizar parámetros con los nombres presentes
-    var params = {};
+    // sincronizar parámetros y sus rangos con los nombres presentes
+    var params = {}, ranges = {};
     (c._paramNames || []).forEach(function (n) {
-      params[n] = (c.params && typeof c.params[n] === 'number' && isFinite(c.params[n]))
+      var v = (c.params && typeof c.params[n] === 'number' && isFinite(c.params[n]))
         ? c.params[n] : defaultParam(n);
+      params[n] = v;
+      var r = c.ranges && c.ranges[n];
+      if (!Array.isArray(r) || !isFinite(r[0]) || !isFinite(r[1])) {
+        r = autoRange(v);
+      } else if (v < r[0] || v > r[1]) {
+        r = [Math.min(r[0], v), Math.max(r[1], v), r[2] || (r[1] - r[0]) / 200];
+      }
+      ranges[n] = r;
     });
     c.params = params;
+    c.ranges = ranges;
   }
 
   function evalCurve(c, x) {
@@ -256,11 +275,60 @@
     return null;
   }
 
+  // triángulo isósceles inscrito en su caja (ápice arriba)
+  function triPoints(ob) {
+    var minx = Math.min(ob.x, ob.x + ob.w), maxx = Math.max(ob.x, ob.x + ob.w);
+    var miny = Math.min(ob.y, ob.y + ob.h), maxy = Math.max(ob.y, ob.y + ob.h);
+    return [
+      { x: (minx + maxx) / 2, y: maxy },
+      { x: maxx, y: miny },
+      { x: minx, y: miny }
+    ];
+  }
+
+  function side(px, py, ax, ay, bx, by) {
+    return (px - bx) * (ay - by) - (ax - bx) * (py - by);
+  }
+
+  function pointInTri(x, y, ob) {
+    var p = triPoints(ob);
+    var d1 = side(x, y, p[0].x, p[0].y, p[1].x, p[1].y);
+    var d2 = side(x, y, p[1].x, p[1].y, p[2].x, p[2].y);
+    var d3 = side(x, y, p[2].x, p[2].y, p[0].x, p[0].y);
+    var neg = d1 < 0 || d2 < 0 || d3 < 0;
+    var pos = d1 > 0 || d2 > 0 || d3 > 0;
+    return !(neg && pos);
+  }
+
+  function segSegT(a, b, c, d) {
+    var rx = b.x - a.x, ry = b.y - a.y;
+    var sx = d.x - c.x, sy = d.y - c.y;
+    var den = rx * sy - ry * sx;
+    if (Math.abs(den) < 1e-12) return null;
+    var t = ((c.x - a.x) * sy - (c.y - a.y) * sx) / den;
+    var u = ((c.x - a.x) * ry - (c.y - a.y) * rx) / den;
+    return (t >= 0 && t <= 1 && u >= 0 && u <= 1) ? t : null;
+  }
+
+  function segTriT(a, b, ob) {
+    if (pointInTri(a.x, a.y, ob)) return 0;
+    var p = triPoints(ob);
+    var best = null;
+    for (var i = 0; i < 3; i++) {
+      var t = segSegT(a, b, p[i], p[(i + 1) % 3]);
+      if (t != null && (best === null || t < best)) best = t;
+    }
+    return best;
+  }
+
   function segObstacleT(a, b, ob) {
-    return ob.type === 'rect' ? segRectT(a, b, ob) : segCircleT(a, b, ob);
+    if (ob.type === 'rect') return segRectT(a, b, ob);
+    if (ob.type === 'tri') return segTriT(a, b, ob);
+    return segCircleT(a, b, ob);
   }
 
   function pointInObstacle(x, y, ob) {
+    if (ob.type === 'tri') return pointInTri(x, y, ob);
     if (ob.type === 'rect') {
       var minx = Math.min(ob.x, ob.x + ob.w), maxx = Math.max(ob.x, ob.x + ob.w);
       var miny = Math.min(ob.y, ob.y + ob.h), maxy = Math.max(ob.y, ob.y + ob.h);
@@ -277,7 +345,7 @@
   }
 
   function obstacleBounds(ob) {
-    if (ob.type === 'rect') {
+    if (ob.type === 'rect' || ob.type === 'tri') {
       return {
         minx: Math.min(ob.x, ob.x + ob.w), maxx: Math.max(ob.x, ob.x + ob.w),
         miny: Math.min(ob.y, ob.y + ob.h), maxy: Math.max(ob.y, ob.y + ob.h),
@@ -339,11 +407,26 @@
     return { samples: samples, hit: hit, length: total };
   }
 
+  function nearestRivalOnPath(tr) {
+    if (!tr || !tr.samples.length || !state.others.length) return null;
+    var limit = Math.min(tr.hit ? tr.hit.index : tr.samples.length, tr.samples.length);
+    var best = null;
+    for (var j = 0; j < state.others.length; j++) {
+      var o = state.others[j];
+      for (var i = 0; i < limit; i++) {
+        var s = tr.samples[i];
+        var d = Math.hypot(s.x - o.x, s.y - o.y);
+        if (!best || d < best.d) best = { o: o, d: d };
+      }
+    }
+    return best;
+  }
+
   /* -------------------------------- dibujo -------------------------------- */
   var needsDraw = true;
 
   function drawGrid() {
-    var major = niceStep(view.scale, 84);
+    var major = niceStep(view.scale, 108);
     var minor = major / 5;
     var showMinor = minor * view.scale >= 9;
     var left = WX(0), right = WX(W), bottom = WY(H), top = WY(0);
@@ -439,6 +522,31 @@
     ctx.restore();
   }
 
+  function drawArena() {
+    var a = state.arena;
+    if (!a || !a.show) return;
+    var x0 = X(-a.w / 2), x1 = X(a.w / 2);
+    var y0 = Y(a.h / 2), y1 = Y(-a.h / 2);
+    if (x1 < 0 || x0 > W || y1 < 0 || y0 > H) return;
+
+    ctx.save();
+    ctx.fillStyle = 'rgba(56,189,248,.028)';
+    ctx.fillRect(x0, y0, x1 - x0, y1 - y0);
+    ctx.setLineDash([7, 6]);
+    ctx.strokeStyle = 'rgba(56,189,248,.34)';
+    ctx.lineWidth = 1.4;
+    ctx.strokeRect(x0 + 0.5, y0 + 0.5, x1 - x0, y1 - y0);
+    ctx.restore();
+
+    ctx.save();
+    ctx.font = '600 10px ' + MONO;
+    ctx.fillStyle = 'rgba(125,200,240,.55)';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'bottom';
+    ctx.fillText('ARENA ' + fmt(a.w, 0) + ' × ' + fmt(a.h, 0), x0 + 4, y0 - 4);
+    ctx.restore();
+  }
+
   var stripes = null;
   function stripePattern() {
     if (stripes) return stripes;
@@ -469,6 +577,13 @@
         if (w < 0) { x += w; w = -w; }
         if (h < 0) { y += h; h = -h; }
         roundRectPath(ctx, x, y, w, h, Math.min(6, w / 4, h / 4));
+      } else if (ob.type === 'tri') {
+        var tp = triPoints(ob);
+        ctx.beginPath();
+        ctx.moveTo(X(tp[0].x), Y(tp[0].y));
+        ctx.lineTo(X(tp[1].x), Y(tp[1].y));
+        ctx.lineTo(X(tp[2].x), Y(tp[2].y));
+        ctx.closePath();
       } else {
         ctx.beginPath();
         ctx.arc(X(ob.cx), Y(ob.cy), ob.r * view.scale, 0, TAU);
@@ -505,7 +620,7 @@
   }
 
   function handlePoints(ob) {
-    if (ob.type === 'rect') {
+    if (ob.type === 'rect' || ob.type === 'tri') {
       return [
         { x: X(ob.x), y: Y(ob.y) },
         { x: X(ob.x + ob.w), y: Y(ob.y) },
@@ -616,7 +731,7 @@
     ctx.lineTo(bx, by);
     ctx.stroke();
     ctx.restore();
-    label((ax + bx) / 2, (ay + by) / 2 - 22, 'la curva no pasa por ti · ' + fmt(dist, 1) + ' u', '#fbbf24');
+    label(ax, ay + 16, 'la curva no pasa por ti · ' + fmt(dist, 1) + ' u', '#fbbf24');
   }
 
   function drawImpact() {
@@ -837,6 +952,7 @@
     ctx.clearRect(0, 0, W, H);
     if (state.showGrid) drawGrid();
     drawRange();
+    drawArena();
     drawObstacles();
     drawCurves();
     drawTrajectory();
@@ -940,7 +1056,7 @@
     if (hi >= 0) {
       var ob = selectedObstacle();
       var fixed;
-      if (ob.type === 'rect') {
+      if (ob.type === 'rect' || ob.type === 'tri') {
         var fx = hi === 0 || hi === 2 ? ob.x + ob.w : ob.x;
         var fy = hi === 0 || hi === 1 ? ob.y + ob.h : ob.y;
         fixed = { x: fx, y: fy };
@@ -1066,7 +1182,7 @@
     if (drag.type === 'resize') {
       var r = obstacleById(drag.id);
       if (!r) return;
-      if (r.type === 'rect') {
+      if (r.type === 'rect' || r.type === 'tri') {
         var x = snapVal(wx), y = snapVal(wy);
         r.x = Math.min(drag.fixed.x, x);
         r.y = Math.min(drag.fixed.y, y);
@@ -1147,6 +1263,14 @@
       state.obstacles.push(ob);
       selection = { type: 'obstacle', id: ob.id };
       renderLists();
+    } else if (kind === 'tri') {
+      var ot = {
+        id: uid(), type: 'tri', name: 'Bloque ' + (countObstacles('tri') + 1),
+        x: Math.round(x - 9), y: Math.round(y - 7), w: 18, h: 14
+      };
+      state.obstacles.push(ot);
+      selection = { type: 'obstacle', id: ot.id };
+      renderLists();
     } else if (kind === 'circle') {
       var oc = {
         id: uid(), type: 'circle', name: 'Roca ' + (countObstacles('circle') + 1),
@@ -1176,6 +1300,7 @@
       player: 'Haz clic en el mapa para poner tu punto',
       rival: 'Haz clic para colocar un rival',
       rect: 'Haz clic para colocar un muro',
+      tri: 'Haz clic para colocar un bloque triangular',
       circle: 'Haz clic para colocar una roca'
     }[mode];
     hint.textContent = txt || '';
@@ -1190,6 +1315,17 @@
     view.scale = clamp(view.scale * k, 3, 500);
     view.cx = bx - (px - W / 2) / view.scale;
     view.cy = by + (py - H / 2) / view.scale;
+    needsDraw = true;
+    updateHud();
+    save();
+  }
+
+  function fitArena() {
+    var a = state.arena || { w: 160, h: 160 };
+    var s = Math.min(W / (a.w * 1.12), H / (a.h * 1.12));
+    view.scale = clamp(s, 2, 240);
+    view.cx = 0;
+    view.cy = 0;
     needsDraw = true;
     updateHud();
     save();
@@ -1220,37 +1356,106 @@
   }
 
   /* --------------------------------- UI ---------------------------------- */
-  var TEMPLATES = [
-    { label: 'recta', expr: '0.5*x' },
-    { label: 'm·x+b', expr: 'm*x + b' },
-    { label: 'parábola', expr: 'a*(x - h)^2 + k' },
-    { label: 'onda', expr: 'A*sin(w*x)' },
-    { label: 'raíz', expr: 'sqrt(x + 16)' },
-    { label: 'cúbica', expr: '0.02*x^3 - x' }
+  /* Tipos de función del juego (Math Wars). Cada uno trae su forma general,
+     valores iniciales razonables a escala ±80 y el rango de cada deslizador. */
+  var FUNCIONES = [
+    { n: 'Lineal', e: 'm*x + b', d: { m: 0.5, b: 0 }, r: { m: [-5, 5, 0.05], b: [-100, 100, 1] },
+      tip: 'La única que siempre está permitida.' },
+    { n: 'Cuadrático', e: 'a*x^2 + b*x + c', d: { a: 0.02, b: 0, c: 0 },
+      r: { a: [-0.5, 0.5, 0.001], b: [-3, 3, 0.05], c: [-100, 100, 1] } },
+    { n: 'Cúbico', e: 'a*x^3 + b*x^2 + c*x + d', d: { a: 0.0005, b: 0, c: 0, d: 0 },
+      r: { a: [-0.005, 0.005, 0.00005], b: [-0.5, 0.5, 0.001], c: [-3, 3, 0.05], d: [-100, 100, 1] } },
+    { n: 'Valor abs.', e: 'a*abs(x - h) + k', d: { a: 1, h: 0, k: 0 },
+      r: { a: [-5, 5, 0.1], h: [-100, 100, 1], k: [-100, 100, 1] } },
+    { n: 'Log', e: 'a*log(x - h) + k', d: { a: 20, h: -80, k: 0 },
+      r: { a: [-100, 100, 1], h: [-100, 100, 1], k: [-100, 100, 1] } },
+    { n: 'Log nat.', e: 'a*ln(x - h) + k', d: { a: 20, h: -80, k: 0 },
+      r: { a: [-100, 100, 1], h: [-100, 100, 1], k: [-100, 100, 1] } },
+    { n: 'Seno', e: 'a*sin(b*(x - h)) + k', d: { a: 24, b: 0.0785, h: 0, k: 0 },
+      r: { a: [-60, 60, 1], b: [-0.3, 0.3, 0.002], h: [-100, 100, 1], k: [-100, 100, 1] } },
+    { n: 'Coseno', e: 'a*cos(b*(x - h)) + k', d: { a: 24, b: 0.0785, h: 0, k: 0 },
+      r: { a: [-60, 60, 1], b: [-0.3, 0.3, 0.002], h: [-100, 100, 1], k: [-100, 100, 1] } },
+    { n: 'Exponencial', e: 'a*e^(b*(x - h)) + k', d: { a: 1, b: 0.05, h: 0, k: 0 },
+      r: { a: [-60, 60, 1], b: [-0.2, 0.2, 0.002], h: [-100, 100, 1], k: [-100, 100, 1] } },
+    { n: 'Raíz', e: 'a*sqrt(x - h) + k', d: { a: 10, h: -80, k: 0 },
+      r: { a: [-60, 60, 1], h: [-100, 100, 1], k: [-100, 100, 1] } },
+    { n: 'Seno inv.', e: 'a*asin(b*(x - h)) + k', d: { a: 20, b: 0.02, h: 0, k: 0 },
+      r: { a: [-100, 100, 1], b: [-1, 1, 0.01], h: [-100, 100, 1], k: [-100, 100, 1] } },
+    { n: 'Coseno inv.', e: 'a*acos(b*(x - h)) + k', d: { a: 20, b: 0.02, h: 0, k: 0 },
+      r: { a: [-100, 100, 1], b: [-1, 1, 0.01], h: [-100, 100, 1], k: [-100, 100, 1] } },
+    { n: 'Tan. inv.', e: 'a*atan(b*(x - h)) + k', d: { a: 30, b: 0.05, h: 0, k: 0 },
+      r: { a: [-100, 100, 1], b: [-1, 1, 0.01], h: [-100, 100, 1], k: [-100, 100, 1] } },
+    { n: 'Tanh', e: 'a*tanh(b*(x - h)) + k', d: { a: 30, b: 0.05, h: 0, k: 0 },
+      r: { a: [-100, 100, 1], b: [-1, 1, 0.01], h: [-100, 100, 1], k: [-100, 100, 1] } },
+    { n: 'Tangente', e: 'a*tan(b*(x - h)) + k', d: { a: 20, b: 0.0785, h: 0, k: 0 },
+      r: { a: [-100, 100, 1], b: [-0.5, 0.5, 0.002], h: [-100, 100, 1], k: [-100, 100, 1] } },
+    { n: 'Recíproco', e: 'a/(x - h) + k', d: { a: 200, h: 0, k: 0 },
+      r: { a: [-2000, 2000, 5], h: [-100, 100, 1], k: [-100, 100, 1] } }
   ];
 
-  function buildTemplates() {
-    var box = $('#templates');
+  function applyFuncion(f) {
+    var c = activeCurve();
+    if (!c) return;
+    c.expr = f.e;
+    c.params = {};
+    Object.keys(f.d).forEach(function (k) { c.params[k] = f.d[k]; });
+    c.ranges = {};
+    if (f.r) Object.keys(f.r).forEach(function (k) { c.ranges[k] = f.r[k].slice(); });
+    c.dx = 0; c.dy = 0;
+    c._src = null; c._compiled = null; c._paramNames = [];
+    compileCurve(c);
+    renderCurves(); renderParams(); renderFunciones(); refresh();
+    toast(f.n + ' · ajusta los deslizadores');
+  }
+
+  function renderFunciones() {
+    var box = $('#funcGrid');
+    if (!box) return;
+    var c = activeCurve();
     box.innerHTML = '';
-    TEMPLATES.forEach(function (t) {
+    FUNCIONES.forEach(function (f) {
       var b = document.createElement('button');
-      b.className = 'chip';
       b.type = 'button';
-      b.textContent = t.label;
-      b.title = 'y = ' + t.expr;
-      b.addEventListener('click', function () {
-        var c = activeCurve();
-        if (!c) return;
-        c.expr = t.expr;
-        c.dx = 0; c.dy = 0;
-        c._src = null; c._compiled = null; c._paramNames = [];
-        compileCurve(c);
-        renderParams();
-        renderCurves();
-        refresh();
-      });
+      b.className = 'func' + (c && c.expr === f.e ? ' on' : '');
+      b.title = (f.tip ? f.tip + '\n' : '') + 'f(x) = ' + f.e;
+      b.innerHTML = '<span>' + escapeHtml(f.n) + '</span>';
+      b.addEventListener('click', function () { applyFuncion(f); });
       box.appendChild(b);
     });
+  }
+
+  /* ------------------------- ecuación final ------------------------- */
+  function numText(v) {
+    var s = fmt(v, 4);
+    return v < 0 ? '(' + s + ')' : s;
+  }
+
+  // ecuación lista para pegar en el juego: parámetros con su valor numérico
+  function effectiveExpr(c) {
+    if (!c) return '';
+    var src = String(c.expr || '').replace(/^\s*(y|f\s*\(\s*x\s*\))\s*=/i, '').trim();
+    if (!src) return '';
+
+    var names = (c._paramNames || []).slice().sort(function (a, b) { return b.length - a.length; });
+    names.forEach(function (n) {
+      var v = c.params ? c.params[n] : null;
+      if (typeof v !== 'number' || !isFinite(v)) return;
+      var safe = n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      src = src.replace(new RegExp('\\b' + safe + '\\b', 'g'), numText(v));
+    });
+
+    var out = src;
+    if (Math.abs(c.dx) > 1e-9) out = out.replace(/\bx\b/g, '(x - ' + numText(c.dx) + ')');
+    if (Math.abs(c.dy) > 1e-9) out = out + ' + ' + numText(c.dy);
+    return out;
+  }
+
+  function updateEffective() {
+    var el = $('#eqEffective');
+    if (!el) return;
+    var c = activeCurve();
+    if (!c) { el.textContent = '—'; return; }
+    el.textContent = 'f(x) = ' + (effectiveExpr(c) || '…');
   }
 
   function renderParams() {
@@ -1282,14 +1487,16 @@
       var name = row.dataset.p;
       var v = c.params[name];
       if (typeof v !== 'number') return;
+      var r = (c.ranges && c.ranges[name]) || autoRange(v);
       var range = row.querySelector('input[type=range]');
       var number = row.querySelector('input[type=number]');
-      var lo = Math.min(-5, Math.floor(v - 1));
-      var hi = Math.max(5, Math.ceil(v + 1));
-      if (+range.min !== lo) range.min = lo;
-      if (+range.max !== hi) range.max = hi;
+      var step = r[2] || (r[1] - r[0]) / 200;
+      if (+range.min !== r[0]) range.min = r[0];
+      if (+range.max !== r[1]) range.max = r[1];
+      if (+range.step !== step) range.step = step;
+      if (+number.step !== step) number.step = step;
       if (document.activeElement !== range) range.value = v;
-      if (document.activeElement !== number) number.value = fmt(v, 3);
+      if (document.activeElement !== number) number.value = fmt(v, 4);
     });
   }
 
@@ -1346,13 +1553,13 @@
       var el = document.createElement('div');
       el.className = 'item ob' + (selection && selection.type === 'obstacle' && selection.id === ob.id ? ' active' : '');
       el.dataset.id = ob.id;
-      var isRect = ob.type === 'rect';
+      var isRect = ob.type === 'rect' || ob.type === 'tri';
       var fields = isRect
         ? [['x', 'X', ob.x], ['y', 'Y', ob.y], ['w', 'An', ob.w], ['h', 'Al', ob.h]]
         : [['cx', 'X', ob.cx], ['cy', 'Y', ob.cy], ['r', 'R', ob.r]];
       el.innerHTML =
         '<div class="ob-top">' +
-          '<span class="swatch ' + (isRect ? '' : 'round') + '" style="background:#f97316"></span>' +
+          '<span class="swatch ' + (ob.type === 'circle' ? 'round' : ob.type === 'tri' ? 'tri' : '') + '" style="background:#f97316"></span>' +
           '<span class="ob-name">' + escapeHtml(ob.name) + '</span>' +
           '<button class="act del" data-act="del" title="Eliminar">✕</button>' +
         '</div>' +
@@ -1391,8 +1598,16 @@
       $('#rangeVal').textContent = state.shot.range;
     }
 
+    updateEffective();
+
     $('#dirBtn').textContent = state.shot.dir >= 0 ? '→' : '←';
     $('#dirBtn').title = state.shot.dir >= 0 ? 'Disparo hacia la derecha (clic para cambiar)' : 'Disparo hacia la izquierda (clic para cambiar)';
+
+    var awEl = $('#arenaW'), ahEl = $('#arenaH');
+    if (awEl) setValue(awEl, String(Math.round(state.arena.w)));
+    if (ahEl) setValue(ahEl, String(Math.round(state.arena.h)));
+    var arEl = $('#arenaToggle');
+    if (arEl) arEl.classList.toggle('on', !!state.arena.show);
 
     $('#gridToggle').classList.toggle('on', state.showGrid);
     $('#snapToggle').classList.toggle('on', state.snapOn);
@@ -1515,13 +1730,20 @@
       $('#pillText').textContent = 'Choque con ' + tr.hit.ob.name + ' en (' + fmt(tr.hit.x, 1) + ', ' + fmt(tr.hit.y, 1) + ')';
     } else {
       var end = tr.samples[tr.samples.length - 1];
+      var near = nearestRivalOnPath(tr);
+      var nearTxt = '';
+      if (near && near.d < 22) {
+        nearTxt = near.d < 4
+          ? '<br><b style="color:#86efac">🎯 pasa por ' + escapeHtml(near.o.name) + '</b>'
+          : '<br>pasa a ' + fmt(near.d, 1) + ' u de ' + escapeHtml(near.o.name);
+      }
       card.classList.add('free');
-      icon.textContent = '✓';
-      title.textContent = 'Camino libre';
+      icon.textContent = near && near.d < 4 ? '🎯' : '✓';
+      title.textContent = near && near.d < 4 ? '¡Le da a ' + near.o.name + '!' : 'Camino libre';
       sub.innerHTML =
         'sale en (' + fmt(tr.samples[0].x, 1) + ', ' + fmt(tr.samples[0].y, 1) + ') → llega a (' + fmt(end.x, 1) + ', ' + fmt(end.y, 1) + ')<br>' +
         fmt(tr.length, 1) + ' u de recorrido · ' + fmt(t, 1) + ' s a ' + state.shot.speed + ' u/s' +
-        (offNote ? '<br>' + escapeHtml(offNote) : '');
+        nearTxt + (offNote ? '<br>' + escapeHtml(offNote) : '');
       pill.classList.add('free');
       $('#pillIcon').textContent = '✓';
       $('#pillText').textContent = 'Camino libre · ' + fmt(tr.length, 1) + ' u';
@@ -1566,6 +1788,7 @@
     state.curves.forEach(compileCurve);
     renderLists();
     renderParams();
+    renderFunciones();
     refresh();
   }
 
@@ -1578,6 +1801,7 @@
     $('#params').dataset.sig = '';
     renderCurves();
     renderParams();
+    renderFunciones();
     refresh();
   }
 
@@ -1596,6 +1820,7 @@
     $('#params').dataset.sig = '';
     renderCurves();
     renderParams();
+    renderFunciones();
     refresh();
     toast('Nueva trayectoria añadida');
   }
@@ -1634,7 +1859,13 @@
       if (!c) return;
       var v = parseFloat(target.value);
       if (!isFinite(v)) return;
-      c.params[row.dataset.p] = v;
+      var pname = row.dataset.p;
+      c.params[pname] = v;
+      var cur = c.ranges && c.ranges[pname];
+      if (cur && (v < cur[0] || v > cur[1])) {
+        c.ranges[pname] = [Math.min(cur[0], v), Math.max(cur[1], v), cur[2]];
+        updateParamValues();
+      }
       var other = target.type === 'range' ? row.querySelector('input[type=number]') : row.querySelector('input[type=range]');
       if (other && document.activeElement !== other) {
         if (other.type === 'number') other.value = fmt(v, 3);
@@ -1738,6 +1969,7 @@
       }
     });
 
+    $('#addTri').addEventListener('click', function () { setPlaceMode('tri'); });
     $('#addRect').addEventListener('click', function () { setPlaceMode('rect'); });
     $('#addCircle').addEventListener('click', function () { setPlaceMode('circle'); });
 
@@ -1807,6 +2039,26 @@
     $('#helpModal').addEventListener('click', function (e) {
       if (e.target === this) this.hidden = true;
     });
+
+    var aw = $('#arenaW'), ah = $('#arenaH');
+    if (aw) aw.addEventListener('input', function () {
+      state.arena.w = clamp(num(this.value, 160), 20, 600);
+      refresh();
+    });
+    if (ah) ah.addEventListener('input', function () {
+      state.arena.h = clamp(num(this.value, 160), 20, 600);
+      refresh();
+    });
+    var fa = $('#fitArenaBtn');
+    if (fa) fa.addEventListener('click', fitArena);
+    var ar = $('#arenaToggle');
+    if (ar) ar.addEventListener('click', function () {
+      state.arena.show = !state.arena.show;
+      this.classList.toggle('on', state.arena.show);
+      needsDraw = true; save();
+    });
+
+    $('#copyEq').addEventListener('click', copyEquation);
 
     $('#exportBtn').addEventListener('click', exportScene);
     $('#importBtn').addEventListener('click', function () { $('#importFile').click(); });
@@ -1921,8 +2173,31 @@
     c.dx = 0; c.dy = 0;
     c._src = null; c._compiled = null; c._paramNames = [];
     compileCurve(c);
-    renderCurves(); renderParams(); refresh();
+    renderCurves(); renderParams(); renderFunciones(); refresh();
     toast('Recta trazada hacia ' + o.name);
+  }
+
+  function copyEquation() {
+    var c = activeCurve();
+    if (!c) return;
+    var text = 'f(x) = ' + (effectiveExpr(c) || '');
+    function done() { toast('Ecuación copiada'); }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, function () { fallback(); });
+    } else fallback();
+    function fallback() {
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        ta.remove();
+        done();
+      } catch (e) { toast('No se pudo copiar: ' + text); }
+    }
   }
 
   /* ------------------------------- escena IO ------------------------------ */
@@ -1985,7 +2260,7 @@
 
   function init() {
     resize();
-    buildTemplates();
+    renderFunciones();
     bindUI();
     refreshAll();
 
@@ -2004,9 +2279,12 @@
     }
     window.addEventListener('resize', resize);
 
-    // encuadre inicial la primera vez
+    // encuadre inicial la primera vez: la arena entera
     if (!localStorage.getItem(LS_KEY)) {
-      setTimeout(function () { fitView(); }, 60);
+      setTimeout(function () {
+        if (state.arena && state.arena.show) fitArena();
+        else fitView();
+      }, 60);
     }
 
     if (!localStorage.getItem(LS_KEY + '.visto')) {
