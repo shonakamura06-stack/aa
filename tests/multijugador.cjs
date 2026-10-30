@@ -21,7 +21,7 @@ test('Servidor y dos teléfonos: reconexión, historia, aislamiento y desempate'
   let browser;
   const errors=[];
   try {
-    browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH || undefined,headless:true,args:['--no-sandbox','--no-zygote','--single-process','--disable-dev-shm-usage']});
+    browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH || undefined,headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});
     const host=await browser.newPage({viewport:{width:1280,height:800}});
     host.on('pageerror',e=>errors.push('host: '+e.message));
     await host.goto('http://127.0.0.1:8000/?entrada=off',{waitUntil:'domcontentloaded'});

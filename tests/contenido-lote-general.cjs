@@ -8,7 +8,7 @@ const tercero=require('../contenido/lote-general-03.json');
 const lote=Object.fromEntries(Object.keys(primero).map(k=>[k,primero[k].concat(segundo[k],tercero[k])]));
 
 test('El lote General está integrado, no duplica al sincronizar y no se repite tras recargar',{timeout:40000},async()=>{
-  const b=await chromium.launch({executablePath:process.env.CHROMIUM_PATH,headless:true,args:['--no-sandbox','--no-zygote','--single-process','--disable-dev-shm-usage']});
+  const b=await chromium.launch({executablePath:process.env.CHROMIUM_PATH,headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});
   try{
     const p=await b.newPage();
     await p.goto('http://127.0.0.1:8000/?entrada=off');

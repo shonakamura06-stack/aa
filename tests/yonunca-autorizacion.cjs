@@ -22,7 +22,7 @@ test('Solo el mando acusado puede tomar su decisión en Yo Nunca Nunca',{timeout
   const port=await new Promise((resolve,reject)=>{server.once('message',resolve);server.once('error',reject)});
   let b;
   try{
-    b=await chromium.launch({executablePath:process.env.CHROMIUM_PATH,headless:true,args:['--no-sandbox','--no-zygote','--single-process','--disable-dev-shm-usage']});
+    b=await chromium.launch({executablePath:process.env.CHROMIUM_PATH,headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});
     const host=await b.newPage();
     await host.goto('http://127.0.0.1:8000/?entrada=off');await host.waitForTimeout(1200);await host.evaluate(senalLocal,port);
     await host.evaluate(()=>{V14.settings.gameMode='servidor';V14.net.host()});

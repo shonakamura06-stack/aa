@@ -5,7 +5,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_CORE || 'playwright-core');
 async function abrir(viewport={width:1280,height:800}, inicio=false) {
   let browser;
   for(let attempt=0;attempt<3;attempt++) {
-    try { browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH || undefined, headless:true, args:['--no-sandbox','--no-zygote','--single-process','--disable-dev-shm-usage']}); break; }
+    try { browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH || undefined, headless:true, args:['--no-sandbox','--disable-dev-shm-usage']}); break; }
     catch(e) { if(attempt===2 || !/SIGSEGV/.test(String(e))) throw e; console.warn('Chromium terminó con SIGSEGV al iniciar; reintentando lanzamiento',attempt+1); }
   }
   const page=await browser.newPage({viewport});

@@ -7928,6 +7928,11 @@ const MATRIX_DB = BUNDLE_DB.topics;
       return id;
     }
 
+    // Nombres y demás texto de usuario nunca deben interpretarse como HTML.
+    function escapeUserText(value) {
+      return String(value == null ? '' : value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
     function showNotice(msg) {
       const toast = document.getElementById('hud-toast');
       const toastMsg = document.getElementById('hud-toast-msg');
@@ -8442,7 +8447,7 @@ const MATRIX_DB = BUNDLE_DB.topics;
       if (state.phase === 'guide') {
         /* PAPEL 1 · HACE ADIVINAR. Ve el dial con el intervalo; su compañero no. */
         dock.innerHTML = `
-          <div class="dock-phase-indicator">HACE ADIVINAR: <strong>${activeTeam.name}</strong></div>
+          <div class="dock-phase-indicator">HACE ADIVINAR: <strong>${escapeUserText(activeTeam.name)}</strong></div>
           <div class="dock-phase-sub">Tu compañero de equipo no debe ver la pantalla</div>
           <button id="btn-dial-hold" class="btn-action btn-primary-filled btn-dock-giant">
             MANTÉN PULSADO PARA VER EL DIAL
@@ -8453,7 +8458,7 @@ const MATRIX_DB = BUNDLE_DB.topics;
       } else if (state.phase === 'guessing') {
         /* PAPEL 2 · ADIVINA. Mueve la aguja y es el único que revela. */
         dock.innerHTML = `
-          <div class="dock-phase-indicator">AHORA ADIVINA: <strong>${activeTeam.name}</strong></div>
+          <div class="dock-phase-indicator">AHORA ADIVINA: <strong>${escapeUserText(activeTeam.name)}</strong></div>
           <div style="font-size:10px; font-weight:800; color:var(--text-body); text-align:center;">
             Posición de la aguja: <strong style="color:var(--primary-gold-dark); font-family:monospace;" class="dock-needle-val">${state.guessValue}</strong>
           </div>
@@ -8479,13 +8484,13 @@ const MATRIX_DB = BUNDLE_DB.topics;
            </div>`;
 
         dock.innerHTML = `
-          <div class="dock-phase-indicator">RESULTADO: <strong>${activeTeam.name}</strong></div>
+          <div class="dock-phase-indicator">RESULTADO: <strong>${escapeUserText(activeTeam.name)}</strong></div>
           ${comoFue}
           <div class="dock-result-pill ${zoneClass}">${state.lastZoneAwarded}</div>
           <div class="dock-pts-badge">${state.lastPointsAwarded >= 0 ? '+' : ''}${state.lastPointsAwarded} PTS</div>
 
           ${isFail ? `
-            <button class="btn-action btn-coral-filled" style="width:100%; font-size:10px; padding:6px; justify-content:center;" onclick="openPenaltyRouletteModal()">
+            <button class="btn-action btn-coral-filled" style="width:100%; font-size:10px; padding:6px; justify-content:center; white-space:normal; overflow-wrap:anywhere;" onclick="openPenaltyRouletteModal()">
               GIRAR RULETA DE CASTIGO (OPCIONAL)
             </button>
           ` : ''}
@@ -8904,7 +8909,7 @@ const MATRIX_DB = BUNDLE_DB.topics;
         container.innerHTML = state.teams.map((t, idx) => `
         <div class="team-score-card ${idx === state.activeTeamIdx ? 'active-turn' : ''}" data-team-id="${t.id}" onclick="selectActiveTeam(${idx})">
           <div class="team-card-head">
-            <span class="team-name">${t.name}</span>
+            <span class="team-name">${escapeUserText(t.name)}</span>
             <span class="team-pts-number ${t.score < 0 ? 'score-negative' : ''}">${window.V14 && V14.formatScore ? V14.formatScore(t.score) : t.score} PTS</span>
           </div>
           <div class="team-status-row ${idx === state.activeTeamIdx ? '' : 'waiting'}">
@@ -8956,7 +8961,7 @@ const MATRIX_DB = BUNDLE_DB.topics;
 
       box.innerHTML = state.teams.map((t, idx) => `
         <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-surface); border:1.5px solid var(--border-light); border-radius:var(--radius-sm); padding:5px 8px; gap:6px;">
-          <input type="text" value="${t.name}" class="btn-action" style="flex:1; padding:4px 6px; font-size:11px; font-weight:800; cursor:text; background:#FFFFFF;" onchange="updateTeamName(${idx}, this.value)" title="Edita el nombre directamente aquí" />
+          <input type="text" value="${escapeUserText(t.name)}" class="btn-action" style="flex:1; padding:4px 6px; font-size:11px; font-weight:800; cursor:text; background:#FFFFFF;" onchange="updateTeamName(${idx}, this.value)" title="Edita el nombre directamente aquí" />
           <div style="display:flex; align-items:center; gap:3px;">
             <button class="btn-action btn-coral-filled" style="padding:2px 6px; font-size:10px; font-weight:900;" onclick="adjustTeamScore(${idx}, -1)" title="Restar 1 punto">-1</button>
             <span style="font-size:10.5px; font-family:monospace; color:${t.score < 0 ? 'var(--accent-coral)' : 'var(--primary-gold-dark)'}; font-weight:900; min-width:44px; text-align:center; ${t.score < 0 ? 'background:var(--accent-coral-soft); border-radius:3px; padding:1px 3px;' : ''}">${t.score} pts</span>
@@ -9530,6 +9535,8 @@ const MATRIX_DB = BUNDLE_DB.topics;
         phase: 'pass'
       };
 
+      // Los roles de la ronda anterior no deben aparecer durante el nuevo reparto.
+      if (V14.net && V14.net.rawAll) V14.net.rawAll({ t: 'roleclear' });
       document.getElementById('impostor-setup-box').style.display = 'none';
       document.getElementById('impostor-debate-box').style.display = 'none';
       document.getElementById('impostor-result-box').style.display = 'none';
@@ -10718,7 +10725,10 @@ function doOpenGame(id) {
   const hub = document.getElementById('hub-view');
   /* Al salir de Tabú se purga su tarjeta: ni la palabra ni las prohibidas
      sobreviven al cambio de vista. */
-  if (id !== 'tabu' && typeof window.purgarTabu === 'function') window.purgarTabu();
+  if (id !== 'tabu' && typeof window.purgarTabu === 'function') {
+    if (window.V14 && V14.__v65) V14.__v65.limpiar();
+    window.purgarTabu();
+  }
   if (id === 'hub' || !id) {
     currentGame = null;
     if (hub) hub.classList.add('open');
@@ -10735,7 +10745,9 @@ function doOpenGame(id) {
 
   onGameOpened(id);
   applyConfigLayout();
-  renderSharedScoreboard();
+  // La formación puede haber cambiado los participantes desde la última vista.
+  // Repintar también los marcadores laterales, no solo la barra compartida.
+  renderTeamsList();
 }
 
 function onGameOpened(id) {
@@ -10749,6 +10761,14 @@ function onGameOpened(id) {
       break;
     case 'impostor':
       resetImpostorRound();
+      // En sala, el reparto inicial debe corresponder a mandos reales, no al
+      // valor que quedó seleccionado de una partida local anterior.
+      if (window.V14 && V14.__v55 && V14.settings &&
+          (V14.settings.gameMode === 'servidor' || V14.settings.gameMode === 'sala')) {
+        const cantidad = V14.__v55.jugadores().length;
+        const selector = document.getElementById('impostor-player-count-select');
+        if (selector && selector.querySelector('option[value="' + cantidad + '"]')) selector.value = String(cantidad);
+      }
       break;
     case 'mentiroso':
       resetMenRound();
@@ -10762,6 +10782,8 @@ function onGameOpened(id) {
       if (psel2) psel2.value = String(state.config.tabu.roundSeconds);
       drawNextTabuCard();
       renderTabuMode();
+      // La formación abre por doOpenGame, no necesariamente por V.openGame.
+      if (window.V14 && V14.__v65) V14.__v65.preparar();
       break;
     case 'bomba':
       resetBombRound();
@@ -10780,7 +10802,7 @@ function onGameOpened(id) {
 function renderSharedScoreboard() {
   const pillsHtml = state.teams.map((t, idx) => `
     <div class="ss-team-pill ${idx === state.activeTeamIdx ? 'ss-active' : ''}" onclick="selectActiveTeam(${idx})">
-      <span class="ss-team-name">${t.name}</span>
+      <span class="ss-team-name">${escapeUserText(t.name)}</span>
       <span class="ss-team-pts ${t.score < 0 ? 'ss-neg' : ''}">${window.V14 && V14.formatScore ? V14.formatScore(t.score) : t.score}</span>
     </div>
   `).join('');
@@ -10795,7 +10817,7 @@ function renderSharedScoreboard() {
   if (hubRow) {
     const hubHtml = state.teams.map((t, idx) => `
       <div class="hub-team-tile ${idx === state.activeTeamIdx ? 'hub-active' : ''}" onclick="selectActiveTeam(${idx})">
-        <span class="hub-team-name">${t.name}</span>
+        <span class="hub-team-name">${escapeUserText(t.name)}</span>
         <span class="hub-team-pts ${t.score < 0 ? 'ss-neg' : ''}">${window.V14 && V14.formatScore ? V14.formatScore(t.score) : t.score}</span>
       </div>
     `).join('');
@@ -10903,7 +10925,7 @@ function mentirosoRoundActive() {
 function tabuRoundActive() {
   const summary = document.getElementById('tabu-round-summary-box');
   const summaryVisible = !!(summary && summary.style.display === 'flex');
-  return tabuRunning || summaryVisible;
+  return tabuRunning || summaryVisible || !!(window.V14 && V14.__v65 && V14.__v65.estado().fase === 'visible');
 }
 
 function bombRoundActive() {
@@ -19129,6 +19151,7 @@ window.addEventListener('DOMContentLoaded', () => {
       // La acción antigua autorizaba por asiento compartido, incluso al guía.
       if (V.gameOf() === 'dial' && V.__v66 && (aid === 'reveal' || aid === 'hold')) return;
       if (aid.indexOf('dial:') === 0) { rec.dialActionRound = Number(d.round); if (V.netAction && V.netAction(aid, rec)) return; }
+      if (V.gameOf() === 'verdad') rec.verdadActionRound = d.round;
       if (V.netAction && V.netAction(aid, rec)) return;   // el juego atiende y sabe quién pulsó
       runAction(aid, rec);
       return;
@@ -19187,7 +19210,7 @@ window.addEventListener('DOMContentLoaded', () => {
       else { setTimeout(function () { NET.broadcast(); }, 150); }
       return;
     }
-    if (d.t === 'roleseen') { impostorSeen(rec); return; }
+    if (d.t === 'roleseen') { impostorSeen(rec, d); return; }
   }
 
   /* El celular bautiza su equipo si el equipo aún tiene nombre genérico */
@@ -19525,7 +19548,7 @@ window.addEventListener('DOMContentLoaded', () => {
       const spicy = '';
       const name = n.name || 'el jugador';
       const a = [];
-      let out = { kicker: 'Verdad o Reto' + spicy, title: '', text: '', sub: '', actions: a };
+      let out = { kicker: 'Verdad o Reto' + spicy, title: '', text: '', sub: '', actions: a, verdadRound: n.round };
 
       if (n.phase === 'idle') {
         out.kicker = 'Verdad o Reto' + spicy;
@@ -19836,8 +19859,11 @@ window.addEventListener('DOMContentLoaded', () => {
     if (!n) return;
     const slot = n - 1;
     const rec = connForSlot(slot);
-    if (!rec) { box.dataset.vnetSent = ''; return; }        // sin teléfono: sigue el flujo normal
-    if (box.dataset.vnetSent === String(n)) return;
+    if (!rec) { box.dataset.vnetPeer = ''; return; }        // espera la reconexión del participante
+    if (box.dataset.vnetSent === String(n) && box.dataset.vnetPeer === rec.id) return;
+    if (box.dataset.vnetSent !== String(n) || !box.dataset.vnetToken) {
+      box.dataset.vnetToken = Date.now().toString(36) + '-' + Math.random().toString(36).slice(2);
+    }
 
     let title = '', desc = '';
     try {
@@ -19849,8 +19875,9 @@ window.addEventListener('DOMContentLoaded', () => {
     if (disp) disp.style.display = 'none';                 // nada de roles en la tele
     if (!title) return;
 
-    rawSend(rec, { t: 'role', title: title, desc: desc, player: tag });
+    rawSend(rec, { t: 'role', title: title, desc: desc, player: tag, token: box.dataset.vnetToken });
     box.dataset.vnetSent = String(n);
+    box.dataset.vnetPeer = rec.id;
     box.dataset.vnetName = tag;
     veilImpostor(tag);
     NET.lastFp = '';
@@ -19886,12 +19913,19 @@ window.addEventListener('DOMContentLoaded', () => {
   function cleanupImpostor() {
     document.querySelectorAll('.v-role-veil').forEach(function (v) { v.remove(); });
     const box = document.getElementById('impostor-pass-box');
-    if (box) { box.dataset.vnetSent = ''; }
+    if (box) { box.dataset.vnetSent = ''; box.dataset.vnetPeer = ''; box.dataset.vnetToken = ''; }
   }
 
-  function impostorSeen(rec) {
+  function impostorSeen(rec, d) {
+    const box = document.getElementById('impostor-pass-box');
+    if (V.gameOf() !== 'impostor' || !box || box.offsetParent === null || !rec ||
+        box.dataset.vnetSent !== String(rec.slot + 1) ||
+        !box.dataset.vnetToken || d.token !== box.dataset.vnetToken) return;
     cleanupImpostor();
-    try { if (typeof window.hideImpostorRole === 'function') window.hideImpostorRole(); } catch (e) {}
+    // El guardia de doble toque solo avanza un rol visible; se muestra y oculta
+    // en la misma tarea para que nunca se pinte en la pantalla del anfitrión.
+    try { if (typeof window.revealImpostorRole === 'function') window.revealImpostorRole();
+          if (typeof window.hideImpostorRole === 'function') window.hideImpostorRole(); } catch (e) {}
     NET.lastFp = '';
     setTimeout(function () { impostorSync(); NET.broadcast(); }, 220);
   }
@@ -20554,8 +20588,9 @@ window.addEventListener('DOMContentLoaded', () => {
       showScreen(null);
       return;
     }
+    if (d.t === 'roleclear') { RM.role = null; RM.roleSeen = false; renderActions(RM.lastSync || {}); return; }
     if (d.t === 'role') {
-      RM.role = { title: d.title, desc: d.desc };
+      RM.role = { title: d.title, desc: d.desc, token: d.token };
       RM.roleSeen = false;
       vibrate([25, 45, 25]);
       renderActions(RM.lastSync || {});
@@ -20602,6 +20637,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const legacyTabuWords = document.getElementById('v20-banned');
     if (legacyTabuWords) legacyTabuWords.remove();
     RM.lastSync = s;
+    if (s.game !== 'impostor') { RM.role = null; RM.roleSeen = false; }
     const you = (s.teams || []).filter(t => t.i === s.youSlot)[0] || null;
     const roomtag = document.getElementById('rm-roomtag');
     if (roomtag) roomtag.textContent = s.code || RM.code;
@@ -20659,11 +20695,13 @@ window.addEventListener('DOMContentLoaded', () => {
     const subEl = document.getElementById('rm-sub');
     const noteEl = document.getElementById('rm-note');
 
-    if (scr.title) { titleEl.style.display = ''; titleEl.textContent = scr.title; }
+    const mostrandoRol = s.game === 'impostor' && RM.role && V.__v20 && V.__v20.holding && V.__v20.heldKind === 'data-role';
+    if (mostrandoRol) { titleEl.style.display = ''; titleEl.textContent = RM.role.title; }
+    else if (scr.title) { titleEl.style.display = ''; titleEl.textContent = scr.title; }
     else { titleEl.style.display = 'none'; }
     if (scr.text) { textEl.style.display = ''; textEl.textContent = scr.text; }
     else { textEl.style.display = 'none'; textEl.textContent = ''; }
-    subEl.textContent = scr.sub || '';
+    subEl.textContent = mostrandoRol ? (RM.role.desc || '') : (scr.sub || '');
     const taskEl = document.getElementById('rm-task');
     if (taskEl) {
       if (scr.task) { taskEl.style.display = ''; taskEl.textContent = scr.task; }
@@ -20789,7 +20827,7 @@ window.addEventListener('DOMContentLoaded', () => {
     if (scr.hideTitle && $wordFor(scr)) {
       html += '<button class="rm-btn primary rm-word-btn" data-word="' + esc($wordFor(scr)) + '">Ver la palabra<small>solo mientras mantienes · nadie más la ve</small></button>';
     }
-    if (RM.role && !scr.lobby) {
+    if (RM.role && s.game === 'impostor' && !scr.lobby) {
       html += '<button class="rm-btn primary rm-role-btn" data-role="1">Mi rol<small>mantén para verlo · nadie más lo ve</small></button>';
       if (!RM.roleSeen) html += '<button class="rm-btn ok" data-roleseen="1">Ya lo vi · siguiente</button>';
     }
@@ -20934,7 +20972,8 @@ window.addEventListener('DOMContentLoaded', () => {
         b.addEventListener('pointerleave', off);
       } else {
         b.onclick = function () {
-          send({ t: 'action', id: b.getAttribute('data-act'), round: scr.dial && scr.dial.round });
+          const actual = (RM.lastSync && RM.lastSync.screen) || {};
+          send({ t: 'action', id: b.getAttribute('data-act'), round: actual.dial ? actual.dial.round : actual.verdadRound });
           vibrate(12);
           b.style.opacity = .55;
           setTimeout(function () { b.style.opacity = ''; }, 230);
@@ -21010,7 +21049,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const seenBtn = box.querySelector('[data-roleseen]');
     if (seenBtn) seenBtn.onclick = function () {
       RM.roleSeen = true;
-      send({ t: 'roleseen' });
+      send({ t: 'roleseen', token: RM.role && RM.role.token });
       vibrate(14);
       seenBtn.remove();
       const t = document.getElementById('rm-title');
@@ -21106,7 +21145,9 @@ window.addEventListener('DOMContentLoaded', () => {
       return;
     }
     if (sec.kind === 'tabu-guess') {
-      box.innerHTML = '<div class="rm-compose"><input id="rm-tabu-proposal" class="rm-name-in" maxlength="80" autocapitalize="sentences" placeholder="Tu propuesta"><button class="rm-btn primary" id="rm-tabu-send">Enviar propuesta</button></div><div class="rm-note">Solo el anfitrión recibe y decide las propuestas.</div>';
+      // Mantener el campo y su foco al sincronizar, y cambiar la huella entre
+      // cartas para que el formulario desaparezca o se renueve cuando corresponde.
+      repintarAcciones(box, '<div class="rm-compose" data-round="' + esc(sec.round) + '" data-card="' + esc(sec.card) + '"><input id="rm-tabu-proposal" class="rm-name-in" maxlength="80" autocapitalize="sentences" placeholder="Tu propuesta"><button class="rm-btn primary" id="rm-tabu-send">Enviar propuesta</button></div><div class="rm-note">Solo el anfitrión recibe y decide las propuestas.</div>');
       const b = document.getElementById('rm-tabu-send');
       if (b) b.onclick = function () { const i=document.getElementById('rm-tabu-proposal'),v=(i&&i.value||'').trim();if(!v){if(i)i.focus();return;}send({t:'tabuguess',v:v,round:sec.round,card:sec.card});if(i)i.value='';b.disabled=true;b.textContent='Enviada';vibrate(14); };
       return;
@@ -21520,7 +21561,9 @@ window.addEventListener('DOMContentLoaded', () => {
   const AUTO_MS = 5000;
   const PTS = { verdad: 3, noLoHice: 1, mentira: -2, retoOk: 3, retoMedio: 1, retoNo: -2 };
 
+  let vdSerial = Date.now() * 1000 + Math.floor(Math.random() * 1000);
   let st = {
+    round: ++vdSerial,
     phase: 'idle',   // idle | ask | context | reto | retoGo | settled
     kind: null,      // 'VERDAD' | 'RETO'
     text: '',
@@ -21574,7 +21617,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const s = S();
     const mio = (youSlot == null || youSlot === '') ? null : Number(youSlot);
     return {
-      phase: st.phase, kind: st.kind, text: st.text, slot: st.slot,
+      phase: st.phase, kind: st.kind, text: st.text, slot: st.slot, round: st.round,
       name: nameOf(st.slot), turn: s ? s.activeTeamIdx : 0,
       turnName: nameOf(st.slot),
       youSlot: mio,
@@ -21744,6 +21787,7 @@ window.addEventListener('DOMContentLoaded', () => {
       () => draw(k));
     if (texto === null) { st.phase = 'idle'; st.text = ''; render(); sync(); return { ok: false, motivo: 'sin consignas' }; }
     st = {
+      round: ++vdSerial,
       phase: k === 'VERDAD' ? 'ask' : 'reto',
       kind: k,
       settled: false,
@@ -21770,9 +21814,13 @@ window.addEventListener('DOMContentLoaded', () => {
     clearTimers();
     const s = S(); if (!s) return;
     st.settled = true;
-    st.pts = pts;
     st.phase = 'settled';
+    // La capa de ajustes puede modificar el premio; mostrar el cambio real.
+    const antes = Number(s.teams && s.teams[st.slot] && s.teams[st.slot].score);
     try { V.award(st.slot, pts, label); } catch (e) {}
+    const despues = Number(s.teams && s.teams[st.slot] && s.teams[st.slot].score);
+    if (Number.isFinite(antes) && Number.isFinite(despues)) pts = despues - antes;
+    st.pts = pts;
     celebrate(pts, nameOf(st.slot));
     render();
     sync();
@@ -21820,6 +21868,7 @@ window.addEventListener('DOMContentLoaded', () => {
   function nextPlayer() {
     clearTimers();
     try { V.nextTurn(); } catch (e) {}
+    st.round = ++vdSerial;
     st.phase = 'idle'; st.kind = null; st.text = ''; st.lie = null; st.ack = false; st.pts = null;
     st.settled = false;
     st.slot = S() ? S().activeTeamIdx : 0;
@@ -21889,6 +21938,8 @@ window.addEventListener('DOMContentLoaded', () => {
   V.netAction = function (id, rec) {
     if (!V.gameOf || V.gameOf() !== 'verdad') return false;
     if (!V.vdNow) return false;
+    const validos = ['VERDAD', 'RETO', 'RANDOM', 'culpable', 'nolo', 'mentira', 'endcontext', 'aceptar'];
+    if (validos.indexOf(String(id)) >= 0 && (!rec || !Number.isSafeInteger(rec.verdadActionRound) || rec.verdadActionRound !== st.round)) return true;
     const elige = ['VERDAD', 'RETO', 'RANDOM'];
     if (elige.indexOf(String(id)) >= 0) {
       const res = V.vdElegir ? V.vdElegir(id, rec && rec.slot != null ? rec.slot : 'host') : { ok: false };
@@ -21926,6 +21977,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   function resetState() {
     clearTimers();
+    st.round = ++vdSerial;
     st.phase = 'idle'; st.kind = null; st.text = ''; st.lie = null; st.ack = false; st.pts = null;
     st.slot = S() ? S().activeTeamIdx : 0;
   }
@@ -22112,9 +22164,11 @@ window.addEventListener('DOMContentLoaded', () => {
       else bar.appendChild(el);
     }
     const i = info();
-    el.className = 'v-play-chip ' + i.mode;
-    el.textContent = i.label;
-    el.title = i.mode === 'solo'
+    const salaReal = V.settings && (V.settings.gameMode === 'servidor' || V.settings.gameMode === 'sala');
+    const conectados = salaReal && V.__v55 ? V.__v55.jugadores().length : 0;
+    el.className = 'v-play-chip ' + (salaReal ? 'equipos' : i.mode);
+    el.textContent = salaReal ? 'Sala · ' + conectados + (conectados === 1 ? ' jugador' : ' jugadores') : i.label;
+    el.title = salaReal ? 'Participantes conectados; el anfitrión no juega' : i.mode === 'solo'
       ? 'Juega una sola persona: los turnos no rotan'
       : (i.mode === 'duo' ? 'Duelo de dos: uno contra uno' : 'Partida por equipos');
   }
@@ -22125,8 +22179,24 @@ window.addEventListener('DOMContentLoaded', () => {
     const orig = window.startImpostorGame;
     if (typeof orig !== 'function' || orig.__vp) return;
     const w = function () {
-      const h = humans();
-      if (h >= 3) return orig.apply(this, arguments);
+      const enSala = V.settings && (V.settings.gameMode === 'servidor' || V.settings.gameMode === 'sala');
+      const conectados = enSala && V.__v55 ? V.__v55.jugadores() : null;
+      const h = conectados ? conectados.length : humans();
+      if (h >= 3) {
+        if (conectados) {
+          const selector = document.getElementById('impostor-player-count-select');
+          if (!selector || Number(selector.value) !== h) {
+            V.toast('Selecciona la cantidad de mandos conectados antes de repartir los roles.', 'warn', 4000);
+            return;
+          }
+          const slots = conectados.map(p => p.slot).sort((a, b) => a - b);
+          if (slots.some((slot, index) => slot !== index)) {
+            V.toast('Hay asientos desconectados. Reorganiza la sala antes de repartir los roles.', 'warn', 4000);
+            return;
+          }
+        }
+        return orig.apply(this, arguments);
+      }
       const solo = V.settings && V.settings.playersMode === 'solo';
       if (!V.modal) return orig.apply(this, arguments);
       V.modal({
@@ -27403,6 +27473,10 @@ var qrcode = function() {
       sub: (document.getElementById('rm-sub') || {}).textContent || '',
       snap: null
     };
+    if (kind === 'data-role') {
+      var remoto = V.net && V.net._debugRemote && V.net._debugRemote();
+      if (remoto && remoto.role) { held.title = remoto.role.title || ''; held.sub = remoto.role.desc || ''; }
+    }
     if (ev && ev.cancelable) ev.preventDefault();
     V.__v20.holding = true;
     V.__v20.holds++;
@@ -29403,6 +29477,10 @@ var qrcode = function() {
     if (tour || ocupado || apagado() || esMando()) return;
     if (!JUEGOS[id] || juegoVisto(id)) return;
     if ((V.gameOf && V.gameOf()) !== id) return;
+    // Una formación posterior no debe quedar tapada por el tutorial retrasado
+    // del juego que se está abandonando; si se cancela, vuelve a intentarlo.
+    var form = V.__v33api && V.__v33api.estado && V.__v33api.estado();
+    if (form && form.abierto) { setTimeout(function () { breve(id); }, 350); return; }
     marcarJuego(id);
     abrir(pasosBreves(id), 'breve', id);
   }
@@ -38697,7 +38775,10 @@ html.v50-hub #hub-view #v-play-chip { display:none !important; }
        batería */
     var sueltos = viejos.filter(function (t) {
       if (!t || nuevos.indexOf(t) >= 0) return false;
-      return (Number(t.score) || 0) !== 0;
+      // Un jugador identificado puede volver tras una desconexión o recarga.
+      // Conservar su asiento aunque aún no tenga puntos evita que otro mando
+      // herede ese índice mientras los saludos llegan en distinto orden.
+      return (Number(t.score) || 0) !== 0 || (t.__v55pids || []).length > 0;
     });
 
     /* los que se retiran por no tener dispositivo detrás se avisan una vez
@@ -41843,18 +41924,25 @@ html.v50-hub #hub-view #v-play-chip { display:none !important; }
     var sel = $('tabu-round-time-select');
     T.total = Math.max(10,Math.min(300,parseInt((sel && sel.value) || cfg.roundSeconds || 60, 10) || 60));
     T.seg = T.total; T.pausado=false; T.ronda++; T.aciertos = 0; T.resueltas = {}; T.intentos={}; T.intento=null; T.decidido=false; T.fase='visible';
+    var resumen=$('tabu-round-summary-box'), marcador=$('tabu-live-score');
+    if(resumen)resumen.style.display='none'; if(marcador)marcador.textContent='0';
     if (sacarCarta() === false) return null;
     pintarReloj(); pintarEstado(); relojArranca();
-    var b=$('btn-tabu-round-start');if(b)b.textContent='Detener ronda';
+    var b=$('btn-tabu-round-start');if(b)b.textContent='Pausar ronda';
     try { V.toast('Ronda Tabú: el anfitrión describe; las propuestas llegan en privado', 'info', 2200); } catch (e) {}
     if(S)S.sincro(); return T;
   }
   function detener(motivo) {
     relojPara(); T.pausado=false; T.fase='fin'; T.intento=null; pintarEstado();
     var b=$('btn-tabu-round-start');if(b)b.textContent='¡INICIAR RONDA TABÚ!';
-    var resumen=$('tabu-round-summary-box'),txt=$('tabu-summary-text');
-    if(txt)txt.textContent=(motivo==='tiempo'?'¡Tiempo agotado! ':'')+'Aciertos: '+T.aciertos+' (+'+T.aciertos+' pts)';
+    T.motivoFin=motivo; actualizarResumen();
+    var resumen=$('tabu-round-summary-box');
     if(resumen)resumen.style.display='flex'; renderPropuestas(); if(S)S.sincro(); return T;
+  }
+  function actualizarResumen(){
+    var txt=$('tabu-summary-text'),cfg=V.G()&&V.G().config&&V.G().config.tabu;
+    var puntos=T.aciertos*((cfg&&cfg.pointsPerHit)||1);
+    if(txt)txt.textContent=(T.motivoFin==='tiempo'?'¡Tiempo agotado! ':'')+'Aciertos: '+T.aciertos+' (+'+puntos+' pts)';
   }
   function terminar(){return detener('tiempo');}
   function siguienteCarta(){
@@ -41887,7 +41975,7 @@ html.v50-hub #hub-view #v-play-chip { display:none !important; }
     var key=T.ronda+':'+T.carta;if(T.resueltas[key])return {ok:false,motivo:'Carta ya puntuada'};
     if(winner!==null&&winner!==undefined){var propuesta=T.intentos[winner];if(!propuesta||propuesta.ronda!==T.ronda||propuesta.carta!==T.carta)return {ok:false,motivo:'El ganador no tiene una propuesta vigente'};}
     T.decidido=true;T.resueltas[key]=true;
-    if(winner!==null&&winner!==undefined){T.aciertos++;var g=V.G(),pts=((g&&g.config&&g.config.tabu&&g.config.tabu.pointsPerHit)||1),team=g&&g.teams&&g.teams[propuesta.slot],members=[];
+    if(winner!==null&&winner!==undefined){T.aciertos++;var marcador=$('tabu-live-score');if(marcador)marcador.textContent=String(T.aciertos);var g=V.G(),pts=((g&&g.config&&g.config.tabu&&g.config.tabu.pointsPerHit)||1),team=g&&g.teams&&g.teams[propuesta.slot],members=[];
       if(V.settings.gameMode==='local' && team && Number.isInteger(team.tabuEquipo))members=g.teams.map(function(t,i){return t.tabuEquipo===team.tabuEquipo?i:-1}).filter(function(i){return i>=0});
       if(!members.length)members=[propuesta.slot];
       V._diffScores && V._diffScores();V._batchPriceScore=true;
@@ -41895,7 +41983,7 @@ html.v50-hub #hub-view #v-play-chip { display:none !important; }
       V._diffScores && V._diffScores();
     }
     T.intentos={};
-    if(T.fase==='fin'){pintarEstado();renderPropuestas();if(S)S.sincro();return {ok:true,acierto:winner!=null};}
+    if(T.fase==='fin'){actualizarResumen();pintarEstado();renderPropuestas();if(S)S.sincro();return {ok:true,acierto:winner!=null};}
     siguienteCarta();return {ok:true,acierto:winner!=null};
   }
 
@@ -41966,6 +42054,7 @@ html.v50-hub #hub-view #v-play-chip { display:none !important; }
       return {fase:T.fase,palabra:T.palabra,prohibidas:T.prohibidas.slice(),seg:T.seg,pausado:T.pausado,relojActivo:!!T.reloj,aciertos:T.aciertos,intentos:Object.keys(T.intentos).length,ronda:T.ronda,carta:T.carta};
     },
     iniciar: iniciar, terminar: terminar, siguienteCarta: siguienteCarta,
+    preparar: function(){ resetear(); css(); engancharBotones(); pintarEstado(); },
     intento: intento, resolver: resolver, limpiar: resetear
   };
 })();

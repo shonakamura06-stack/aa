@@ -2,7 +2,7 @@ const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const {chromium}=require(process.env.PLAYWRIGHT_CORE||'playwright-core');
 test('Importación revisa, guarda, conserva acentos y llega al banco real del Impostor', {timeout:45000}, async()=>{
- const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH,headless:true,args:['--no-sandbox','--no-zygote','--single-process','--disable-dev-shm-usage']});
+ const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH,headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});
  const page=await browser.newPage({viewport:{width:1280,height:800}}),errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>d.accept());
  try {
   await page.goto('http://127.0.0.1:8000/?entrada=off');await page.waitForTimeout(1600);if(await page.locator('#v40-skip').isVisible())await page.locator('#v40-skip').click();
@@ -27,7 +27,7 @@ test('Importación revisa, guarda, conserva acentos y llega al banco real del Im
  }finally{await browser.close();}
 });
 test('Migración de historial legado conserva claves estructuradas y solo reinicia al pedirlo', {timeout:20000}, async()=>{
- const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH,headless:true,args:['--no-sandbox','--no-zygote','--single-process']});
+ const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH,headless:true,args:['--no-sandbox']});
  const page=await browser.newPage();try{await page.goto('http://127.0.0.1:8000/?entrada=off');const result=await page.evaluate(()=>{
   const v=V14.__v67,pref='sintonia:bolsa:';
   const fixtures=[{id:'test:migracion:texto',item:'Ñandú Azul',key:JSON.stringify('nandu azul')},{id:'test:migracion:array',item:['Árbol','Ñandú'],key:JSON.stringify(['arbol','nandu'])},{id:'test:migracion:objeto',item:{z:'Ñandú',a:['Árbol']},key:JSON.stringify({a:['arbol'],z:'nandu'})},{id:'test:migracion:palabra',item:{word:'ÑANDÚ',category:'Aves',hint:'Pico'},key:JSON.stringify('nandu')}];

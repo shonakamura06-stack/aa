@@ -1,0 +1,31 @@
+TAP version 13
+# Subtest: Un fallo al guardar la sesión se comunica, conserva el estado en memoria y permite reintentar
+ok 1 - Un fallo al guardar la sesión se comunica, conserva el estado en memoria y permite reintentar
+  ---
+  duration_ms: 1572.397157
+  type: 'test'
+  ...
+# Subtest: El aviso permite reintentar y no revive una eliminación fallida
+ok 2 - El aviso permite reintentar y no revive una eliminación fallida
+  ---
+  duration_ms: 1446.353676
+  type: 'test'
+  ...
+# Subtest: El historial de cada banco sobrevive al cierre y reapertura del navegador
+ok 3 - El historial de cada banco sobrevive al cierre y reapertura del navegador
+  ---
+  duration_ms: 1437.726352
+  type: 'test'
+  ...
+# Subtest: Una frase atrasada de Historia no se acepta tras recargar al anfitrión
+ok 4 - Una frase atrasada de Historia no se acepta tras recargar al anfitrión
+  ---
+  duration_ms: 9022.569092
+  type: 'test'
+  ...
+# Subtest: El lote General está integrado, no duplica al sincronizar y no se repite tras recargar
+ok 5 - El lote General está integrado, no duplica al sincronizar y no se repite tras recargar
+  ---
+  duration_ms: 1269.736971
+  type: 'test'
+  ...

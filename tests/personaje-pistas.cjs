@@ -14,7 +14,7 @@ test('Personaje entrega pistas acumuladas a dos mandos y limpia la ronda', {time
   const port=await new Promise((resolve,reject)=>{server.once('message',resolve);server.once('error',reject);server.once('exit',c=>reject(Error('Señalización terminó: '+c)))});
   let browser;const errores=[];
   try {
-    browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||undefined,headless:true,args:['--no-sandbox','--no-zygote','--single-process','--disable-dev-shm-usage']});
+    browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||undefined,headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});
     const host=await browser.newPage({viewport:{width:1280,height:800}});host.on('pageerror',e=>errores.push('PC: '+e.message));
     await host.goto('http://127.0.0.1:8000/?entrada=off');await host.waitForTimeout(1200);await host.evaluate(senalLocal,port);
     await host.evaluate(()=>{V14.settings.gameMode='servidor';V14.net.host()});

@@ -13,3 +13,7 @@ Estas instrucciones no sustituyen una prueba con teléfonos físicos ni garantiz
 ## Qué contiene y qué falta
 
 La entrega incorpora 300 entradas General durante la misión y protege mensajes de rondas anteriores en Historia, Yo Nunca Nunca, Personaje, Trivia, Ranking, Precio y Tabú. Se ensayaron recorridos de sala a resultado con 2, 3 y 4 mandos emulados en varios juegos y la partida de diez preguntas de Trivia. Las pruebas usan señalización local; no equivalen a red pública ni teléfonos físicos. Los mandos cargados con la versión anterior deben recargar. Faltan objetivos de contenido, recorridos y recuperación integral. Ver `reportes/CONTINUACION-MISION.md`; no es lanzamiento aprobado.
+
+## Continuación posterior
+
+Se corrigieron el reparto y marcador de Impostor, acciones antiguas de Verdad/Reto, el ciclo de Tabú, el tutorial tardío y varios problemas visuales y de tratamiento de nombres. Persisten decisiones y validaciones importantes, incluida la puntuación de Impostor, la recuperación de rondas y las metas de contenido. Consulta `reportes/CONTINUACION-MULTIJUGADOR.md` para las pruebas y sus límites. No promover esta versión a producción como terminada.

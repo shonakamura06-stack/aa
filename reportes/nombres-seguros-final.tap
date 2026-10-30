@@ -1,0 +1,16 @@
+TAP version 13
+# Subtest: Los nombres de participantes se muestran como texto, no como HTML
+ok 1 - Los nombres de participantes se muestran como texto, no como HTML
+  ---
+  duration_ms: 3022.48171
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3424.722127

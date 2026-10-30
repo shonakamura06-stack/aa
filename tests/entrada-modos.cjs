@@ -1,5 +1,5 @@
 const {test}=require('node:test');const assert=require('node:assert/strict');const {chromium}=require(process.env.PLAYWRIGHT_CORE||'playwright-core');
-const opts={executablePath:process.env.CHROMIUM_PATH,headless:true,args:['--no-sandbox','--no-zygote','--single-process','--disable-dev-shm-usage']};
+const opts={executablePath:process.env.CHROMIUM_PATH,headless:true,args:['--no-sandbox','--disable-dev-shm-usage']};
 test('Modo local configura jugadores reales sin red y abre el catálogo', {timeout:35000},async()=>{
  const b=await chromium.launch(opts),p=await b.newPage({viewport:{width:390,height:844}}),errs=[];p.on('pageerror',e=>errs.push(e.message));
  try{await p.route('**/*',r=>/127\.0\.0\.1:8000/.test(r.request().url())?r.continue():r.abort());await p.addInitScript(()=>localStorage.setItem('sintonia.tour.v45',JSON.stringify({at:Date.now()})));await p.goto('http://127.0.0.1:8000/');await p.locator('#v21-boot').waitFor({state:'hidden'});await p.locator('#v40-welcome [data-v40="local"]').click();await p.locator('#v40-sala-previa').waitFor();assert.equal(await p.evaluate(()=>V14.net.status==='open'),false);

@@ -1,0 +1,46 @@
+TAP version 13
+# Subtest: Impostor: reparto privado y resultado con 3 mandos
+not ok 1 - Impostor: reparto privado y resultado con 3 mandos
+  ---
+  duration_ms: 13348.582068
+  type: 'test'
+  location: '/home/user/aa/tests/impostor-partidas-completas.cjs:9:29'
+  failureType: 'testCodeFailure'
+  error: 'al soltar se oculta el rol'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: '¡ERES EL IMPOSTOR!'
+  actual: '¡ERES EL IMPOSTOR!'
+  operator: 'notStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (/home/user/aa/tests/impostor-partidas-completas.cjs:41:327)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: Impostor: reparto privado y resultado con 4 mandos
+not ok 2 - Impostor: reparto privado y resultado con 4 mandos
+  ---
+  duration_ms: 15340.3326
+  type: 'test'
+  location: '/home/user/aa/tests/impostor-partidas-completas.cjs:9:29'
+  failureType: 'testCodeFailure'
+  error: 'al soltar se oculta el rol'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'PALABRA: CARTÓGRAFO'
+  actual: 'PALABRA: CARTÓGRAFO'
+  operator: 'notStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (/home/user/aa/tests/impostor-partidas-completas.cjs:41:327)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 0
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 29057.641087

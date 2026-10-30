@@ -312,3 +312,7 @@ físicos. Las pruebas de WebRTC usan un PeerServer local, no el servicio públic
 El QR fue decodificado desde la imagen y su enlace abrió la pantalla de mando
 en Chromium. Se verificó que JUGAR queda visible en la sala a 1366 × 768 y
 390 × 844. Esto no es una lectura con cámara física.
+
+### Continuación de ciclos y seguridad
+
+La matriz anterior es histórica. Para los recorridos posteriores de Dial, Impostor, Tabú y Verdad/Reto, sus pruebas antes/después, la discrepancia de puntuación de Impostor y las limitaciones de recuperación y diseño, véase [`reportes/CONTINUACION-MULTIJUGADOR.md`](reportes/CONTINUACION-MULTIJUGADOR.md). Las pruebas multijugador usan navegadores emulados y señalización local, no teléfonos físicos ni red pública.
