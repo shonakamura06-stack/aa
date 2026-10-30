@@ -7148,7 +7148,9 @@ html.v21-cover-off::before{display:none;}
 
 
 
-      <!-- COLUMNA 3: JUGADORES + MARCADOR -->
+      <!-- Copia heredada sin vista propietaria: se conserva inerte para recuperación.
+           El marcador activo pertenece a cada vista de juego. -->
+      <template id="marcador-heredado-sin-vista">
       <aside class="sidebar-scoreboard">
         <div class="scoreboard-header" style="border-top:2px solid var(--border-light); padding-top:6px;">
           <div class="panel-title-group">
@@ -7158,9 +7160,7 @@ html.v21-cover-off::before{display:none;}
         </div>
         <div class="teams-list-scrollable js-teams-container" title="Toca un equipo para ponerlo en turno"></div>
       </aside>
-    </div>
-  </div>
-</section>
+      </template>
 
 <!-- ============================================================
      5 · JUEGO: PALABRA TABÚ
@@ -11643,8 +11643,28 @@ window.addEventListener('DOMContentLoaded', () => {
   /* ----------------------------------------------------------- ALMACENAMIENTO */
   const NS = 'sintonia.v14.';
   const mem = {};
+  const pendientes = new Set(), eliminados = new Set();
+  function avisoAlmacenamiento() {
+    if (!document.body) { document.addEventListener('DOMContentLoaded', avisoAlmacenamiento, {once:true}); return; }
+    let aviso = document.getElementById('v-storage-warning');
+    if (!pendientes.size) { if (aviso) aviso.remove(); return; }
+    if (aviso) return;
+    aviso = document.createElement('div');
+    aviso.id = 'v-storage-warning'; aviso.setAttribute('role', 'alert');
+    aviso.style.cssText = 'position:fixed;z-index:100000;top:max(12px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);width:min(92vw,540px);padding:14px 16px;border:1px solid #d9a94c;border-radius:14px;background:#fff9e8;color:#342c20;box-shadow:0 8px 32px #0004;font:600 14px/1.45 system-ui,sans-serif';
+    aviso.innerHTML = '<span>No se pudo guardar en este navegador. Los cambios solo están en memoria y podrían perderse al cerrar o recargar.</span> <button type="button" style="margin-top:8px;padding:7px 12px;border:1px solid #8a6318;border-radius:8px;background:#fff;color:#342c20;font:inherit;cursor:pointer">Reintentar guardado</button>';
+    aviso.querySelector('button').onclick = function () {
+      if (pendientes.has('session') && !eliminados.has('session') && typeof V.sessionPayload === 'function') {
+        const actual = V.sessionPayload(); if (actual) mem.session = actual;
+      }
+      Array.from(pendientes).forEach(key => eliminados.has(key) ? store.del(key) : store.set(key, mem[key]));
+      if (!pendientes.size && V.toast) V.toast('Cambios guardados en este navegador.', 'ok', 3500);
+    };
+    document.body.appendChild(aviso);
+  }
   const store = {
     get(key, fallback) {
+      if (pendientes.has(key)) return key in mem ? mem[key] : fallback;
       try {
         const raw = localStorage.getItem(NS + key);
         if (raw === null) return fallback;
@@ -11652,10 +11672,15 @@ window.addEventListener('DOMContentLoaded', () => {
       } catch (e) { return key in mem ? mem[key] : fallback; }
     },
     set(key, value) {
-      mem[key] = value;
-      try { localStorage.setItem(NS + key, JSON.stringify(value)); } catch (e) { /* modo privado */ }
+      mem[key] = value; eliminados.delete(key);
+      try { localStorage.setItem(NS + key, JSON.stringify(value)); pendientes.delete(key); avisoAlmacenamiento(); return true; }
+      catch (e) { pendientes.add(key); avisoAlmacenamiento(); return false; }
     },
-    del(key) { try { localStorage.removeItem(NS + key); } catch (e) {} delete mem[key]; },
+    del(key) {
+      delete mem[key]; eliminados.add(key);
+      try { localStorage.removeItem(NS + key); pendientes.delete(key); eliminados.delete(key); avisoAlmacenamiento(); return true; }
+      catch (e) { pendientes.add(key); avisoAlmacenamiento(); return false; }
+    },
     available() { try { localStorage.setItem(NS + 't', '1'); localStorage.removeItem(NS + 't'); return true; } catch (e) { return false; } }
   };
   V.store = store;
@@ -11937,15 +11962,15 @@ window.addEventListener('DOMContentLoaded', () => {
     if (!V.settings.autosave) return;
     const p = V.sessionPayload();
     if (!p) return;
-    store.set('session', p);
+    const guardado = store.set('session', p);
     const ind = document.querySelector('.v-save-dot');
-    if (ind) { ind.style.opacity = '1'; setTimeout(() => { ind.style.opacity = '.35'; }, 900); }
+    if (guardado && ind) { ind.style.opacity = '1'; setTimeout(() => { ind.style.opacity = '.35'; }, 900); }
   }, 400);
 
   // Guardado inmediato (sin debounce): se usa al cambiar audiencias o de juego
   V.saveSessionNow = function () {
     const p = V.sessionPayload();
-    if (p) V.store.set('session', p);
+    return p ? V.store.set('session', p) : false;
   };
 
   V.restoreSession = function () {
@@ -19072,7 +19097,12 @@ window.addEventListener('DOMContentLoaded', () => {
 
     if (d.t === 'seat' && d.slot != null) {
       if (NET.playing || V.gameOf() !== 'hub') { rawSend(rec, { t: 'deny', id: 'seat', why: 'seat-locked-during-game' }); return; }
-      const wanted = Number(d.slot);
+      const wanted = d.slot;
+      const equipos = (V.G() && V.G().teams) || [];
+      if (!Number.isSafeInteger(wanted) || wanted < 0 || wanted >= equipos.length) {
+        rawSend(rec, { t: 'deny', id: 'seat', why: 'invalid-seat' });
+        return;
+      }
       const taken = seats().some(s => s.i === wanted && s.online && s.id !== rec.id);
       if (!taken) { rec.slot = wanted; adoptName(wanted, rec.name); }
       rawSend(rec, { t: 'seat', slot: rec.slot, teams: seats() });

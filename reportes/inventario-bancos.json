@@ -1,0 +1,175 @@
+{
+  "nota": "Bancos base activos; validez estructural según la API actual, no revisión humana ni inventario de importaciones.",
+  "filas": [
+    {
+      "juego": "dial",
+      "variante": "general",
+      "id": "dial:general:temas",
+      "total": 2125,
+      "validas": 2125,
+      "unicas": 2123,
+      "duplicadas": 2,
+      "invalidas": 0
+    },
+    {
+      "juego": "verdad",
+      "variante": "general",
+      "id": "verdad:general:VERDAD",
+      "total": 1040,
+      "validas": 1040,
+      "unicas": 1040,
+      "duplicadas": 0,
+      "invalidas": 0
+    },
+    {
+      "juego": "reto",
+      "variante": "general",
+      "id": "verdad:general:RETO",
+      "total": 480,
+      "validas": 480,
+      "unicas": 480,
+      "duplicadas": 0,
+      "invalidas": 0
+    },
+    {
+      "juego": "tabu",
+      "variante": "general",
+      "id": "tabu:general",
+      "total": 74,
+      "validas": 74,
+      "unicas": 74,
+      "duplicadas": 0,
+      "invalidas": 0
+    },
+    {
+      "juego": "palabras",
+      "variante": "general",
+      "id": "impostor:general:palabras",
+      "total": 40,
+      "validas": 40,
+      "unicas": 40,
+      "duplicadas": 0,
+      "invalidas": 0
+    },
+    {
+      "juego": "probable",
+      "variante": "general",
+      "id": "probable:general",
+      "total": 70,
+      "validas": 70,
+      "unicas": 70,
+      "duplicadas": 0,
+      "invalidas": 0
+    },
+    {
+      "juego": "yonunca",
+      "variante": "general",
+      "id": "yonunca:general",
+      "total": 65,
+      "validas": 65,
+      "unicas": 65,
+      "duplicadas": 0,
+      "invalidas": 0
+    },
+    {
+      "juego": "cadena",
+      "variante": "general",
+      "id": "cadena:general",
+      "total": 40,
+      "validas": 40,
+      "unicas": 40,
+      "duplicadas": 0,
+      "invalidas": 0
+    },
+    {
+      "juego": "ranking",
+      "variante": "general",
+      "id": "ranking:general:conjuntos",
+      "total": 30,
+      "validas": 30,
+      "unicas": 30,
+      "duplicadas": 0,
+      "invalidas": 0
+    },
+    {
+      "juego": "trivia",
+      "variante": "general",
+      "id": "trivia:general",
+      "total": 53,
+      "validas": 53,
+      "unicas": 52,
+      "duplicadas": 1,
+      "invalidas": 0
+    },
+    {
+      "juego": "personaje",
+      "variante": "general",
+      "id": "personaje:general",
+      "total": 34,
+      "validas": 34,
+      "unicas": 34,
+      "duplicadas": 0,
+      "invalidas": 0
+    },
+    {
+      "juego": "precio",
+      "variante": "bo:general",
+      "id": "precio:bo:general",
+      "total": 46,
+      "validas": 46,
+      "unicas": 46,
+      "duplicadas": 0,
+      "invalidas": 0
+    },
+    {
+      "juego": "precio",
+      "variante": "latam:general",
+      "id": "precio:latam:general",
+      "total": 39,
+      "validas": 39,
+      "unicas": 39,
+      "duplicadas": 0,
+      "invalidas": 0
+    },
+    {
+      "juego": "precio",
+      "variante": "mx:general",
+      "id": "precio:mx:general",
+      "total": 38,
+      "validas": 38,
+      "unicas": 38,
+      "duplicadas": 0,
+      "invalidas": 0
+    },
+    {
+      "juego": "precio",
+      "variante": "ar:general",
+      "id": "precio:ar:general",
+      "total": 36,
+      "validas": 36,
+      "unicas": 36,
+      "duplicadas": 0,
+      "invalidas": 0
+    },
+    {
+      "juego": "precio",
+      "variante": "es:general",
+      "id": "precio:es:general",
+      "total": 37,
+      "validas": 37,
+      "unicas": 37,
+      "duplicadas": 0,
+      "invalidas": 0
+    },
+    {
+      "juego": "precio",
+      "variante": "us:general",
+      "id": "precio:us:general",
+      "total": 39,
+      "validas": 39,
+      "unicas": 39,
+      "duplicadas": 0,
+      "invalidas": 0
+    }
+  ]
+}

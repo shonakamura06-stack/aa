@@ -1,0 +1,7 @@
+'use strict';
+const {test}=require('node:test'),assert=require('node:assert/strict');
+const {chromium}=require(process.env.PLAYWRIGHT_CORE||'playwright-core');
+test('El marcador global huérfano no desplaza las vistas y el marcador del juego sigue disponible',{timeout:25000},async()=>{
+  const b=await chromium.launch({executablePath:process.env.CHROMIUM_PATH,headless:true,args:['--no-sandbox','--no-zygote','--single-process']});
+  try{const p=await b.newPage({viewport:{width:390,height:844}});await p.goto('http://127.0.0.1:8000/?entrada=off');await p.waitForTimeout(800);await p.evaluate(()=>{V14.settings.gameMode='local';V14.G().teams=[{id:1,name:'Ana',score:0,members:[]},{id:2,name:'Luis',score:0,members:[]}];V14.settings.onboarded.precio=true;V14.openGame('precio')});await p.locator('#precio-stage [data-iniciar-ronda]').click();await p.waitForTimeout(400);const r=await p.evaluate(()=>({huerfano:document.querySelectorAll('body > .sidebar-scoreboard').length,encabezado:document.querySelector('#view-precio .top-header').getBoundingClientRect().top,marcador:!!document.querySelector('#view-precio .sidebar-scoreboard'),fuente:!!document.querySelector('#marcador-heredado-sin-vista').content.querySelector('.sidebar-scoreboard'),desborde:document.documentElement.scrollWidth>innerWidth}));assert.equal(r.huerfano,0);assert.ok(r.encabezado<100,JSON.stringify(r));assert.ok(r.marcador);assert.ok(r.fuente);assert.equal(r.desborde,false)}finally{await b.close()}
+});

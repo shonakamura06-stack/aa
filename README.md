@@ -2,6 +2,8 @@
 
 ## Sintonía (trabajo en curso)
 
+**Auditoría más reciente:** la suite posterior a los cambios terminó 60/62; dos casos no iniciaron por SIGSEGV de Chromium y sus archivos pasaron 4/4 al reintentarlos. El resultado histórico 58/58 mencionado más abajo corresponde a otra ejecución. Ver `reportes/AUDITORIA-SINTONIA.md` para matriz, capturas, inventario y límites. No se ha aprobado la puerta estricta de producción.
+
 El repositorio no contenía la aplicación de Sintonía; `index.html` parte del
 `actual.html` proporcionado por el usuario. La copia intacta se encuentra en
 `recuperacion/actual-original.html` (SHA-256
