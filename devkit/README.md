@@ -120,6 +120,8 @@ Esto se comprueba en `test/tokens.test.mjs`, no se confía.
 | `vdiff` sin cambios | 0 píxeles distintos |
 | `vdiff` tras cambiar un radio | 162 píxeles, exit 2 |
 | Determinismo | dos ejecuciones producen hallazgos idénticos |
+| Lighthouse sobre la interfaz de referencia | performance **100**, accessibility **100**, best-practices 96, SEO **100** · LCP 0,8 s · CLS 0 · TBT 0 ms |
+| CI en GitHub Actions (Chromium del sistema) | ✅ verde: tests + tokens sin deriva + gate de diseño |
 
 ---
 
@@ -146,8 +148,10 @@ devkit/
 
 `.github/workflows/devkit.yml` ejecuta lo que el sandbox no puede:
 
-- matriz Node 20 y 22 sobre Ubuntu,
-- Chromium del sistema (no el binario del sandbox),
+- Node 22 sobre Ubuntu,
+- Chromium del sistema (`browser-actions/setup-chrome`), no el binario del sandbox,
+- las fuentes del repo (`FONT_DIR=toolkit/fonts`), para que las capturas sean idénticas a las locales,
+- anotaciones `::error::` con el detalle de cada hallazgo: el fallo se explica sin abrir los logs,
 - tests, regeneración de tokens con detección de deriva (`git diff --exit-code`),
 - gate de diseño sobre la interfaz de referencia,
 - aviso si se commitea un archivo > 3 MB.

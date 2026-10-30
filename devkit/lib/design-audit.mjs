@@ -132,25 +132,10 @@ const COLLECT = () => {
     horizontalScroll: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
   };
 
-  // ---- foco visible: se enfoca de verdad y se compara el estilo antes/después ----
-  const focusables = [...document.querySelectorAll('a[href],button,input,select,textarea,[tabindex]')]
-    .filter(vis).slice(0, 40);
-  const sig = (el) => {
-    const cs = getComputedStyle(el);
-    return `${cs.outlineStyle}|${cs.outlineWidth}|${cs.outlineColor}|${cs.boxShadow}|${cs.borderColor}|${cs.backgroundColor}`;
+  // el foco se prueba con teclado real desde Puppeteer (ver probeFocus)
+  const focus = {
+    focusables: [...document.querySelectorAll('a[href],button,input,select,textarea,[tabindex]:not([tabindex="-1"])')].length,
   };
-  let withFocusStyle = 0;
-  let probed = 0;
-  for (const el of focusables.slice(0, 8)) {
-    try {
-      const before = sig(el);
-      el.focus({ preventScroll: true });
-      const after = sig(el);
-      probed++;
-      if (before !== after) withFocusStyle++;
-      el.blur();
-    } catch { /* elemento no enfocable */ }
-  }
 
   // ---- densidad ----
   const rects = visible.map((el) => el.getBoundingClientRect());
@@ -166,7 +151,7 @@ const COLLECT = () => {
     fonts, sizes, lineHeights, samples: pairs,
     spacing: { values: spacing, total: pads.length },
     interactive, imgs, headings, inputs, overflow, doc,
-    focus: { focusables: focusables.length, withFocusStyle, probed },
+    focus,
     density: { coverage: Number((area / pageArea).toFixed(3)) },
     meta: {
       description: document.querySelector('meta[name=description]')?.content || null,
@@ -356,11 +341,27 @@ export function analyze(raw, { minTap = 44 } = {}) {
   }
 
   // --- foco ---
-  if (raw.focus.probed > 0 && raw.focus.withFocusStyle === 0) {
+  if (raw.focus?.probed > 0 && raw.focus.withFocusStyle === 0) {
     add('error', 'accesibilidad', 'no-focus',
       'Ningún elemento muestra indicador de foco',
       'Navegación por teclado imposible de seguir. Revisar outline:none sin reemplazo.',
-      `${raw.focus.probed} elementos enfocados, ninguno cambió outline/border/shadow`);
+      `${raw.focus.probed} elementos recorridos con Tab, ninguno muestra indicador`);
+  }
+
+  // --- orden de tabulación ---
+  if (raw.focus?.stuck) {
+    add('error', 'accesibilidad', 'focus-trap',
+      'El foco no avanza al pulsar Tab',
+      'Puede haber un foco atrapado o un elemento que intercepta la navegación.',
+      `último foco: ${raw.focus.order.at(-1)?.tag} "${raw.focus.order.at(-1)?.label}"`);
+  }
+  const sinIndicador = raw.focus?.order?.filter((o) => !o.visible) ?? [];
+  if (sinIndicador.length) {
+    const grave = sinIndicador.length / raw.focus.order.length > 0.5;
+    add(grave ? 'error' : 'warning', 'accesibilidad', 'focus-partial',
+      `${sinIndicador.length} de ${raw.focus.order.length} controles sin indicador de foco al tabular`,
+      'El indicador debe estar en todos, no solo en algunos.',
+      sinIndicador.slice(0, 5).map((o) => `<${o.tag}> "${o.label}"`).join(' | '));
   }
 
   // --- meta ---
@@ -383,6 +384,44 @@ export function analyze(raw, { minTap = 44 } = {}) {
   return { findings, summary: { ...sev, score: Math.round(score) }, raw };
 }
 
+/**
+ * Recorre la página con Tab como un usuario de teclado y mide el indicador de foco real.
+ * `element.focus()` no activa :focus-visible; el teclado sí. Además valida el orden de tabulación.
+ */
+export async function probeFocus(page, steps = 12) {
+  const seq = [];
+  await page.evaluate(() => { document.activeElement?.blur?.(); window.scrollTo(0, 0); });
+  for (let i = 0; i < steps; i++) {
+    await page.keyboard.press('Tab');
+    const info = await page.evaluate(() => {
+      const el = document.activeElement;
+      if (!el || el === document.body) return null;
+      const cs = getComputedStyle(el);
+      const visible =
+        (cs.outlineStyle !== 'none' && parseFloat(cs.outlineWidth) > 0) ||
+        cs.boxShadow !== 'none' ||
+        cs.textDecorationLine.includes('underline');
+      return {
+        tag: el.tagName.toLowerCase(),
+        label: (el.getAttribute('aria-label') || el.textContent || el.getAttribute('placeholder') || '').trim().slice(0, 40),
+        outline: `${cs.outlineStyle} ${cs.outlineWidth} ${cs.outlineColor}`,
+        boxShadow: cs.boxShadow === 'none' ? 'none' : 'sí',
+        visible,
+      };
+    });
+    if (!info) break;
+    seq.push(info);
+  }
+  const conIndicador = seq.filter((x) => x.visible).length;
+  return {
+    focusables: seq.length,
+    probed: seq.length,
+    withFocusStyle: conIndicador,
+    order: seq,
+    stuck: seq.length > 1 && seq[seq.length - 1].label === seq[0].label,
+  };
+}
+
 /** Ejecuta la auditoría completa contra una URL/archivo. */
 export async function auditTarget(page, target) {
   await page.addStyleTag({ content: fontFaceCss() }).catch(() => {});
@@ -390,6 +429,8 @@ export async function auditTarget(page, target) {
   // la medida de línea oscila entre ejecuciones y el informe no es reproducible.
   await page.evaluate(async () => { await document.fonts.ready; });
   await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
-  const raw = await page.evaluate(COLLECT);
+  let raw = await page.evaluate(COLLECT);
+  const focus = await probeFocus(page).catch(() => null);
+  if (focus) raw = { ...raw, focus };
   return analyze(raw);
 }

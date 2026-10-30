@@ -34,7 +34,7 @@ t('detecta los defectos sembrados en la interfaz mala', async () => {
   const ids = new Set(r.findings.map((f) => f.id));
   for (const esperado of [
     'contrast-wcag', 'tap-targets-aa', 'img-alt', 'heading-skip',
-    'h-scroll', 'no-viewport-meta', 'no-lang', 'no-meta-description', 'spacing-no-grid', 'no-focus',
+    'h-scroll', 'no-viewport-meta', 'no-lang', 'no-meta-description', 'spacing-no-grid', 'focus-partial',
   ]) {
     assert.ok(ids.has(esperado), `no detectó ${esperado}. Encontró: ${[...ids].join(', ')}`);
   }
