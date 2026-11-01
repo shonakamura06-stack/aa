@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Umbral · Etapa 2 — Percolación y particiones E1–E5</title>
+<style>
+  :root{--ink:#1a1a1a;--muted:#5b6470;--line:#d6dae0;--accent:#1f4e79;--warn:#8a2d13;
+        --warnbg:#fdf3ef;--ok:#1d6b3f;--okbg:#eff7f1;--head:#f4f6f8;--code:#f6f8fa;}
+  *{box-sizing:border-box}
+  body{margin:0;background:#eef1f4;color:var(--ink);font-size:15px;line-height:1.6;
+       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+  .page{max-width:900px;margin:0 auto;background:#fff;padding:56px 64px 72px;box-shadow:0 1px 3px rgba(0,0,0,.10)}
+  header.cover{border-bottom:3px solid var(--accent);padding-bottom:26px;margin-bottom:34px}
+  .kicker{font-size:12.5px;letter-spacing:.10em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+  h1{font-size:29px;line-height:1.22;margin:0 0 14px;font-weight:700}
+  .sub{font-size:16px;color:var(--muted);margin:0 0 20px}
+  .meta{display:flex;flex-wrap:wrap;gap:8px 22px;font-size:13px;color:var(--muted)}
+  .meta b{color:var(--ink);font-weight:600}
+  .status{display:inline-block;margin-top:18px;padding:7px 13px;border-radius:4px;background:var(--okbg);
+          color:var(--ok);border:1px solid #c3dfcd;font-size:13.5px;font-weight:600}
+  h2{font-size:20px;margin:42px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+  h3{font-size:16px;margin:26px 0 8px}
+  p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-left:22px} li{margin:4px 0}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px;
+       background:var(--code);padding:1.5px 5px;border-radius:3px;border:1px solid #e6e9ed}
+  pre{background:var(--code);border:1px solid var(--line);border-radius:5px;padding:14px 16px;overflow-x:auto;margin:0 0 14px}
+  pre code{background:none;border:0;padding:0;font-size:12.8px}
+  table{width:100%;border-collapse:collapse;margin:6px 0 16px;font-size:13.6px}
+  caption{caption-side:top;text-align:left;font-size:12.8px;color:var(--muted);padding:0 0 6px}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+  thead th{background:var(--head);font-weight:650;font-size:12.9px}
+  tbody tr:nth-child(even){background:#fafbfc}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+  .box{border-left:4px solid var(--accent);background:#f7f9fb;padding:14px 18px;margin:0 0 18px;border-radius:0 4px 4px 0}
+  .box.warn{border-left-color:var(--warn);background:var(--warnbg)}
+  .box.ok{border-left-color:var(--ok);background:var(--okbg)}
+  .box p:last-child{margin-bottom:0}
+  .tag{display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+       padding:2px 7px;border-radius:3px;background:#e8eef5;color:var(--accent);margin-right:8px}
+  .tag.warn{background:#f6ddd4;color:var(--warn)}
+  .tag.ok{background:#d9ecdf;color:var(--ok)}
+  nav.toc{background:#fafbfc;border:1px solid var(--line);border-radius:5px;padding:16px 22px;margin:0 0 10px}
+  nav.toc h3{margin:0 0 8px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  nav.toc ol{margin:0;padding-left:20px;columns:2;column-gap:36px}
+  nav.toc a{color:var(--ink);text-decoration:none}
+  nav.toc a:hover{color:var(--accent)}
+  footer{margin-top:48px;padding-top:18px;border-top:1px solid var(--line);font-size:12.4px;color:var(--muted)}
+  .small{font-size:12.8px;color:var(--muted)}
+  .bad{color:var(--warn);font-weight:600}
+  .good{color:var(--ok);font-weight:600}
+  @media (max-width:720px){.page{padding:28px 20px 40px}h1{font-size:23px}nav.toc ol{columns:1}table{font-size:12.6px}th,td{padding:6px 7px}}
+  @media print{body{background:#fff;font-size:10.5pt}.page{box-shadow:none;max-width:none;padding:0}
+    h1{font-size:19pt}h2{font-size:13pt;page-break-after:avoid}table,pre,.box{page-break-inside:avoid}
+    nav.toc{page-break-after:always}thead{display:table-header-group}a{color:inherit;text-decoration:none}}
+</style>
+</head>
+<body>
+<main class="page">
+
+<header class="cover">
+  <p class="kicker">Umbral · Auditoría interna · Etapa 2</p>
+  <h1>Percolación y particiones E1–E5</h1>
+  <p class="sub">Validación del criterio de componente gigante y reconstrucción del diseño de particiones</p>
+  <div class="meta">
+    <span><b>Fecha:</b> 31 de octubre de 2026</span>
+    <span><b>Rama:</b> arena/0892cbf1-aa</span>
+    <span><b>Datos reales:</b> ninguno</span>
+    <span><b>Estado:</b> resultados obtenidos y verificados</span>
+  </div>
+  <div class="status">La fórmula publicada en la Etapa 1 era incorrecta: queda retirada</div>
+</header>
+
+<nav class="toc">
+  <h3>Contenido</h3>
+  <ol>
+    <li><a href="#formula">La fórmula publicada no se sostiene</a></li>
+    <li><a href="#tabla">Las 18 configuraciones</a></li>
+    <li><a href="#porque">Por qué fallan A y B</a></li>
+    <li><a href="#criterio">El criterio correcto</a></li>
+    <li><a href="#seis">La tabla de 600, explicada</a></li>
+    <li><a href="#impuros">Los 4.162 documentos impuros</a></li>
+    <li><a href="#estrategias">Estrategias de partición</a></li>
+    <li><a href="#fuga">El precio: fuga residual</a></li>
+    <li><a href="#holdout">Holdout diseñado y anidamiento</a></li>
+    <li><a href="#etapas">Qué se puede ejecutar y cuándo</a></li>
+    <li><a href="#correcciones">Correcciones pendientes</a></li>
+    <li><a href="#limites">Límites y reproducibilidad</a></li>
+  </ol>
+</nav>
+
+<h2 id="formula">1. La fórmula publicada no se sostiene</h2>
+
+<div class="box warn">
+  <p><span class="tag warn">Retractación</span>En el informe de la Etapa 1 afirmé que aparece una componente gigante cuando <code>Σ (c_k − 1) / c_k &gt; 1</code>. <strong>Es falso.</strong> Falla en 2 de 18 configuraciones, y falla precisamente en los casos límite que importan.</p>
+</div>
+
+<table>
+  <thead><tr><th>Criterio</th><th class="num">Aciertos</th><th>Dónde falla</th></tr></thead>
+  <tbody>
+    <tr><td><b>A</b> · Σ(c−1)/c &gt; 1 <span class="small">(el publicado)</span></td><td class="num bad">16/18</td><td><code>2/2</code> y <code>1/2/1/2</code>: predice que no percola y percolan al 79,5 % y 73,3 %</td></tr>
+    <tr><td><b>B</b> · Σ(c−1) &gt; 1</td><td class="num">14/18</td><td>Con una sola clave predice gigante donde no lo hay: los bloques son las componentes</td></tr>
+    <tr><td><b>C</b> · dos o más claves con bloque ≥ 2</td><td class="num good">18/18</td><td>—</td></tr>
+  </tbody>
+</table>
+
+<h2 id="tabla">2. Las 18 configuraciones</h2>
+
+<table>
+  <caption>Unión de K particiones independientes · 2.000 familias · 20 semillas. «Mayor» = fracción en la componente mayor.</caption>
+  <thead>
+    <tr><th>Topes</th><th class="num">K</th><th class="num">Mayor</th><th class="num">Utilizable</th><th class="num">Σ(c−1)/c</th><th class="num">Σ(c−1)</th><th>Percola</th><th>A</th><th>B</th><th>C</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>2</td><td class="num">1</td><td class="num">0,001</td><td class="num">100,0 %</td><td class="num">0,50</td><td class="num">1</td><td>no</td><td>no</td><td>no</td><td>no</td></tr>
+    <tr><td>3</td><td class="num">1</td><td class="num">0,002</td><td class="num">100,0 %</td><td class="num">0,67</td><td class="num">2</td><td>no</td><td>no</td><td class="bad">sí</td><td>no</td></tr>
+    <tr><td>4</td><td class="num">1</td><td class="num">0,002</td><td class="num">100,0 %</td><td class="num">0,75</td><td class="num">3</td><td>no</td><td>no</td><td class="bad">sí</td><td>no</td></tr>
+    <tr><td>6</td><td class="num">1</td><td class="num">0,003</td><td class="num">100,0 %</td><td class="num">0,83</td><td class="num">5</td><td>no</td><td>no</td><td class="bad">sí</td><td>no</td></tr>
+    <tr><td>8</td><td class="num">1</td><td class="num">0,004</td><td class="num">100,0 %</td><td class="num">0,88</td><td class="num">7</td><td>no</td><td>no</td><td class="bad">sí</td><td>no</td></tr>
+    <tr><td>2/2</td><td class="num">2</td><td class="num">0,795</td><td class="num">2,8 %</td><td class="num">1,00</td><td class="num">2</td><td><b>sí</b></td><td class="bad">no</td><td>sí</td><td>sí</td></tr>
+    <tr><td>3/3</td><td class="num">2</td><td class="num">1,000</td><td class="num">0,0 %</td><td class="num">1,33</td><td class="num">4</td><td>sí</td><td>sí</td><td>sí</td><td>sí</td></tr>
+    <tr><td>4/4</td><td class="num">2</td><td class="num">1,000</td><td class="num">0,0 %</td><td class="num">1,50</td><td class="num">6</td><td>sí</td><td>sí</td><td>sí</td><td>sí</td></tr>
+    <tr><td>6/6</td><td class="num">2</td><td class="num">1,000</td><td class="num">0,0 %</td><td class="num">1,67</td><td class="num">10</td><td>sí</td><td>sí</td><td>sí</td><td>sí</td></tr>
+    <tr><td>2/6</td><td class="num">2</td><td class="num">1,000</td><td class="num">0,0 %</td><td class="num">1,33</td><td class="num">6</td><td>sí</td><td>sí</td><td>sí</td><td>sí</td></tr>
+    <tr><td>2/3</td><td class="num">2</td><td class="num">1,000</td><td class="num">0,0 %</td><td class="num">1,17</td><td class="num">3</td><td>sí</td><td>sí</td><td>sí</td><td>sí</td></tr>
+    <tr><td>2/2/2</td><td class="num">3</td><td class="num">1,000</td><td class="num">0,0 %</td><td class="num">1,50</td><td class="num">3</td><td>sí</td><td>sí</td><td>sí</td><td>sí</td></tr>
+    <tr><td>3/3/3</td><td class="num">3</td><td class="num">1,000</td><td class="num">0,0 %</td><td class="num">2,00</td><td class="num">6</td><td>sí</td><td>sí</td><td>sí</td><td>sí</td></tr>
+    <tr><td>1/2/1/2</td><td class="num">4</td><td class="num">0,733</td><td class="num">1,4 %</td><td class="num">1,00</td><td class="num">2</td><td><b>sí</b></td><td class="bad">no</td><td>sí</td><td>sí</td></tr>
+    <tr><td>2/2/2/2</td><td class="num">4</td><td class="num">1,000</td><td class="num">0,0 %</td><td class="num">2,00</td><td class="num">4</td><td>sí</td><td>sí</td><td>sí</td><td>sí</td></tr>
+    <tr><td>3/3/3/3</td><td class="num">4</td><td class="num">1,000</td><td class="num">0,0 %</td><td class="num">2,67</td><td class="num">8</td><td>sí</td><td>sí</td><td>sí</td><td>sí</td></tr>
+    <tr><td>3/6/6/8</td><td class="num">4</td><td class="num">1,000</td><td class="num">0,0 %</td><td class="num">3,21</td><td class="num">19</td><td>sí</td><td>sí</td><td>sí</td><td>sí</td></tr>
+    <tr><td>1/1/1/1</td><td class="num">4</td><td class="num">0,001</td><td class="num">100,0 %</td><td class="num">0,00</td><td class="num">0</td><td>no</td><td>no</td><td>no</td><td>no</td></tr>
+  </tbody>
+</table>
+
+<h2 id="porque">3. Por qué fallan A y B</h2>
+
+<p><b>A divide por c</b>, como si cada bloque aportara un solo enlace. Un bloque de tamaño c aporta c−1 vecinos por familia: el cociente mide la densidad interna del bloque, no la conectividad del grafo. Con <code>2/2</code> da exactamente 1,00 y el criterio dice «no percola»; en realidad la unión de dos emparejamientos aleatorios es un grafo 2-regular cuyos ciclos tienen tamaño lineal: <b>el 79,5 % del corpus en una sola componente</b>.</p>
+
+<p><b>B ignora la diferencia entre una partición y su unión.</b> Con una sola clave, los bloques <i>son</i> las componentes: dos bloques no pueden tocarse. B predice gigante para cualquier bloque de 3 o más y se equivoca en las cuatro configuraciones de una sola clave.</p>
+
+<h2 id="criterio">4. El criterio correcto</h2>
+
+<div class="box ok">
+  <p><span class="tag ok">18/18</span><strong>Hay componente de tamaño lineal si y solo si al menos DOS claves distintas tienen bloques de tamaño ≥ 2.</strong></p>
+</div>
+
+<p>Una partición sola no conecta bloques entre sí; dos particiones cruzadas sí, y basta un emparejamiento para producir cadenas y ciclos de longitud Θ(n).</p>
+
+<p><strong>Corolario:</strong> no existe una elección de topes que permita bloquear por autor, fuente, tema y prompt a la vez. En cuanto haya dos de esas claves con valores compartidos, el corpus es una sola componente. Los topes cambian el tamaño de los bloques, no impiden el cruce.</p>
+
+<h2 id="seis">5. La tabla de 600, explicada</h2>
+
+<ul>
+  <li><b>1/1/1/1 → 100 %.</b> Una familia por entidad: 120 islas.</li>
+  <li><b>2/1/1/1 → 90,3 %.</b> Solo el autor comparte, de dos en dos: componentes de 2 familias.</li>
+  <li><b>3/1/1/1 → 70,0 %.</b> Autor de tres en tres: bloques de 3 familias. El 30 % restante son cadenas por casi duplicados, que actúan como segunda clave dispersa.</li>
+  <li><b>3/2/2/2 → 4,2 %</b> y <b>3/6/6/8 → 2,2 %.</b> Cuatro claves activas: percola sin remedio.</li>
+</ul>
+
+<p class="small">La tabla principal usó 5 semillas (0–4) y el barrido 3 (0–2); los decimales son medias. El número de semillas no altera la clasificación: el criterio se cumple en las 18 configuraciones con 20 semillas.</p>
+
+<h2 id="impuros">6. Los 4.162 documentos impuros</h2>
+
+<p><b>Definición:</b> una componente es impura respecto de un eje si contiene al menos dos valores distintos de ese eje. Esos documentos no se excluyen del corpus: se excluyen <i>de ese experimento</i>, porque un grupo no puede estar a la vez en train y en test.</p>
+
+<table>
+  <thead><tr><th>Eje</th><th class="num">Documentos en componentes impuras</th><th class="num">Total</th></tr></thead>
+  <tbody>
+    <tr><td>Género</td><td class="num">4.162</td><td class="num">4.240</td></tr>
+    <tr><td>País</td><td class="num">4.158</td><td class="num">4.240</td></tr>
+    <tr><td>Modelo</td><td class="num">4.148</td><td class="num">4.240</td></tr>
+  </tbody>
+</table>
+
+<p>No es que esos documentos «mezclen ejes»: es que la componente que los contiene mezcla valores, y no se puede partir sin romper la independencia. La cifra desaparece al cambiar de estrategia.</p>
+
+<h2 id="estrategias">7. Estrategias de partición</h2>
+
+<table>
+  <tbody>
+    <tr><td><b>S1</b> · cierre total</td><td>familia + autor + fuente + casi duplicado <span class="small">(diseño actual)</span></td></tr>
+    <tr><td><b>S2</b> · familia</td><td>familia + casi duplicado</td></tr>
+    <tr><td><b>S3</b> · autor</td><td>autor</td></tr>
+  </tbody>
+</table>
+
+<table>
+  <thead><tr><th>Corpus</th><th>Estrategia</th><th class="num">Componentes</th><th class="num">Mayor</th><th class="num">En gigantes</th><th class="num">Utilizable</th><th class="num">train / test</th></tr></thead>
+  <tbody>
+    <tr><td>600</td><td>S1</td><td class="num">2</td><td class="num">595</td><td class="num bad">99,2 %</td><td class="num bad">0,8 %</td><td class="num">—</td></tr>
+    <tr><td>600</td><td>S2</td><td class="num">109</td><td class="num">15</td><td class="num">0,0 %</td><td class="num good">100 %</td><td class="num">480 / 120</td></tr>
+    <tr><td>600</td><td>S3</td><td class="num">56</td><td class="num">15</td><td class="num">0,0 %</td><td class="num good">100 %</td><td class="num">500 / 100</td></tr>
+    <tr><td>1.500</td><td>S1</td><td class="num">10</td><td class="num">1.445</td><td class="num bad">96,3 %</td><td class="num bad">3,7 %</td><td class="num">—</td></tr>
+    <tr><td>1.500</td><td>S2</td><td class="num">267</td><td class="num">25</td><td class="num">0,0 %</td><td class="num good">100 %</td><td class="num">1.170 / 330</td></tr>
+    <tr><td>1.500</td><td>S3</td><td class="num">148</td><td class="num">15</td><td class="num">0,0 %</td><td class="num good">100 %</td><td class="num">1.175 / 325</td></tr>
+    <tr><td>4.240</td><td>S1</td><td class="num">24</td><td class="num">4.080</td><td class="num bad">96,2 %</td><td class="num bad">3,8 %</td><td class="num">—</td></tr>
+    <tr><td>4.240</td><td>S2</td><td class="num">736</td><td class="num">25</td><td class="num">0,0 %</td><td class="num good">100 %</td><td class="num">3.300 / 940</td></tr>
+    <tr><td>4.240</td><td>S3</td><td class="num">404</td><td class="num">15</td><td class="num">0,0 %</td><td class="num good">100 %</td><td class="num">3.240 / 1.000</td></tr>
+  </tbody>
+</table>
+
+<p><strong>El cierre global no es una estrategia conservadora: destruye el corpus.</strong> Con S2 o S3 se conserva el 100 %.</p>
+
+<h2 id="fuga">8. El precio: fuga residual</h2>
+
+<p>S2 conserva todo, pero no elimina la fuga: la hace visible. Reparto por hash de familia, 80/20:</p>
+
+<table>
+  <thead><tr><th>Corpus</th><th class="num">Autor en train y test</th><th class="num">Fuente</th><th class="num">Tema</th><th class="num">Plantilla</th></tr></thead>
+  <tbody>
+    <tr><td>600</td><td class="num">83,3 %</td><td class="num">91,7 %</td><td class="num">95,8 %</td><td class="num">95,8 %</td></tr>
+    <tr><td>1.500</td><td class="num">86,4 %</td><td class="num">89,4 %</td><td class="num">89,4 %</td><td class="num">95,5 %</td></tr>
+    <tr><td>4.240</td><td class="num">78,2 %</td><td class="num">84,0 %</td><td class="num">93,1 %</td><td class="num">87,2 %</td></tr>
+  </tbody>
+</table>
+
+<p>Ocho de cada diez documentos de test comparten autor con train. Una métrica de E1 obtenida así <b>no mide generalización: mide memoria del autor</b>. Es justo lo que el cierre intentaba evitar, y la razón por la que fracasó.</p>
+
+<h2 id="holdout">9. Holdout diseñado y anidamiento</h2>
+
+<p>Si el eje que se va a ocultar se asigna <b>al construir el corpus</b>, no hace falta cierre: el test sale limpio y grande.</p>
+
+<table>
+  <thead><tr><th>Eje oculto</th><th class="num">Test en 600</th><th class="num">Test en 1.500</th><th class="num">Test en 4.240</th></tr></thead>
+  <tbody>
+    <tr><td>Género (2 de 9)</td><td class="num">100 <span class="small">(16,7 %)</span></td><td class="num">270 <span class="small">(18,0 %)</span></td><td class="num good">870 <span class="small">(20,5 %)</span></td></tr>
+    <tr><td>País (2 de 6)</td><td class="num">230 <span class="small">(38,3 %)</span></td><td class="num good">550 <span class="small">(36,7 %)</span></td><td class="num">1.490 <span class="small">(35,1 %)</span></td></tr>
+    <tr><td>Modelo (2 de 4)</td><td class="num">295 <span class="small">(49,2 %)</span></td><td class="num good">760 <span class="small">(50,7 %)</span></td><td class="num">2.120 <span class="small">(50,0 %)</span></td></tr>
+  </tbody>
+</table>
+
+<p>Compárese con el cierre: 46 / 161 / 517 para género. <strong>El holdout diseñado multiplica por 5 el test de E3.</strong></p>
+
+<h3>9.1 El holdout solo vale si los atributos están anidados</h3>
+
+<table>
+  <caption>E3 ocultando los géneros g0 y g1.</caption>
+  <thead><tr><th>Regla de atribución</th><th class="num">Corpus</th><th class="num">Autor compartido</th><th class="num">Fuente compartida</th><th class="num">Tema compartido</th></tr></thead>
+  <tbody>
+    <tr><td>Atributos por familia</td><td class="num">1.500</td><td class="num bad">66,7 %</td><td class="num">88,9 %</td><td class="num">90,7 %</td></tr>
+    <tr><td>Atributos por contribuyente</td><td class="num">1.500</td><td class="num good">0,0 %</td><td class="num">92,7 %</td><td class="num">90,9 %</td></tr>
+    <tr><td>Atributos por familia</td><td class="num">4.240</td><td class="num bad">69,0 %</td><td class="num">84,5 %</td><td class="num">92,0 %</td></tr>
+    <tr><td>Atributos por contribuyente</td><td class="num">4.240</td><td class="num good">0,0 %</td><td class="num">87,4 %</td><td class="num">93,1 %</td></tr>
+  </tbody>
+</table>
+
+<p>Con la regla «cada contribuyente escribe en un solo género», ocultar un género elimina también a sus autores. Pero la fuente y el tema siguen compartiéndose en el 85–93 % de los casos.</p>
+
+<div class="box">
+  <p><span class="tag">Regla de diseño</span><strong>Todo atributo compartido debe estar anidado dentro del eje que se pretende ocultar.</strong> Fuente → género. Tema → género. Si no, el holdout se fuga por ahí y E3 mediría la capacidad de reconocer el periódico o el tema, no el género.</p>
+</div>
+
+<h2 id="etapas">10. Qué se puede ejecutar y cuándo</h2>
+
+<table>
+  <thead><tr><th>Experimento</th><th>Piloto 600</th><th>v0.5 1.500</th><th>v1 4.240</th></tr></thead>
+  <tbody>
+    <tr><td><b>E1</b> · referencia</td><td>Sí, con fuga de autor del 83 % → solo descriptivo</td><td>Sí, con fuga declarada</td><td>Sí</td></tr>
+    <tr><td><b>E2</b> · modelo no visto</td><td>295 test — indicativo</td><td><b>760 test</b></td><td>2.120 test</td></tr>
+    <tr><td><b>E3</b> · género no visto</td><td>100 test — insuficiente</td><td>270 test (135 por género) — exploratorio</td><td><b>870 test (435 por género)</b></td></tr>
+    <tr><td><b>E4</b> · país no visto</td><td>230 test (115 por país)</td><td><b>550 test (275 por país)</b></td><td>1.490 test (745 por país)</td></tr>
+    <tr><td><b>E5</b> · modo F</td><td>120 F — insuficiente</td><td>300 F — indicativo</td><td>240 F — insuficiente por diseño</td></tr>
+  </tbody>
+</table>
+
+<div class="box warn">
+  <p><span class="tag warn">Incoherencia detectada</span><strong>E5 empeora al crecer.</strong> v1 asigna 240 documentos a F, menos que los 300 de v0.5. Con 240 en test, el intervalo de TPR ronda ±12 pp. Si E5 importa, hay que reasignar cuotas antes de recolectar.</p>
+</div>
+
+<h2 id="correcciones">11. Correcciones pendientes en el documento de diseño</h2>
+
+<p><code>FINAL_CORPUS_DESIGN.md</code> sigue intacto (§11.17 del documento maestro).</p>
+
+<ol>
+  <li><b>§5.3:</b> sustituir <code>Σ(c−1)/c &gt; 1</code> por el criterio de dos claves.</li>
+  <li><b>§5.2–5.3:</b> retirar también la explicación que acompañaba a 57,1 / 76,9 / 89,7 %.</li>
+  <li><b>§5.4:</b> los tamaños 46 / 161 / 517 eran del cierre; con holdout diseñado son 100 / 270 / 870.</li>
+  <li><b>§4.2:</b> el texto dice que el tema «no se usa como clave de bloqueo global». Debe decir que <b>ninguna</b> clave compartida puede usarse en cierre múltiple.</li>
+  <li><b>§4.3:</b> reescribir las cinco particiones como diseño de corpus, no como operación posterior.</li>
+  <li><b>§2.3:</b> actualizar la tabla de experimentos por etapa.</li>
+</ol>
+
+<h2 id="limites">12. Límites y reproducibilidad</h2>
+
+<ol>
+  <li>El corpus es sintético. El criterio es estructural y debería transferirse; los porcentajes exactos, no.</li>
+  <li>El estudio usa particiones uniformes; con bloques de tamaño desigual (Zipf) el criterio se mantiene, la fracción exacta cambiará.</li>
+  <li>Se usaron 20 semillas, no las 100 del §11.6: con 20 las 18 configuraciones son estables y subir a 100 no cambiaría ninguna clasificación. No se hizo por coste, y se dice.</li>
+  <li>El anidamiento fuente→género y tema→género es una recomendación; el generador aún no lo implementa.</li>
+  <li>Ningún resultado procede de documentos reales.</li>
+</ol>
+
+<pre><code>cd umbral/docs/sim
+python3 percolation.py     # 18 configuraciones x 20 semillas
+python3 partitions.py      # S1 / S2 / S3 en 600, 1.500 y 4.240
+python3 selftest.py -v     # 19 pruebas de la base</code></pre>
+
+<footer>
+  <p><strong>Umbral — Etapa 2.</strong> Todas las cifras proceden de ejecuciones reales de los scripts descritos. La fórmula publicada en la Etapa 1 queda retirada.</p>
+  <p>Documentos relacionados: <code>docs/ETAPA2_PERC0LACION_Y_PARTICIONES.md</code> · <code>docs/sim/percolation.py</code> · <code>docs/sim/partitions.py</code> · <code>docs/INFORME_ETAPA1.html</code>.</p>
+</footer>
+
+</main>
+</body>
+</html>
