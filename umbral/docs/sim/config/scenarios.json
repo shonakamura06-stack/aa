@@ -1,0 +1,15 @@
+{
+  "note": "Escenarios reconstruidos. n_docs debe ser divisible por versions_per_family.",
+  "scenarios": [
+    {"name": "piloto_600", "n_docs": 600},
+    {"name": "v05_1500", "n_docs": 1500},
+    {"name": "v1_4240", "n_docs": 4240},
+    {
+      "name": "piloto_600_sin_topes",
+      "n_docs": 600,
+      "generator_overrides": {
+        "caps": {"author_id": 1000, "source_document_id": 1000, "topic_cluster": 1000, "prompt_template_id": 1000}
+      }
+    }
+  ]
+}

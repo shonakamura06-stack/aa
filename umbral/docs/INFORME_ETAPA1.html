@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Umbral · Auditoría Etapa 1 — Reconstrucción de la simulación Union-Find</title>
+<style>
+  :root{
+    --ink:#1a1a1a; --muted:#5b6470; --line:#d6dae0; --bg:#ffffff;
+    --accent:#1f4e79; --warn:#8a2d13; --warnbg:#fdf3ef; --ok:#1d6b3f; --okbg:#eff7f1;
+    --head:#f4f6f8; --code:#f6f8fa;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; padding:0; background:#eef1f4; color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    font-size:15px; line-height:1.6;
+  }
+  .page{
+    max-width:900px; margin:0 auto; background:var(--bg); padding:56px 64px 72px;
+    box-shadow:0 1px 3px rgba(0,0,0,.10);
+  }
+  header.cover{border-bottom:3px solid var(--accent); padding-bottom:26px; margin-bottom:34px}
+  .kicker{font-size:12.5px; letter-spacing:.10em; text-transform:uppercase; color:var(--muted); margin:0 0 10px}
+  h1{font-size:29px; line-height:1.22; margin:0 0 14px; font-weight:700; letter-spacing:-.01em}
+  .sub{font-size:16px; color:var(--muted); margin:0 0 20px}
+  .meta{display:flex; flex-wrap:wrap; gap:8px 22px; font-size:13px; color:var(--muted)}
+  .meta b{color:var(--ink); font-weight:600}
+  .status{
+    display:inline-block; margin-top:18px; padding:7px 13px; border-radius:4px;
+    background:var(--warnbg); color:var(--warn); border:1px solid #e7c7bb;
+    font-size:13.5px; font-weight:600;
+  }
+  h2{font-size:20px; margin:42px 0 12px; padding-bottom:6px; border-bottom:1px solid var(--line); font-weight:700}
+  h3{font-size:16px; margin:26px 0 8px; font-weight:650}
+  p{margin:0 0 12px}
+  ul,ol{margin:0 0 14px; padding-left:22px}
+  li{margin:4px 0}
+  code,kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace; font-size:13px;
+    background:var(--code); padding:1.5px 5px; border-radius:3px; border:1px solid #e6e9ed}
+  pre{background:var(--code); border:1px solid var(--line); border-radius:5px; padding:14px 16px;
+    overflow-x:auto; margin:0 0 14px; line-height:1.5}
+  pre code{background:none; border:0; padding:0; font-size:12.8px}
+  table{width:100%; border-collapse:collapse; margin:6px 0 16px; font-size:13.6px}
+  caption{caption-side:top; text-align:left; font-size:12.8px; color:var(--muted); padding:0 0 6px}
+  th,td{border:1px solid var(--line); padding:7px 10px; text-align:left; vertical-align:top}
+  thead th{background:var(--head); font-weight:650; font-size:12.9px}
+  tbody tr:nth-child(even){background:#fafbfc}
+  td.num,th.num{text-align:right; font-variant-numeric:tabular-nums}
+  .box{border-left:4px solid var(--accent); background:#f7f9fb; padding:14px 18px; margin:0 0 18px; border-radius:0 4px 4px 0}
+  .box.warn{border-left-color:var(--warn); background:var(--warnbg)}
+  .box.ok{border-left-color:var(--ok); background:var(--okbg)}
+  .box p:last-child{margin-bottom:0}
+  .box h3{margin-top:0}
+  .tag{display:inline-block; font-size:11.5px; font-weight:700; letter-spacing:.04em; text-transform:uppercase;
+    padding:2px 7px; border-radius:3px; background:#e8eef5; color:var(--accent); margin-right:8px; vertical-align:1px}
+  .tag.warn{background:#f6ddd4; color:var(--warn)}
+  .tag.ok{background:#d9ecdf; color:var(--ok)}
+  nav.toc{background:#fafbfc; border:1px solid var(--line); border-radius:5px; padding:16px 22px; margin:0 0 10px}
+  nav.toc h3{margin:0 0 8px; font-size:13px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted)}
+  nav.toc ol{margin:0; padding-left:20px; columns:2; column-gap:36px}
+  nav.toc a{color:var(--ink); text-decoration:none; border-bottom:1px solid transparent}
+  nav.toc a:hover{border-bottom-color:var(--accent); color:var(--accent)}
+  footer{margin-top:48px; padding-top:18px; border-top:1px solid var(--line); font-size:12.4px; color:var(--muted)}
+  .small{font-size:12.8px; color:var(--muted)}
+  .nowrap{white-space:nowrap}
+  @media (max-width:720px){
+    .page{padding:28px 20px 40px}
+    h1{font-size:23px}
+    nav.toc ol{columns:1}
+    table{font-size:12.6px}
+    th,td{padding:6px 7px}
+  }
+  @media print{
+    body{background:#fff; font-size:10.5pt}
+    .page{box-shadow:none; max-width:none; padding:0}
+    h1{font-size:19pt} h2{font-size:13pt; page-break-after:avoid} h3{page-break-after:avoid}
+    table,pre,.box{page-break-inside:avoid}
+    nav.toc{page-break-after:always}
+    a{color:inherit; text-decoration:none}
+    thead{display:table-header-group}
+  }
+</style>
+</head>
+<body>
+<main class="page">
+
+<header class="cover">
+  <p class="kicker">Umbral · Auditoría interna · Etapa 1</p>
+  <h1>Reconstrucción de la simulación Union-Find</h1>
+  <p class="sub">Verificación de reproducibilidad y hallazgo de percolación en el diseño de particiones</p>
+  <div class="meta">
+    <span><b>Fecha:</b> 31 de octubre de 2026</span>
+    <span><b>Rama:</b> arena/0892cbf1-aa</span>
+    <span><b>Entorno:</b> Python 3.11.2, biblioteca estándar</span>
+    <span><b>Alcance:</b> 4 archivos de código · 3 de configuración · 19 pruebas</span>
+  </div>
+  <div class="status">Estado: reconstrucción verificada · documento de diseño pendiente de revisión</div>
+</header>
+
+<nav class="toc">
+  <h3>Contenido</h3>
+  <ol>
+    <li><a href="#resumen">Resumen del hallazgo</a></li>
+    <li><a href="#archivos">Archivos creados</a></li>
+    <li><a href="#requisitos">Requisitos y cumplimiento</a></li>
+    <li><a href="#correcciones">Correcciones al script perdido</a></li>
+    <li><a href="#parametros">Parámetros</a></li>
+    <li><a href="#resultados">Resultados</a></li>
+    <li><a href="#percolacion">Por qué colapsa el corpus</a></li>
+    <li><a href="#ejes">Reparto por eje</a></li>
+    <li><a href="#pruebas">Pruebas realizadas</a></li>
+    <li><a href="#comandos">Comandos de reproducción</a></li>
+    <li><a href="#supuestos">Supuestos no recuperados</a></li>
+    <li><a href="#limites">Límites</a></li>
+  </ol>
+</nav>
+
+<h2 id="resumen">1. Resumen del hallazgo</h2>
+
+<div class="box warn">
+  <p><span class="tag warn">Cambio de conclusión</span><strong>Los porcentajes de documentos utilizables del §5 del documento de diseño no se reproducen.</strong> Dependían de un defecto del script original: al alcanzar un tope, renombraba entidades con sufijos aleatorios, creando autores y fuentes inexistentes que fragmentaban el grafo.</p>
+  <p>Con topes aplicados honestamente, el corpus percola: <strong>entre el 97 % y el 98 % de los documentos cae en una sola componente</strong> en los tres tamaños, y el porcentaje utilizable baja del 57,1 % declarado al <strong>2,2 %</strong>.</p>
+</div>
+
+<p>La causa no es un error de implementación. Es una propiedad matemática del cierre transitivo: aparece una componente gigante en cuanto el grado medio de enlaces por familia supera 1. Cuatro claves compartidas con topes de 2 ya suman 2,0. <strong>Ninguna combinación realista de dos o más claves compartidas permite una partición.</strong></p>
+
+<p>Consecuencia directa: los experimentos <strong>E2–E5 no son ejecutables</strong> con este diseño de particiones, ni en el piloto ni en v1, porque las componentes mezclan los ejes que se pretende ocultar.</p>
+
+<h2 id="archivos">2. Archivos creados</h2>
+
+<table>
+  <caption>Todo en <code>umbral/docs/sim/</code>. Python estándar, sin instalaciones.</caption>
+  <thead><tr><th>Archivo</th><th>Función</th><th class="num">Líneas</th></tr></thead>
+  <tbody>
+    <tr><td><code>uf_core.py</code></td><td>Union-Find, componentes, cuantiles R-7, estadísticos, pureza por eje, fingerprint</td><td class="num">175</td></tr>
+    <tr><td><code>generator.py</code></td><td>Corpus sintético con topes respetados sin inventar entidades; registro de exclusiones</td><td class="num">234</td></tr>
+    <tr><td><code>run_sim.py</code></td><td>Ejecutor: escenarios × semillas × conjuntos de claves; tablas y JSON</td><td class="num">265</td></tr>
+    <tr><td><code>selftest.py</code></td><td>19 pruebas: determinismo, topes, registro, umbrales, pureza</td><td class="num">210</td></tr>
+    <tr><td><code>README.md</code></td><td>Reconstrucción, parámetros, comandos, límites</td><td class="num">—</td></tr>
+    <tr><td><code>config/base.json</code></td><td>Parámetros, claves de identidad, umbrales, supuestos perdidos</td><td class="num">—</td></tr>
+    <tr><td><code>config/scenarios.json</code></td><td>600 · 1.500 · 4.240 · variante sin topes</td><td class="num">—</td></tr>
+    <tr><td><code>config/sweep_caps.json</code></td><td>Barrido de topes para localizar la percolación</td><td class="num">—</td></tr>
+  </tbody>
+</table>
+
+<p class="small">Ningún módulo ejecuta nada al importarse; la ejecución está en <code>main()</code>. <code>FINAL_CORPUS_DESIGN.md</code> no se ha modificado en esta etapa (424 líneas, SHA-256 <code>db89838c…</code>).</p>
+
+<h2 id="requisitos">3. Requisitos y cumplimiento</h2>
+
+<table>
+  <thead><tr><th>Requisito</th><th>Implementación</th><th>Estado</th></tr></thead>
+  <tbody>
+    <tr><td>Código identificado como reconstrucción</td><td>Cabecera de cada archivo; <code>reconstruction: true</code> en la salida</td><td class="nowrap">Cumple</td></tr>
+    <tr><td>Semillas configurables, resultados deterministas</td><td><code>--seeds</code>; generadores derivados con SHA-256</td><td>Cumple</td></tr>
+    <tr><td>Sin entidades artificiales al alcanzar un tope</td><td>Muestreo solo entre entidades con capacidad; si no hay, <code>ConfigError</code></td><td>Cumple</td></tr>
+    <tr><td>Exclusiones y rechazos registrados</td><td><code>capacity_errors</code>, <code>near_dup</code>, <code>entities_at_cap</code>, <code>draws_with_saturation</code></td><td>Cumple</td></tr>
+    <tr><td>Importar no ejecuta simulación</td><td><code>if __name__ == "__main__"</code> en los cuatro módulos</td><td>Cumple</td></tr>
+    <tr><td>Configuración separada del código</td><td><code>config/*.json</code>; el código no contiene parámetros</td><td>Cumple</td></tr>
+    <tr><td>Claves de identidad configurables</td><td><code>identity_key_sets</code> y <code>--key-set</code></td><td>Cumple</td></tr>
+    <tr><td>Umbrales de gigante 3 %, 5 %, 10 %</td><td><code>giant_thresholds</code> y <code>--thresholds</code></td><td>Cumple</td></tr>
+    <tr><td>Instrucciones de ejecución</td><td>README §6 y §10 de este informe</td><td>Cumple</td></tr>
+    <tr><td>Reproducibilidad comprobada</td><td>Mismo fingerprint con <code>PYTHONHASHSEED</code> distinto; JSON idéntico byte a byte</td><td>Cumple</td></tr>
+  </tbody>
+</table>
+
+<h2 id="correcciones">4. Correcciones al script perdido</h2>
+
+<p>Tres defectos del original, documentados porque <strong>cambian los resultados</strong>:</p>
+
+<table>
+  <thead><tr><th>Defecto</th><th>Qué hacía</th><th>Corrección</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>Topes falsos</td>
+      <td>Al superar un tope, renombraba la entidad con sufijo aleatorio (<code>s12__4821</code>), creando autores y fuentes inexistentes y fragmentando el grafo</td>
+      <td>El tope se aplica antes de asignar; sin capacidad, aborta</td>
+    </tr>
+    <tr>
+      <td>Casi duplicados inertes</td>
+      <td>Guardaba en un documento el identificador de otro; ese valor no coincidía con el de ningún tercero, así que el par nunca se fusionaba</td>
+      <td>Ambos documentos comparten un <code>near_dup_cluster</code> explícito</td>
+    </tr>
+    <tr>
+      <td>Cuantiles sin interpolar</td>
+      <td><code>int(p·n)</code>, que sesga p90 y p95 a la baja</td>
+      <td>Interpolación lineal (R-7)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="parametros">5. Parámetros</h2>
+
+<table>
+  <thead><tr><th>Parámetro</th><th>Valor</th><th>Origen y fiabilidad</th></tr></thead>
+  <tbody>
+    <tr><td><code>versions_per_family</code></td><td>5</td><td>Documento de diseño · fiable</td></tr>
+    <tr><td><code>zipf_exponent</code></td><td>1,2</td><td>Recordado del transcript · <strong>no verificable</strong></td></tr>
+    <tr><td><code>pool_fractions</code></td><td>0,70 / 0,45 / 0,30 / 0,35</td><td>Recordado · <strong>no verificable</strong></td></tr>
+    <tr><td><code>caps</code> (autor / fuente / tema / prompt)</td><td>3 / 6 / 6 / 8</td><td>Documento de diseño</td></tr>
+    <tr><td><code>near_dup_probability</code></td><td>0,03</td><td>Documento de diseño</td></tr>
+    <tr><td><code>contribution_rule</code></td><td><code>per_family</code></td><td>Alternativa <code>per_contributor</code> implementada</td></tr>
+    <tr><td>Ejes</td><td>género 9 · país 6 · modelo 4; se ocultan 2</td><td>Documento de diseño</td></tr>
+    <tr><td>Semillas</td><td>0–4 (5); barrido 0–2</td><td>—</td></tr>
+  </tbody>
+</table>
+
+<p class="small">Enteros en <code>caps</code> = tope absoluto de familias por entidad. Flotantes en (0,1) = fracción de familias (mínimo 2), forma que usaba el original.</p>
+
+<h2 id="resultados">6. Resultados</h2>
+
+<h3>6.1 Escenarios principales · 5 semillas · claves de identidad</h3>
+
+<table>
+  <caption>Tamaños de componente en documentos. «En gigantes» = porcentaje de documentos en componentes mayores que el umbral indicado.</caption>
+  <thead>
+    <tr><th>Escenario</th><th class="num">Componentes</th><th class="num">Mediana</th><th class="num">p90</th><th class="num">p95</th><th class="num">Mayor</th><th class="num">En gigantes 3 / 5 / 10 %</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Piloto 600</td><td class="num">2,8</td><td class="num">182,0</td><td class="num">485,2</td><td class="num">537,1</td><td class="num">589,0</td><td class="num">98,2 / 98,2 / 98,2 %</td></tr>
+    <tr><td>v0.5 · 1.500</td><td class="num">7,6</td><td class="num">5,0</td><td class="num">505,7</td><td class="num">980,9</td><td class="num">1.456,0</td><td class="num">97,1 / 97,1 / 97,1 %</td></tr>
+    <tr><td>v1 · 4.240</td><td class="num">20,4</td><td class="num">5,0</td><td class="num">14,0</td><td class="num">388,1</td><td class="num">4.112,0</td><td class="num">97,0 / 97,0 / 97,0 %</td></tr>
+    <tr><td>Piloto sin topes</td><td class="num">3,0</td><td class="num">124,0</td><td class="num">473,0</td><td class="num">531,0</td><td class="num">589,0</td><td class="num">98,2 / 98,2 / 98,2 %</td></tr>
+  </tbody>
+</table>
+
+<p><strong>La mediana engaña.</strong> En v1 la mediana es de 5 documentos porque la mayoría de componentes son diminutas, pero una sola concentra 4.112 de 4.240. Publicar «mediana 5» sin el tamaño de la mayor sería precisamente el error que este trabajo intenta evitar.</p>
+
+<p>Añadiendo <code>topic_cluster</code> a las claves de identidad, el corpus cae a 1,0–1,6 componentes; añadiendo también <code>prompt_template_id</code>, a 1,0 en los tres tamaños.</p>
+
+<h3>6.2 Barrido de topes · 600 documentos · 3 semillas</h3>
+
+<table>
+  <caption>Grado medio = Σ (c−1)/c sobre las claves de bloqueo: número esperado de enlaces por familia.</caption>
+  <thead>
+    <tr><th>Topes (autor/fuente/tema/prompt)</th><th class="num">Grado medio</th><th class="num">Componentes</th><th class="num">Mayor</th><th class="num">% gigante @5 %</th><th class="num">% utilizable</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>1 / 1 / 1 / 1</td><td class="num">0,00</td><td class="num">105,0</td><td class="num">18,3</td><td class="num">0,0 %</td><td class="num"><strong>100,0 %</strong></td></tr>
+    <tr><td>2 / 1 / 1 / 1</td><td class="num">0,50</td><td class="num">54,3</td><td class="num">45,0</td><td class="num">9,7 %</td><td class="num">90,3 %</td></tr>
+    <tr><td>3 / 1 / 1 / 1</td><td class="num">0,67</td><td class="num">42,3</td><td class="num">68,3</td><td class="num">30,0 %</td><td class="num">70,0 %</td></tr>
+    <tr><td>3 / 2 / 2 / 2</td><td class="num">2,17</td><td class="num">3,3</td><td class="num">575,0</td><td class="num">95,8 %</td><td class="num"><strong>4,2 %</strong></td></tr>
+    <tr><td>3 / 6 / 6 / 8 <span class="small">(los del diseño)</span></td><td class="num">3,21</td><td class="num">3,3</td><td class="num">586,7</td><td class="num">97,8 %</td><td class="num"><strong>2,2 %</strong></td></tr>
+  </tbody>
+</table>
+
+<h2 id="percolacion">7. Por qué colapsa el corpus</h2>
+
+<p>Una componente gigante aparece en cuanto el grado medio supera 1. Ese valor no depende del tamaño del corpus, sino del número de claves compartidas y de sus topes:</p>
+
+<ul>
+  <li>Cuatro claves con tope 1 → 0,00 enlaces por familia: todas las familias aisladas.</li>
+  <li>Una clave con tope 2 y tres con tope 1 → 0,50: subcrítico, componentes pequeñas.</li>
+  <li>Dos claves con tope 2 → ya supera 1: percola.</li>
+  <li>Los topes del diseño (3/6/6/8) → 3,21: una componente se lleva casi todo.</li>
+</ul>
+
+<p>El comportamiento observado es exactamente el que predice la teoría de grafos aleatorios: la transición entre 0,67 y 2,17 es abrupta, no gradual. <strong>No se corrige con topes más finos</strong>, sino bajando el grado medio por debajo de 1, lo que exige dejar una sola clave compartida o hacer las demás únicas por familia.</p>
+
+<div class="box">
+  <p><span class="tag">Consecuencia de diseño</span>El problema no está en el algoritmo de partición ni en la implementación: está en suponer que se puede bloquear por autor, fuente, tema y prompt a la vez y conservar un corpus conectado pero divisible. Ambas cosas son incompatibles.</p>
+</div>
+
+<h2 id="ejes">8. Reparto por eje</h2>
+
+<p>Con cierre transitivo, las componentes mezclan valores del eje y quedan inservibles para el experimento correspondiente:</p>
+
+<table>
+  <thead><tr><th>Escenario</th><th>Eje</th><th class="num">Train</th><th class="num">Test</th><th class="num">Impuras</th></tr></thead>
+  <tbody>
+    <tr><td>Piloto 600</td><td>género</td><td class="num">5</td><td class="num">2</td><td class="num">591</td></tr>
+    <tr><td>Piloto 600</td><td>país</td><td class="num">7</td><td class="num">2</td><td class="num">591</td></tr>
+    <tr><td>v1 · 4.240</td><td>género</td><td class="num">63</td><td class="num">15</td><td class="num">4.162</td></tr>
+    <tr><td>v1 · 4.240</td><td>país</td><td class="num">50</td><td class="num">32</td><td class="num">4.158</td></tr>
+  </tbody>
+</table>
+
+<p>Los tamaños «E3 test ≈ 46 · 161 · 517» del documento de diseño procedían del script con topes falsos y no se sostienen. Con el generador corregido, el test de cualquier experimento por eje queda en decenas de documentos, no en centenares.</p>
+
+<h2 id="pruebas">9. Pruebas realizadas</h2>
+
+<div class="box ok">
+  <p><span class="tag ok">19 / 19</span><strong>Todas las pruebas pasan</strong> en 0,65 s con <code>python3 selftest.py -v</code>.</p>
+</div>
+
+<table>
+  <thead><tr><th>Grupo</th><th>Qué verifica</th></tr></thead>
+  <tbody>
+    <tr><td>Union-Find</td><td>Unión, idempotencia, componentes por clave, valores vacíos que no enlazan</td></tr>
+    <tr><td>Cuantiles</td><td>Valores conocidos, interpolación estricta entre estadísticos de orden</td></tr>
+    <tr><td>Topes</td><td>Máximo de familias por entidad ≤ tope; ausencia de sufijos <code>__</code>; <code>ConfigError</code> si no hay capacidad; corpus indivisible rechazado</td></tr>
+    <tr><td>Determinismo</td><td>Misma semilla → corpus idéntico; semillas distintas → distinto; <strong><code>PYTHONHASHSEED=0</code> vs <code>=1</code> en procesos separados → mismo fingerprint</strong></td></tr>
+    <tr><td>Sin efectos al importar</td><td>stdout y stderr vacíos al importar los tres módulos</td></tr>
+    <tr><td>Registro</td><td>Errores de capacidad vacíos; casi duplicados contabilizados; el par queda realmente enlazado</td></tr>
+    <tr><td>Umbrales</td><td>Monotonía 3 % ≥ 5 % ≥ 10 %; complementariedad exacta gigante/utilizable</td></tr>
+    <tr><td>Pureza</td><td>Componentes impuras excluidas del reparto train/test</td></tr>
+  </tbody>
+</table>
+
+<h3>Fingerprint de control</h3>
+<pre><code>--seeds 0,1,2,3,4 · config/scenarios.json · experimentos activados
+569e9cc2b55c4dc8171ca9d287195586aa0321544dd790605757e4589d743678</code></pre>
+<p class="small">Si una ejecución produce otro valor, algo cambió. El fingerprint cubre solo las medias; para auditar el registro por semilla hay que usar <code>--json-out</code>.</p>
+
+<h2 id="comandos">10. Comandos de reproducción</h2>
+
+<pre><code>cd umbral/docs/sim
+
+# 1. Pruebas (19)
+python3 selftest.py -v
+
+# 2. Escenarios principales, 5 semillas, con registro del generador
+python3 run_sim.py --seeds 0,1,2,3,4 --show-log
+
+# 3. Barrido de topes (localiza la percolación)
+python3 run_sim.py --scenarios config/sweep_caps.json --seeds 0,1,2 --key-set identidad
+
+# 4. Un solo umbral y un solo conjunto de claves
+python3 run_sim.py --seeds 0 --thresholds 0.05 --key-set identidad
+
+# 5. Salida JSON para comparar ejecuciones
+python3 run_sim.py --seeds 0,1,2,3,4 --format json --json-out /tmp/sim.json
+
+# 6. Comprobación entre procesos con distinto hash
+PYTHONHASHSEED=0 python3 run_sim.py --seeds 0,1,2,3,4 --format json > /tmp/a.json
+PYTHONHASHSEED=1 python3 run_sim.py --seeds 0,1,2,3,4 --format json > /tmp/b.json
+cmp /tmp/a.json /tmp/b.json &amp;&amp; echo "idénticos"</code></pre>
+
+<p>Duración: unos 1,7 s para 5 semillas × 4 escenarios × 3 conjuntos de claves.</p>
+
+<h2 id="supuestos">11. Supuestos que no se pudieron recuperar</h2>
+
+<p>No se han inventado: están en <code>missing_assumptions</code> de <code>config/base.json</code> y se aplican como valores configurables.</p>
+
+<ul>
+  <li>Exponente Zipf exacto (se usa 1,2, recordado del transcript).</li>
+  <li>Fracciones de pool (0,70 / 0,45 / 0,30 / 0,35): recordadas, no verificables.</li>
+  <li>Semántica original de los topes: se desconoce si el renombrado era un error o una intención.</li>
+  <li>Semántica original de los casi duplicados: probablemente rota, sin forma de saber qué pretendía.</li>
+  <li>Número de semillas por bloque (15 o 20 según el bloque, sin registro de cuál usó cuál).</li>
+  <li>Función de cuantiles original: se sabe lo que hacía, no por qué.</li>
+  <li>Orden de asignación de claves dentro de una misma semilla.</li>
+</ul>
+
+<h2 id="limites">12. Límites</h2>
+
+<ol>
+  <li><strong>El corpus es sintético.</strong> Describe el comportamiento del algoritmo bajo supuestos plausibles; no dice nada sobre documentos reales.</li>
+  <li><strong>Los resultados no coinciden con los del documento de diseño, y no deben coincidir</strong>: el original tenía los topes rotos.</li>
+  <li><strong>El generador asigna atributos de forma independiente entre familias.</strong> En un corpus real, temas y plantillas de prompt están más concentrados, lo que haría la percolación más probable, no menos.</li>
+  <li><strong>El barrido se ejecutó con 3 semillas</strong>, no con 5; la transición es lo bastante marcada como para no necesitar más.</li>
+</ol>
+
+<footer>
+  <p><strong>Umbral — Auditoría Etapa 1.</strong> Informe generado a partir de la ejecución real de los scripts descritos; ninguna cifra procede de una estimación.</p>
+  <p>Documento de diseño asociado: <code>umbral/docs/FINAL_CORPUS_DESIGN.md</code>, 424 líneas, SHA-256 <code>db89838c…</code>, no modificado en esta etapa.<br>
+  Scripts: <code>sim/uf_core.py</code> · <code>sim/generator.py</code> · <code>sim/run_sim.py</code> · <code>sim/selftest.py</code>.</p>
+</footer>
+
+</main>
+</body>
+</html>

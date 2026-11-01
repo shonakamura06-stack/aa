@@ -1,0 +1,18 @@
+{
+  "note": "Barrido de topes para localizar el punto de percolacion. Solo configuracion; los pools se amplian cuando el tope es 1 para que exista capacidad.",
+  "scenarios": [
+    {"name": "caps_1_1_1_1", "n_docs": 600, "generator_overrides": {
+      "pool_fractions": {"author_id": 1.05, "source_document_id": 1.05, "topic_cluster": 1.05, "prompt_template_id": 1.05},
+      "caps": {"author_id": 1, "source_document_id": 1, "topic_cluster": 1, "prompt_template_id": 1}}},
+    {"name": "caps_2_1_1_1", "n_docs": 600, "generator_overrides": {
+      "pool_fractions": {"author_id": 0.70, "source_document_id": 1.05, "topic_cluster": 1.05, "prompt_template_id": 1.05},
+      "caps": {"author_id": 2, "source_document_id": 1, "topic_cluster": 1, "prompt_template_id": 1}}},
+    {"name": "caps_3_1_1_1", "n_docs": 600, "generator_overrides": {
+      "pool_fractions": {"author_id": 0.70, "source_document_id": 1.05, "topic_cluster": 1.05, "prompt_template_id": 1.05},
+      "caps": {"author_id": 3, "source_document_id": 1, "topic_cluster": 1, "prompt_template_id": 1}}},
+    {"name": "caps_3_2_2_2", "n_docs": 600, "generator_overrides": {
+      "pool_fractions": {"author_id": 0.70, "source_document_id": 0.55, "topic_cluster": 0.55, "prompt_template_id": 0.55},
+      "caps": {"author_id": 3, "source_document_id": 2, "topic_cluster": 2, "prompt_template_id": 2}}},
+    {"name": "caps_3_6_6_8", "n_docs": 600}
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "note": "RECONSTRUCCION de la simulacion Union-Find perdida. No es el codigo original. Ver README.md.",
+  "seeds": [0, 1, 2, 3, 4],
+  "giant_thresholds": [0.03, 0.05, 0.10],
+  "generator": {
+    "versions_per_family": 5,
+    "zipf_exponent": 1.2,
+    "pool_fractions": {
+      "author_id": 0.70,
+      "source_document_id": 0.45,
+      "topic_cluster": 0.30,
+      "prompt_template_id": 0.35
+    },
+    "caps": {
+      "author_id": 3,
+      "source_document_id": 6,
+      "topic_cluster": 6,
+      "prompt_template_id": 8
+    },
+    "near_dup_probability": 0.03,
+    "contribution_rule": "per_family",
+    "mode_cycle": ["A", "B", "C", "D", "E", "F"],
+    "axes": {
+      "genre": {"values": 9, "prefix": "g", "holdout": 2},
+      "country": {"values": 6, "prefix": "c", "holdout": 2},
+      "model_family": {"values": 4, "prefix": "m", "holdout": 2}
+    }
+  },
+  "identity_key_sets": {
+    "identidad": ["family_id", "author_id", "source_document_id", "near_dup_cluster"],
+    "identidad+tema": ["family_id", "author_id", "source_document_id", "near_dup_cluster", "topic_cluster"],
+    "identidad+tema+prompt": ["family_id", "author_id", "source_document_id", "near_dup_cluster", "topic_cluster", "prompt_template_id"]
+  },
+  "missing_assumptions": [
+    "Exponente Zipf exacto del script original: se usa 1.2, recordado del transcript, no verificable.",
+    "Fracciones de pool (0.70/0.45/0.30/0.35): recordadas del transcript, no verificables.",
+    "Semantica original de los topes: renombraba valores con sufijos aleatorios, de modo que el tope no se respetaba. Irreconstruible si era un error o una intencion.",
+    "Semantica original de casi duplicados: enlazaba documento -> id de otro documento, lo que casi nunca fusionaba nada. No se sabe si pretendia agrupar.",
+    "Numero de semillas por bloque: 15 o 20 segun el bloque, sin registro de cual uso cual.",
+    "Funcion de cuantiles original: estadistico de orden sin interpolar; aqui se interpola (R-7).",
+    "Orden de asignacion de claves dentro de una misma semilla: no consta."
+  ]
+}
