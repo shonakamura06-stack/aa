@@ -1,0 +1,56 @@
+TAP version 13
+# Subtest: Lobby fijo 1366x655: controles, jugadores y esquina de Netlify
+ok 1 - Lobby fijo 1366x655: controles, jugadores y esquina de Netlify
+  ---
+  duration_ms: 4411.341385
+  type: 'test'
+  ...
+# Subtest: Lobby fijo 360x800: controles, jugadores y esquina de Netlify
+ok 2 - Lobby fijo 360x800: controles, jugadores y esquina de Netlify
+  ---
+  duration_ms: 4285.278692
+  type: 'test'
+  ...
+# Subtest: Lobby fijo 320x700: controles, jugadores y esquina de Netlify
+ok 3 - Lobby fijo 320x700: controles, jugadores y esquina de Netlify
+  ---
+  duration_ms: 3872.654861
+  type: 'test'
+  ...
+# Subtest: Lobby fijo 740x360: controles, jugadores y esquina de Netlify
+not ok 4 - Lobby fijo 740x360: controles, jugadores y esquina de Netlify
+  ---
+  duration_ms: 3551.123642
+  type: 'test'
+  location: '/home/user/aa/tests/lobby-compacto.cjs:7:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    la lista conserva su posición al actualizarse
+    
+    0 !== 817
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 817
+  actual: 0
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/home/user/aa/tests/lobby-compacto.cjs:21:238)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: Lobby de servidor conserva invitación, gestión y botones de participantes
+ok 5 - Lobby de servidor conserva invitación, gestión y botones de participantes
+  ---
+  duration_ms: 7193.958747
+  type: 'test'
+  ...
+1..5
+# tests 5
+# suites 0
+# pass 4
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 23663.29085

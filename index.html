@@ -34315,15 +34315,135 @@ body.v40-solo #hub-view .hub-card:is([data-game="dial"],[data-game="tabu"],[data
 body.v40-solo #hub-view .hub-card:is([data-game="dial"],[data-game="tabu"],[data-game="probable"],[data-game="impostor"])::after{content:'Necesita más jugadores';display:block;margin-top:8px;font-size:11px;font-weight:800;color:#504e49}
 .v40-necesita{padding:18px;border-radius:16px;background:#fffae9;border:1px solid #e9ca80;box-shadow:0 0 0 4px rgba(232,195,106,.18);color:#342c20;line-height:1.5}
 .v40-necesita b{display:block;font-size:17px;margin-bottom:6px}.v40-necesita p{margin:0 0 12px}
-#v40-sala-previa{position:fixed;inset:0;z-index:5000;overflow:auto;background:#f7f5ef;color:#102943;padding:clamp(12px,2.5vw,30px)}
-#v40-sala-previa .v40-sala-inner{max-width:1500px;margin:auto}
-#v40-sala-previa header{display:flex;align-items:center;justify-content:space-between;gap:14px;background:#fffdfa;border:1px solid #e6e2d8;border-radius:15px;padding:16px 20px;margin-bottom:14px}
-#v40-sala-previa h1{font-size:clamp(21px,3vw,30px);margin:3px 0;color:#102943}#v40-sala-previa p{margin:0;color:#607080;font-size:13px}#v40-sala-previa small{color:#208879;font-weight:800;letter-spacing:.13em}
-#v40-sala-previa button{font:inherit;font-weight:800;cursor:pointer;border:1px solid #cfd9d9;background:#fff;border-radius:10px;padding:10px 15px;color:#173c4b}
-#v40-local-form{background:#fffdfa;border:1px solid #e6e2d8;border-radius:15px;padding:15px 20px;margin-bottom:14px}#v40-local-form[hidden]{display:none}#v40-local-form label{display:block;font-weight:800;margin-bottom:8px}#v40-local-form div{display:flex;gap:8px}#v40-local-nombre{min-width:0;flex:1;font:inherit;padding:10px;border:1px solid #cbd4d0;border-radius:9px}#v40-local-parejas{background:#fffdfa;border:1px solid #e6e2d8;border-radius:15px;padding:14px 20px;margin-bottom:14px}#v40-local-parejas[hidden]{display:none}#v40-local-parejas label{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-top:8px}#v40-local-parejas select{font:inherit;padding:6px;border:1px solid #cbd4d0;border-radius:8px}
-#v40-sala-previa #v44-espera{padding:18px;margin:0;background:#fffdfa}#v40-sala-previa .s51-grid{grid-template-columns:minmax(210px,1fr) minmax(0,2fr)}#v40-sala-previa .s51-players{min-height:260px;background:#fafaf7;border:1px solid #e6e2d8;padding:14px;border-radius:12px}
-#v40-sala-previa footer{position:sticky;bottom:0;z-index:2;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 14px;background:#f7f5ef;border-top:1px solid #e3ded2;color:#607080;font-size:13px}#v40-sala-previa #v40-sala-jugar{background:#198b78;color:white;border:0;padding:14px 32px}
-@media(max-width:700px){#v40-sala-previa header{align-items:flex-start}#v40-sala-previa .s51-grid{grid-template-columns:1fr}#v40-sala-previa .s51-players{min-height:120px}#v40-sala-previa footer{flex-wrap:wrap}#v40-sala-jugar{width:100%}}
+/* Sala previa: la mesa permanece fija; las listas largas tienen su propio desplazamiento. */
+#v40-sala-previa{position:fixed;inset:0;z-index:5000;overflow:hidden;background:#f4f3ed;color:#102f3c;padding:clamp(10px,1.5vw,22px);box-sizing:border-box}
+#v40-sala-previa *{box-sizing:border-box}
+#v40-sala-previa .v40-sala-inner{max-width:1500px;height:100%;margin:auto;display:flex;flex-direction:column;gap:10px;min-height:0}
+#v40-sala-previa header{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:10px 14px;background:#fffdfa;border:1px solid #e6e2d8;border-radius:14px;flex:none}
+#v40-sala-previa h1{font-size:clamp(20px,2.2vw,28px);line-height:1.1;margin:3px 0;color:#102f3c}
+#v40-sala-previa p{margin:0;color:#60767a;font-size:13px;line-height:1.35}
+#v40-sala-previa header small{color:#208879;font-weight:800;letter-spacing:.13em;font-size:10px}
+#v40-sala-previa button{font:inherit;font-weight:800;cursor:pointer;border:1px solid #cfdedb;background:#fff;border-radius:10px;padding:9px 12px;color:#173c4b}
+#v40-sala-previa button:focus-visible,#v40-sala-previa summary:focus-visible,#v40-sala-previa input:focus-visible,#v40-sala-previa select:focus-visible{outline:3px solid #b8862f;outline-offset:2px}
+#v40-local-form{background:#fffdfa;border:1px solid #e6e2d8;border-radius:12px;padding:8px 12px;flex:none}
+#v40-local-form[hidden],#v40-local-parejas[hidden]{display:none}
+#v40-local-form label{display:block;font-size:12px;font-weight:800;margin-bottom:5px}
+#v40-local-form div{display:flex;gap:8px}
+#v40-local-nombre{min-width:0;flex:1;font:inherit;padding:8px 10px;border:1px solid #cbd4d0;border-radius:9px}
+#v40-local-parejas{flex:none;max-height:min(34vh,240px);overflow:auto;background:#fffdfa;border:1px solid #e6e2d8;border-radius:12px;padding:8px 12px;font-size:12px}
+#v40-local-parejas summary{cursor:pointer;font-weight:800;color:#176e63}
+#v40-local-parejas p{margin:4px 0;font-size:12px}
+#v40-local-parejas b{display:block;margin-top:10px}
+#v40-local-parejas label{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-top:6px}
+#v40-local-parejas select{font:inherit;padding:6px;border:1px solid #cbd4d0;border-radius:8px}
+#v40-sala-contenido{min-height:0;flex:1;display:flex}
+#v40-sala-previa #v44-espera{display:flex;flex:1;flex-direction:column;min-width:0;min-height:0;margin:0;padding:12px;background:#fffdfa;border:1px solid #e5e5dc;border-radius:15px;box-shadow:0 8px 24px rgba(38,73,65,.04)}
+#v40-sala-previa .s51-top{flex:none;gap:7px;margin:0 0 10px;padding:0 0 10px}
+#v40-sala-previa .s51-title{font-size:14px;color:#143f3c}
+#v40-sala-previa .s51-code{font-size:14px;padding:5px 9px}
+#v40-sala-previa .s51-topacts{gap:6px}
+#v40-sala-previa .s51-topacts .s51-btn{font-size:12px;padding:8px 11px}
+#v40-sala-previa .s51-grid{flex:1;min-height:0;display:grid;grid-template-columns:minmax(210px,260px) minmax(0,1fr);gap:10px;align-items:stretch}
+#v40-sala-previa .s51-col{min-height:0;overflow:auto;overscroll-behavior:contain}
+#v40-sala-previa .s51-panel{gap:6px;padding:12px}
+#v40-sala-previa .s51-status-menu{min-height:0;overflow:auto}
+#v40-sala-previa .s51-admin-menu{flex:none}
+#v40-sala-previa .s51-status-menu,#v40-sala-previa .s51-admin-menu{background:#f7faf7;border:1px solid #dbe8e2;border-radius:12px}
+#v40-sala-previa .s51-status-menu summary,#v40-sala-previa .s51-admin-menu summary{padding:11px 12px;font-size:12px;font-weight:800;color:#176e63;cursor:pointer}
+#v40-sala-previa .s51-status-menu .s51-status,#v40-sala-previa .s51-admin-menu .s51-admin{border:0;background:transparent;padding:0 10px 10px}
+#v40-sala-previa .s51-status-menu .s51-status > .s51-h:first-child{display:none}
+#v40-sala-previa .s51-admin-menu .s51-rows{gap:6px}
+#v40-sala-previa .s51-admin-menu button{font-size:12px;text-align:left;padding:8px 10px}
+#v40-sala-previa .s51-players{min-height:0;min-width:0;overflow:auto;overscroll-behavior:contain;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,280px),1fr));gap:8px;align-content:start;background:#f3f8f4;border:1px solid #deebe3;padding:10px;border-radius:12px}
+#v40-sala-previa .s51-players::before{content:'PARTICIPANTES';grid-column:1/-1;font-size:10px;font-weight:900;letter-spacing:.12em;color:#66827a;padding:2px 3px}
+#v40-sala-previa .v44-slot{min-width:0;min-height:64px;padding:8px;gap:8px;border:1px solid #d9e7df;border-radius:11px;background:#fff;box-shadow:0 2px 7px rgba(26,72,59,.04)}
+#v40-sala-previa .v44-slot.list{background:#fff;border-color:#b9decf}
+#v40-sala-previa .v44-slot.on{box-shadow:inset 3px 0 #d6b462,0 2px 7px rgba(26,72,59,.04)}
+#v40-sala-previa .v44-state{top:7px;right:7px}
+#v40-sala-previa button.v44-ava{width:40px;height:40px;flex:0 0 40px;display:grid;place-items:center;padding:0;border:0;border-radius:10px;background:#e8f5ed;font-size:21px;line-height:1}
+#v40-sala-previa .v44-info{display:flex;flex:1 1 auto;min-width:0;flex-direction:column;gap:2px}
+#v40-sala-previa .v44-name{min-width:0;width:100%;font-size:14px;color:#143b38}
+#v40-sala-previa .v44-state-label{font-size:10px;font-weight:700;color:#87765b;line-height:1.1}
+#v40-sala-previa .v44-state-label.ok{color:#15816c}
+#v40-sala-previa .v44-state-label.off{color:#8a8279}
+#v40-sala-previa .v44-pts{font-size:11px;padding:4px 7px;background:#f4f0e5;color:#77684b}
+#v40-sala-previa .v44-pts::after{content:' pts'}
+#v40-sala-previa .v44-acts{gap:4px;margin-right:4px}
+#v40-sala-previa button.v44-ico{width:34px;height:36px;display:grid;place-items:center;padding:0;border-radius:9px;color:#667e78}
+#v40-sala-previa button.v44-ico svg{width:16px;height:16px}
+/* Dejar el aviso por encima de la insignia externa sin cambiar avisos durante los juegos. */
+body:has(#v40-sala-previa) #v-toasts{bottom:calc(80px + env(safe-area-inset-bottom,0px))!important}
+#v40-sala-previa footer{position:static;z-index:auto;display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:12px;min-height:58px;padding:4px 190px 4px 0;background:transparent;border:0;color:#60767a;font-size:12px;flex:none}
+#v40-sala-previa #v40-sala-aviso{grid-column:2;grid-row:1;line-height:1.3}
+#v40-sala-previa #v40-sala-jugar{grid-column:1;grid-row:1;background:#198b78;color:white;border:0;padding:12px 28px;min-height:44px;white-space:nowrap}
+@media(max-width:700px){
+ #v40-sala-previa{padding:10px}
+ #v40-sala-previa .v40-sala-inner{gap:8px}
+ #v40-sala-previa header{padding:8px 10px;gap:8px}
+ #v40-sala-previa h1{font-size:18px}
+ #v40-sala-previa header p{font-size:11px}
+ #v40-sala-previa header button{font-size:11px;padding:8px;flex:none}
+ #v40-sala-previa #v44-espera{padding:9px}
+ #v40-sala-previa .s51-grid{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr)}
+ #v40-sala-previa .s51-col{max-height:26vh;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:7px}
+ #v40-sala-previa .s51-status{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 10px;padding:8px}
+ #v40-sala-previa .s51-status .s51-h,#v40-sala-previa .s51-status .s51-big,#v40-sala-previa .s51-status .s51-bar,#v40-sala-previa .s51-status .s51-sep,#v40-sala-previa .s51-status .s51-log,#v40-sala-previa .s51-status .s51-wait{grid-column:1/-1}
+ #v40-sala-previa .s51-status .s51-log{max-height:30px;overflow:auto}
+ #v40-sala-previa .s51-status .s51-big{font-size:15px}
+ #v40-sala-previa .s51-status-menu,#v40-sala-previa .s51-admin-menu{min-width:0}
+ #v40-sala-previa .s51-status-menu summary,#v40-sala-previa .s51-admin-menu summary{padding:9px;font-size:11px}
+ #v40-sala-previa .s51-players{grid-template-columns:1fr;padding:8px}
+ #v40-sala-previa .s51-topacts{width:auto;margin-left:auto}
+ #v40-sala-previa footer{grid-template-columns:minmax(0,1fr) 180px;gap:5px;min-height:0;padding:0}
+ #v40-sala-previa #v40-sala-aviso{grid-column:1/-1;grid-row:1}
+ #v40-sala-previa #v40-sala-jugar{grid-column:1;grid-row:2;padding:10px 12px}
+}
+@media(max-width:420px){
+ #v40-sala-previa .v44-slot{display:grid;grid-template-columns:40px minmax(0,1fr) auto;grid-template-areas:"avatar nombre nombre" "avatar puntos acciones";column-gap:8px;row-gap:3px;min-height:92px}
+ #v40-sala-previa .v44-ava{grid-area:avatar}
+ #v40-sala-previa .v44-info{grid-area:nombre;padding-right:12px}
+ #v40-sala-previa .v44-pts{grid-area:puntos;justify-self:start}
+ #v40-sala-previa .v44-acts{grid-area:acciones}
+}
+@media(max-height:560px){
+ #v40-sala-previa .v40-sala-inner{gap:5px}
+ #v40-sala-previa header{padding:5px 10px}
+ #v40-sala-previa h1{font-size:19px}
+ #v40-sala-previa header p{display:none}
+ #v40-sala-previa header small{display:none}
+ #v40-sala-previa .s51-col{max-height:none}
+ #v40-sala-previa .s51-status .s51-log{max-height:22px}
+ #v40-sala-previa #v44-espera{padding:6px}
+ #v40-sala-previa .s51-top{padding-bottom:5px;margin-bottom:5px}
+ #v40-sala-previa footer{min-height:44px;padding-top:0;padding-bottom:0}
+ #v40-local-form:not([hidden]){display:flex;align-items:center;gap:8px;padding:5px 9px}
+ #v40-local-form label{margin:0;max-width:180px;line-height:1.2}
+ #v40-local-form div{flex:1;min-width:0}
+ #v40-local-parejas{padding:5px 9px}
+}
+@media(min-height:561px) and (max-height:650px) and (max-width:480px){
+ #v40-sala-previa .v40-sala-inner{gap:5px}
+ #v40-sala-previa header small{display:none}
+ #v40-sala-previa header{padding:6px 9px}
+ #v40-sala-previa #v44-espera{padding:6px}
+ #v40-sala-previa .s51-top{padding-bottom:5px;margin-bottom:5px}
+ #v40-local-form{padding:5px 9px}
+ #v40-local-parejas{padding:5px 9px}
+}
+@media(max-height:560px) and (max-width:700px){#v40-sala-previa .s51-col{max-height:24vh}}
+@media(max-height:560px) and (max-width:480px){
+ #v40-local-form:not([hidden]){display:block}
+ #v40-local-form label{max-width:none;margin:0 0 3px}
+}
+/* Con teclado virtual o altura extrema se permite un desplazamiento de emergencia. */
+@media(max-height:340px){
+ #v40-sala-previa{overflow:auto}
+ #v40-sala-previa .v40-sala-inner{height:auto;min-height:100%}
+ #v40-sala-contenido{flex:none}
+ #v40-sala-previa #v44-espera{min-height:180px}
+ #v40-sala-previa .s51-grid{min-height:110px}
+ #v40-sala-previa .s51-players{max-height:160px}
+}
 </style>
 <script id="v40-entrada-modos">
 /* ============================================================================
@@ -34639,8 +34759,9 @@ body.v40-solo #hub-view .hub-card:is([data-game="dial"],[data-game="tabu"],[data
     lugarSala = document.createComment('sala de espera'); original.parentNode.insertBefore(lugarSala, original);
     salaPrevia = document.createElement('section'); salaPrevia.id = 'v40-sala-previa';
     salaPrevia.innerHTML = '<div class="v40-sala-inner"><header><div><small>SINTONÍA</small><h1>Preparar la partida</h1><p id="v40-sala-ayuda"></p></div><button type="button" id="v40-sala-modo">Cambiar modo</button></header>'+
-      '<form id="v40-local-form"><label for="v40-local-nombre">Agregar participante en este dispositivo</label><div><input id="v40-local-nombre" maxlength="20" autocomplete="off" placeholder="Nombre del participante"><button type="submit">Agregar</button></div></form><section id="v40-local-parejas" hidden></section><div id="v40-sala-contenido"></div><footer><span id="v40-sala-aviso" role="status"></span><button type="button" id="v40-sala-jugar">JUGAR →</button></footer></div>';
+      '<form id="v40-local-form"><label for="v40-local-nombre">Agregar participante en este dispositivo</label><div><input id="v40-local-nombre" maxlength="20" autocomplete="off" placeholder="Nombre del participante"><button type="submit">Agregar</button></div></form><details id="v40-local-parejas" hidden><summary>Elegir parejas y equipos</summary><div id="v40-local-parejas-contenido"></div></details><div id="v40-sala-contenido"></div><footer><span id="v40-sala-aviso" role="status"></span><button type="button" id="v40-sala-jugar">JUGAR →</button></footer></div>';
     document.body.appendChild(salaPrevia); salaPrevia.querySelector('#v40-sala-contenido').appendChild(original);
+    if (V.__v44api) V.__v44api.pintar();
     salaPrevia.querySelector('#v40-local-form').onsubmit = function(e) { e.preventDefault(); var input=$('v40-local-nombre'); if (modo()==='solo' && V.G().teams.length) { V.toast('En modo solo participa una persona.', 'warn'); return; } if (V.__v44api.agregar(input.value)) { input.value=''; input.focus(); actualizarSalaPrevia(); } };
     salaPrevia.querySelector('#v40-sala-modo').onclick = function(){ abrirPortada(); };
     salaPrevia.querySelector('#v40-sala-jugar').onclick = function(){
@@ -34664,7 +34785,7 @@ body.v40-solo #hub-view .hub-card:is([data-game="dial"],[data-game="tabu"],[data
     var firma=JSON.stringify(equipos.map(function(t){return [t.name,t.dialEquipo,t.tabuEquipo]}));
     if(local && pares.dataset.firma!==firma){
       pares.dataset.firma=firma;
-      pares.innerHTML='<b>Parejas de El Dial (opcional ahora)</b><p>Si van a jugar El Dial, elijan la misma pareja para dos personas. No se asignan automáticamente.</p>'+equipos.map(function(t,i){
+      $('v40-local-parejas-contenido').innerHTML='<b>Parejas de El Dial (opcional ahora)</b><p>Si van a jugar El Dial, elijan la misma pareja para dos personas. No se asignan automáticamente.</p>'+equipos.map(function(t,i){
         return '<label><span>'+esc(t.name)+'</span><select data-par="'+i+'" aria-label="Pareja de '+esc(t.name)+'"><option value="">Sin pareja</option>'+Array.from({length:6},function(_,k){return '<option value="'+(k+1)+'"'+(t.dialEquipo===k+1?' selected':'')+'>Pareja '+(k+1)+'</option>'}).join('')+'</select></label>';
       }).join('') + '<b>Equipos de Tabú (opcional ahora)</b><p>Elijan el mismo equipo para compartir sus puntos; no se forman automáticamente.</p>' + equipos.map(function(t,i){return '<label><span>'+esc(t.name)+'</span><select data-tabu-equipo="'+i+'" aria-label="Equipo Tabú de '+esc(t.name)+'"><option value="">Sin equipo</option>'+Array.from({length:6},function(_,k){return '<option value="'+(k+1)+'"'+(t.tabuEquipo===k+1?' selected':'')+'>Equipo '+(k+1)+'</option>'}).join('')+'</select></label>';}).join('');
       pares.querySelectorAll('[data-tabu-equipo]').forEach(function(sel){sel.onchange=function(){var t=V.G().teams[Number(sel.dataset.tabuEquipo)];if(!t)return;t.tabuEquipo=sel.value?Number(sel.value):null;try{if(V.saveSessionNow)V.saveSessionNow();}catch(e){};actualizarSalaPrevia();};});
@@ -36301,6 +36422,12 @@ body.v40-solo #hub-view .hub-card:is([data-game="dial"],[data-game="tabu"],[data
       var marca = body.querySelector('.hub-scoreboard') || body.querySelector('.hub-grid') || null;
       if (marca) body.insertBefore(el, marca); else body.insertBefore(el, body.firstChild);
     }
+    var enSalaPrevia = !!el.closest('#v40-sala-previa');
+    var menuAbierto = !!(el.querySelector('.s51-admin-menu') && el.querySelector('.s51-admin-menu').open);
+    var estadoAnterior = el.querySelector('.s51-status-menu');
+    var estadoAbierto = estadoAnterior ? estadoAnterior.open : window.matchMedia('(min-width:701px) and (min-height:561px)').matches;
+    var listaAnterior = el.querySelector('.s51-players');
+    var scrollJugadores = listaAnterior ? listaAnterior.scrollTop : 0;
     var st = s() || { teams: [], activeTeamIdx: 0 };
     var arr = st.teams || [];
     var c = cuentas();
@@ -36323,11 +36450,13 @@ body.v40-solo #hub-view .hub-card:is([data-game="dial"],[data-game="tabu"],[data
         '<i class="v44-state ' + estado + '" title="' + esc(ttl) + '" aria-hidden="true"></i>' +
         '<span class="s51-chip ' + estado + '" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)">' + esc(ttl) + '</span>' +
         '<button class="v44-ava" type="button" data-ava title="Cambiar emoji" style="color:' + col + '">' + (t.emoji || '🦅') + '</button>' +
-        '<input class="v44-name" data-name value="' + esc(t.name) + '" maxlength="20" aria-label="Nombre">' +
+        (enSalaPrevia ? '<span class="v44-info">' : '') +
+        '<input class="v44-name" data-name value="' + esc(t.name) + '" maxlength="20" aria-label="Nombre"' + (enSalaPrevia ? ' title="' + esc(t.name) + '"' : '') + '>' +
+        (enSalaPrevia ? '<span class="v44-state-label ' + estado + '" aria-hidden="true">' + esc(ttl) + '</span></span>' : '') +
         '<span class="v44-pts" title="Puntos">' + V.formatScore(t.score) + '</span>' +
         '<span class="v44-acts">' +
           '<button class="v44-ico del" type="button" data-del title="Quitar a ' + esc(t.name) + '" aria-label="Quitar">' +
-            '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14"/><path d="M15 6l-6 6 6 6"/></svg></button>' +
+            '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">' + (enSalaPrevia ? '<path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5"/>' : '<path d="M5 12h14"/><path d="M15 6l-6 6 6 6"/>') + '</svg></button>' +
           '<button class="v44-ico ban" type="button" data-ban title="Banear a ' + esc(t.name) + '" aria-label="Banear">' +
             '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M6 6l12 12"/></svg></button>' +
         '</span>' +
@@ -36402,14 +36531,15 @@ body.v40-solo #hub-view .hub-card:is([data-game="dial"],[data-game="tabu"],[data
         '<span class="s51-pill">' + esc(etiquetaModo()) + '</span>' +
         '<span class="s51-topacts">' +
           (code ? '<button class="s51-btn" type="button" data-copy>Copiar enlace</button><button class="s51-btn ghost" type="button" data-qr>QR</button>' : '') +
-          '<button class="s51-btn ghost" type="button" data-modo>Cambiar modo</button>' +
+          (enSalaPrevia ? '' : '<button class="s51-btn ghost" type="button" data-modo>Cambiar modo</button>') +
         '</span>' +
       '</div>' +
       '<div class="s51-grid">' +
-        '<div class="s51-col" aria-label="Sala y configuración">' + status + admin + '</div>' +
+        '<div class="s51-col" aria-label="Sala y configuración">' + (enSalaPrevia ? '<details class="s51-status-menu"' + (estadoAbierto ? ' open' : '') + '><summary>Estado de la partida</summary>' + status + '</details><details class="s51-admin-menu"' + (menuAbierto ? ' open' : '') + '><summary>Gestionar sala</summary>' + admin + '</details>' : status + admin) + '</div>' +
         '<div class="s51-players" aria-label="Jugadores y marcador">' + cards + '</div>' +
       '</div>';
 
+    if (enSalaPrevia && el.querySelector('.s51-players')) el.querySelector('.s51-players').scrollTop = scrollJugadores;
     atar(el, arr);
     vigilarListos();
   }
