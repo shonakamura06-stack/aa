@@ -1,0 +1,32 @@
+TAP version 13
+# Subtest: Verdad o Reto: verdad, reto y turnos con 2 mandos
+not ok 1 - Verdad o Reto: verdad, reto y turnos con 2 mandos
+  ---
+  duration_ms: 18229.425438
+  type: 'test'
+  location: '/home/user/aa/tests/verdad-partidas-completas.cjs:8:31'
+  failureType: 'testCodeFailure'
+  error: |-
+    el resultado mostrado debe coincidir con los puntos aplicados
+    
+    1 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 1
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/home/user/aa/tests/verdad-partidas-completas.cjs:33:117)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 18606.935144

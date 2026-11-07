@@ -1,0 +1,16 @@
+TAP version 13
+# Subtest: Trivia rechaza respuestas de antes de recargar y acepta la actual
+ok 1 - Trivia rechaza respuestas de antes de recargar y acepta la actual
+  ---
+  duration_ms: 11071.310229
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 11475.696014

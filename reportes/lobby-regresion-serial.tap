@@ -1,0 +1,82 @@
+TAP version 13
+# Subtest: Modo local configura jugadores reales sin red y abre el catálogo
+ok 1 - Modo local configura jugadores reales sin red y abre el catálogo
+  ---
+  duration_ms: 4821.646776
+  type: 'test'
+  ...
+# Subtest: Servidor y dos mandos atraviesan la sala previa con conexiones reales
+ok 2 - Servidor y dos mandos atraviesan la sala previa con conexiones reales
+  ---
+  duration_ms: 7448.62954
+  type: 'test'
+  ...
+# Subtest: Votación local de Más probable entrega un voto privado por participante
+ok 3 - Votación local de Más probable entrega un voto privado por participante
+  ---
+  duration_ms: 2980.600543
+  type: 'test'
+  ...
+# Subtest: Tabú local recoge propuesta sin transmitir ni mostrar la carta al participante
+ok 4 - Tabú local recoge propuesta sin transmitir ni mostrar la carta al participante
+  ---
+  duration_ms: 3812.840131
+  type: 'test'
+  ...
+# Subtest: Dial local divide el resultado entre las personas de la pareja elegida
+ok 5 - Dial local divide el resultado entre las personas de la pareja elegida
+  ---
+  duration_ms: 1570.440548
+  type: 'test'
+  ...
+# Subtest: Lobby fijo 1366x655: controles, jugadores y esquina de Netlify
+ok 6 - Lobby fijo 1366x655: controles, jugadores y esquina de Netlify
+  ---
+  duration_ms: 3463.027574
+  type: 'test'
+  ...
+# Subtest: Lobby fijo 360x800: controles, jugadores y esquina de Netlify
+ok 7 - Lobby fijo 360x800: controles, jugadores y esquina de Netlify
+  ---
+  duration_ms: 3441.14181
+  type: 'test'
+  ...
+# Subtest: Lobby fijo 320x700: controles, jugadores y esquina de Netlify
+ok 8 - Lobby fijo 320x700: controles, jugadores y esquina de Netlify
+  ---
+  duration_ms: 3240.015559
+  type: 'test'
+  ...
+# Subtest: Lobby fijo 740x360: controles, jugadores y esquina de Netlify
+ok 9 - Lobby fijo 740x360: controles, jugadores y esquina de Netlify
+  ---
+  duration_ms: 3272.238583
+  type: 'test'
+  ...
+# Subtest: Lobby de servidor conserva invitación, gestión y botones de participantes
+ok 10 - Lobby de servidor conserva invitación, gestión y botones de participantes
+  ---
+  duration_ms: 4817.551712
+  type: 'test'
+  ...
+# Subtest: Los nombres de participantes se muestran como texto, no como HTML
+ok 11 - Los nombres de participantes se muestran como texto, no como HTML
+  ---
+  duration_ms: 2650.18151
+  type: 'test'
+  ...
+# Subtest: Tres mandos emulados excluyen al anfitrión y rechazan asientos inválidos
+ok 12 - Tres mandos emulados excluyen al anfitrión y rechazan asientos inválidos
+  ---
+  duration_ms: 7174.056039
+  type: 'test'
+  ...
+1..12
+# tests 12
+# suites 0
+# pass 12
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 49798.742619

@@ -1,0 +1,16 @@
+TAP version 13
+# Subtest: El historial de cada banco sobrevive al cierre y reapertura del navegador
+ok 1 - El historial de cada banco sobrevive al cierre y reapertura del navegador
+  ---
+  duration_ms: 2258.512033
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2911.350509

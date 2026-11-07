@@ -1,0 +1,22 @@
+TAP version 13
+# Subtest: El Dial conserva parejas elegidas y distribuye fases por conexión
+ok 1 - El Dial conserva parejas elegidas y distribuye fases por conexión
+  ---
+  duration_ms: 41221.756838
+  type: 'test'
+  ...
+# Subtest: Tabú rechaza propuestas de antes de recargar y admite las actuales
+ok 2 - Tabú rechaza propuestas de antes de recargar y admite las actuales
+  ---
+  duration_ms: 14384.741179
+  type: 'test'
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 2
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 56688.994726

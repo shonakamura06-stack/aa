@@ -1,0 +1,65 @@
+# REPETICION 1
+TAP version 13
+# DIAG RELOAD {"teams":[{"name":"Ana","pids":["pmvuh6z8jkouknt"],"owners":["ce8260da-01ca-43f6-938b-733dea053440"],"score":0},{"name":"Luis","pids":["pmvuh70kk6b0dak"],"owners":["93dc604b-3417-438e-ae7e-5e71bd825d30"],"score":0}],"dir":{"pmvuh6z8jkouknt":{"pid":"pmvuh6z8jkouknt","name":"Ana","slot":0,"joined":true,"online":true,"at":1793334733539},"pmvuh70kk6b0dak":{"pid":"pmvuh70kk6b0dak","name":"Luis","slot":1,"joined":true,"online":true,"at":1793334733550}},"conns":[{"id":"93dc604b-3417-438e-ae7e-5e71bd825d30","name":"Luis","pid":"pmvuh70kk6b0dak","slot":1,"online":true,"open":true},{"id":"ce8260da-01ca-43f6-938b-733dea053440","name":"Ana","pid":"pmvuh6z8jkouknt","slot":0,"online":true,"open":true}],"individuales":false,"game":"hub"}
+# DIAG ANTES {"mesa":{"slot":0,"serial":1793334731082821,"on":true,"quien":"Ana","hecho":false},"players":[{"slot":0,"estado":{"on":true,"mio":true,"quien":"Ana","item":"Una entrada de cine en centro comercial","buf":"","enviado":false,"esperando":false,"serial":1793334731082821}},{"slot":1,"estado":{"on":true,"mio":false,"quien":"Ana","item":"Una entrada de cine en centro comercial","buf":"","enviado":false,"esperando":false,"serial":1793334731082821}}]}
+# Subtest: Precio rechaza estimaciones de antes de recargar y acepta la actual
+ok 1 - Precio rechaza estimaciones de antes de recargar y acepta la actual
+  ---
+  duration_ms: 11991.367185
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 12399.341654
+# REPETICION 2
+TAP version 13
+# DIAG RELOAD {"teams":[{"name":"Ana","pids":["pmvuh78lxl5xyll"],"owners":["e18c82ec-3be2-4785-b90d-24ed1147e00c"],"score":0},{"name":"Luis","pids":["pmvuh7a6c1hjdu2"],"owners":["80964d67-6aeb-4a8c-b695-b8c885ed9612"],"score":0}],"dir":{"pmvuh78lxl5xyll":{"pid":"pmvuh78lxl5xyll","name":"Ana","slot":0,"joined":true,"online":true,"at":1793334746692},"pmvuh7a6c1hjdu2":{"pid":"pmvuh7a6c1hjdu2","name":"Luis","slot":1,"joined":true,"online":true,"at":1793334746706}},"conns":[{"id":"80964d67-6aeb-4a8c-b695-b8c885ed9612","name":"Luis","pid":"pmvuh7a6c1hjdu2","slot":1,"online":true,"open":true},{"id":"e18c82ec-3be2-4785-b90d-24ed1147e00c","name":"Ana","pid":"pmvuh78lxl5xyll","slot":0,"online":true,"open":true}],"individuales":false,"game":"hub"}
+# DIAG ANTES {"mesa":{"slot":0,"serial":1793334744273194,"on":true,"quien":"Ana","hecho":false},"players":[{"slot":0,"estado":{"on":true,"mio":true,"quien":"Ana","item":"Un chocolate de 200 gramos","buf":"","enviado":false,"esperando":false,"serial":1793334744273194}},{"slot":1,"estado":{"on":true,"mio":false,"quien":"Ana","item":"Un chocolate de 200 gramos","buf":"","enviado":false,"esperando":false,"serial":1793334744273194}}]}
+# Subtest: Precio rechaza estimaciones de antes de recargar y acepta la actual
+ok 1 - Precio rechaza estimaciones de antes de recargar y acepta la actual
+  ---
+  duration_ms: 12805.435534
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 13167.329377
+# REPETICION 3
+TAP version 13
+# DIAG RELOAD {"teams":[{"name":"Ana","pids":["pmvuh7kgufwwd1y","pmvuh7j0o6sg1rd"],"owners":["2579a367-fef1-44ca-a514-72ec646bd99a","64999dbd-d2dd-4d34-9602-6cebe9ba1416"],"score":0}],"dir":{"pmvuh7j0o6sg1rd":{"pid":"pmvuh7j0o6sg1rd","name":"Ana","slot":0,"joined":true,"online":true,"at":1793334759957},"pmvuh7kgufwwd1y":{"pid":"pmvuh7kgufwwd1y","name":"Luis","slot":0,"joined":true,"online":true,"at":1793334759953}},"conns":[{"id":"2579a367-fef1-44ca-a514-72ec646bd99a","name":"Luis","pid":"pmvuh7kgufwwd1y","slot":0,"online":true,"open":true},{"id":"64999dbd-d2dd-4d34-9602-6cebe9ba1416","name":"Ana","pid":"pmvuh7j0o6sg1rd","slot":0,"online":true,"open":true}],"individuales":false,"game":"hub"}
+# DIAG ANTES {"mesa":{"slot":0,"serial":1793334757545050,"on":true,"quien":"Equipo 1","hecho":false},"players":[{"slot":0,"estado":{"on":true,"mio":true,"quien":"Equipo 1","item":"Una hamburguesa de food truck","buf":"","enviado":false,"esperando":false,"serial":1793334757545050}},{"slot":0,"estado":{"on":true,"mio":true,"quien":"Equipo 1","item":"Una hamburguesa de food truck","buf":"","enviado":false,"esperando":false,"serial":1793334757545050}}]}
+# DIAG FALLO {"mesa":{"slot":0,"serial":1793334757545050,"on":false,"quien":"Equipo 1","hecho":false,"estimates":[{"name":"Equipo 1","slot":0,"value":"45"}]},"players":[{"slot":0,"estado":{"on":false,"mio":true,"quien":"Equipo 1","item":"Una hamburguesa de food truck","buf":"","enviado":false,"esperando":false,"serial":1793334757545050}},{"slot":0,"estado":{"on":false,"mio":true,"quien":"Equipo 1","item":"Una hamburguesa de food truck","buf":"","enviado":false,"esperando":false,"serial":1793334757545050}}]}
+# Subtest: Precio rechaza estimaciones de antes de recargar y acepta la actual
+not ok 1 - Precio rechaza estimaciones de antes de recargar y acepta la actual
+  ---
+  duration_ms: 22475.625064
+  type: 'test'
+  location: '/home/user/aa/tests/precio-ronda-recarga.cjs:8:1'
+  failureType: 'testCodeFailure'
+  error: 'page.waitForFunction: Timeout 10000ms exceeded.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TimeoutError'
+  stack: |-
+    TestContext.<anonymous> (/home/user/aa/tests/precio-ronda-recarga.cjs:20:161)
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 22841.012672

@@ -1,0 +1,37 @@
+{
+  "reto": {
+    "total": 10,
+    "nuevas": 10,
+    "duplicadas": 0,
+    "invalidas": [],
+    "similares": []
+  },
+  "cadena": {
+    "total": 10,
+    "nuevas": 10,
+    "duplicadas": 0,
+    "invalidas": [],
+    "similares": []
+  },
+  "yonunca": {
+    "total": 10,
+    "nuevas": 10,
+    "duplicadas": 0,
+    "invalidas": [],
+    "similares": []
+  },
+  "probable": {
+    "total": 10,
+    "nuevas": 10,
+    "duplicadas": 0,
+    "invalidas": [],
+    "similares": []
+  },
+  "palabras": {
+    "total": 10,
+    "nuevas": 10,
+    "duplicadas": 0,
+    "invalidas": [],
+    "similares": []
+  }
+}

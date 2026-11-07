@@ -1,0 +1,85 @@
+# REPETICION 1
+TAP version 13
+# Subtest: Precio rechaza estimaciones de antes de recargar y acepta la actual
+ok 1 - Precio rechaza estimaciones de antes de recargar y acepta la actual
+  ---
+  duration_ms: 11259.561432
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 11667.184066
+# REPETICION 2
+TAP version 13
+# Subtest: Precio rechaza estimaciones de antes de recargar y acepta la actual
+ok 1 - Precio rechaza estimaciones de antes de recargar y acepta la actual
+  ---
+  duration_ms: 11706.856987
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 12121.91321
+# REPETICION 3
+TAP version 13
+# Subtest: Precio rechaza estimaciones de antes de recargar y acepta la actual
+ok 1 - Precio rechaza estimaciones de antes de recargar y acepta la actual
+  ---
+  duration_ms: 11915.633849
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 12341.202034
+# REPETICION 4
+TAP version 13
+# Subtest: Precio rechaza estimaciones de antes de recargar y acepta la actual
+ok 1 - Precio rechaza estimaciones de antes de recargar y acepta la actual
+  ---
+  duration_ms: 10845.924986
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 11267.4163
+# REPETICION 5
+TAP version 13
+# Subtest: Precio rechaza estimaciones de antes de recargar y acepta la actual
+ok 1 - Precio rechaza estimaciones de antes de recargar y acepta la actual
+  ---
+  duration_ms: 11017.85316
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 11388.717061

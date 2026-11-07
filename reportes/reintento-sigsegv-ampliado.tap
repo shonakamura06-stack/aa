@@ -1,0 +1,28 @@
+TAP version 13
+# Subtest: Historia: sala real y una historia completa con 3 mandos
+ok 1 - Historia: sala real y una historia completa con 3 mandos
+  ---
+  duration_ms: 10334.525319
+  type: 'test'
+  ...
+# Subtest: Personaje: ronda con veredicto y 4 mandos
+ok 2 - Personaje: ronda con veredicto y 4 mandos
+  ---
+  duration_ms: 12830.091432
+  type: 'test'
+  ...
+# Subtest: Yo Nunca Nunca: acusación completa con 4 mandos
+ok 3 - Yo Nunca Nunca: acusación completa con 4 mandos
+  ---
+  duration_ms: 12222.541004
+  type: 'test'
+  ...
+1..3
+# tests 3
+# suites 0
+# pass 3
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 36462.341105

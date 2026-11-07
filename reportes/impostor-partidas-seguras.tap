@@ -1,0 +1,36 @@
+TAP version 13
+# Subtest: Impostor: reparto privado y resultado con 3 mandos
+not ok 1 - Impostor: reparto privado y resultado con 3 mandos
+  ---
+  duration_ms: 22674.051202
+  type: 'test'
+  location: '/home/user/aa/tests/impostor-partidas-completas.cjs:8:29'
+  failureType: 'testCodeFailure'
+  error: 'page.waitForFunction: Timeout 10000ms exceeded.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TimeoutError'
+  stack: |-
+    TestContext.<anonymous> (/home/user/aa/tests/impostor-partidas-completas.cjs:38:31)
+  ...
+# Subtest: Impostor: reparto privado y resultado con 4 mandos
+not ok 2 - Impostor: reparto privado y resultado con 4 mandos
+  ---
+  duration_ms: 23423.713092
+  type: 'test'
+  location: '/home/user/aa/tests/impostor-partidas-completas.cjs:8:29'
+  failureType: 'testCodeFailure'
+  error: 'page.waitForFunction: Timeout 10000ms exceeded.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TimeoutError'
+  stack: |-
+    TestContext.<anonymous> (/home/user/aa/tests/impostor-partidas-completas.cjs:38:31)
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 0
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 46463.944568

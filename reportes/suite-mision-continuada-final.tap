@@ -1,0 +1,609 @@
+TAP version 13
+# Subtest: Un fallo al guardar la sesión se comunica, conserva el estado en memoria y permite reintentar
+ok 1 - Un fallo al guardar la sesión se comunica, conserva el estado en memoria y permite reintentar
+  ---
+  duration_ms: 2066.423025
+  type: 'test'
+  ...
+# Subtest: El aviso permite reintentar y no revive una eliminación fallida
+ok 2 - El aviso permite reintentar y no revive una eliminación fallida
+  ---
+  duration_ms: 1985.548687
+  type: 'test'
+  ...
+# Subtest: El historial de cada banco sobrevive al cierre y reapertura del navegador
+ok 3 - El historial de cada banco sobrevive al cierre y reapertura del navegador
+  ---
+  duration_ms: 2817.135712
+  type: 'test'
+  ...
+# Subtest: Una frase atrasada de Historia no se acepta tras recargar al anfitrión
+ok 4 - Una frase atrasada de Historia no se acepta tras recargar al anfitrión
+  ---
+  duration_ms: 10961.055353
+  type: 'test'
+  ...
+# Subtest: El lote General está integrado, no duplica al sincronizar y no se repite tras recargar
+ok 5 - El lote General está integrado, no duplica al sincronizar y no se repite tras recargar
+  ---
+  duration_ms: 2217.363141
+  type: 'test'
+  ...
+# Subtest: El Dial conserva parejas elegidas y distribuye fases por conexión
+ok 6 - El Dial conserva parejas elegidas y distribuye fases por conexión
+  ---
+  duration_ms: 41208.912157
+  type: 'test'
+  ...
+# Subtest: El Dial rechaza el inicio de una ronda anterior a la recarga
+not ok 7 - El Dial rechaza el inicio de una ronda anterior a la recarga
+  ---
+  duration_ms: 17974.135041
+  type: 'test'
+  location: '/home/user/aa/tests/dial-ronda-recarga.cjs:8:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    locator.click: Timeout 10000ms exceeded.
+    Call log:
+      - waiting for locator('#v33-form [data-act="empezar"]')
+        - locator resolved to <button data-act="empezar" class="v33-btn gold">Empezar la partida</button>
+      - attempting click action
+        2 × waiting for element to be visible, enabled and stable
+          - element is visible, enabled and stable
+          - scrolling into view if needed
+          - done scrolling
+          - <div class="v26-veil"></div> from <div id="v26-tour" role="dialog" aria-modal="true" aria-label="Tutorial de Sintonía">…</div> subtree intercepts pointer events
+        - retrying click action
+        - waiting 20ms
+        2 × waiting for element to be visible, enabled and stable
+          - element is visible, enabled and stable
+          - scrolling into view if needed
+          - done scrolling
+          - <div class="v26-veil"></div> from <div id="v26-tour" role="dialog" aria-modal="true" aria-label="Tutorial de Sintonía">…</div> subtree intercepts pointer events
+        - retrying click action
+          - waiting 100ms
+        18 × waiting for element to be visible, enabled and stable
+           - element is visible, enabled and stable
+           - scrolling into view if needed
+           - done scrolling
+           - <div class="v26-veil"></div> from <div id="v26-tour" role="dialog" aria-modal="true" aria-label="Tutorial de Sintonía">…</div> subtree intercepts pointer events
+         - retrying click action
+           - waiting 500ms
+    
+  code: 'ERR_TEST_FAILURE'
+  name: 'TimeoutError'
+  stack: |-
+    abrir (/home/user/aa/tests/dial-ronda-recarga.cjs:15:789)
+    async TestContext.<anonymous> (/home/user/aa/tests/dial-ronda-recarga.cjs:16:3)
+  ...
+# Subtest: Modo local configura jugadores reales sin red y abre el catálogo
+ok 8 - Modo local configura jugadores reales sin red y abre el catálogo
+  ---
+  duration_ms: 5692.272637
+  type: 'test'
+  ...
+# Subtest: Servidor y dos mandos atraviesan la sala previa con conexiones reales
+ok 9 - Servidor y dos mandos atraviesan la sala previa con conexiones reales
+  ---
+  duration_ms: 9890.014214
+  type: 'test'
+  ...
+# Subtest: Votación local de Más probable entrega un voto privado por participante
+ok 10 - Votación local de Más probable entrega un voto privado por participante
+  ---
+  duration_ms: 3908.569028
+  type: 'test'
+  ...
+# Subtest: Tabú local recoge propuesta sin transmitir ni mostrar la carta al participante
+ok 11 - Tabú local recoge propuesta sin transmitir ni mostrar la carta al participante
+  ---
+  duration_ms: 4499.883364
+  type: 'test'
+  ...
+# Subtest: Dial local divide el resultado entre las personas de la pareja elegida
+ok 12 - Dial local divide el resultado entre las personas de la pareja elegida
+  ---
+  duration_ms: 2129.065237
+  type: 'test'
+  ...
+# Subtest: Historia: sala real y una historia completa con 2 mandos
+ok 13 - Historia: sala real y una historia completa con 2 mandos
+  ---
+  duration_ms: 8954.550869
+  type: 'test'
+  ...
+# Subtest: Historia: sala real y una historia completa con 3 mandos
+ok 14 - Historia: sala real y una historia completa con 3 mandos
+  ---
+  duration_ms: 13126.610238
+  type: 'test'
+  ...
+# Subtest: Historia: sala real y una historia completa con 4 mandos
+ok 15 - Historia: sala real y una historia completa con 4 mandos
+  ---
+  duration_ms: 15068.241225
+  type: 'test'
+  ...
+# Subtest: CSV: comas, comillas, saltos internos, líneas originales y errores
+ok 16 - CSV: comas, comillas, saltos internos, líneas originales y errores
+  ---
+  duration_ms: 1363.838441
+  type: 'test'
+  ...
+# Subtest: Cada destino y mercado admite CSV, valida y consume su propio banco
+ok 17 - Cada destino y mercado admite CSV, valida y consume su propio banco
+  ---
+  duration_ms: 1247.101893
+  type: 'test'
+  ...
+# Subtest: Archivo CSV se analiza en la interfaz y no duplica al pulsar dos veces
+ok 18 - Archivo CSV se analiza en la interfaz y no duplica al pulsar dos veces
+  ---
+  duration_ms: 4393.522322
+  type: 'test'
+  ...
+# Subtest: Importación revisa, guarda, conserva acentos y llega al banco real del Impostor
+ok 19 - Importación revisa, guarda, conserva acentos y llega al banco real del Impostor
+  ---
+  duration_ms: 4111.625636
+  type: 'test'
+  ...
+# Subtest: Migración de historial legado conserva claves estructuradas y solo reinicia al pedirlo
+ok 20 - Migración de historial legado conserva claves estructuradas y solo reinicia al pedirlo
+  ---
+  duration_ms: 1182.033423
+  type: 'test'
+  ...
+# Subtest: Importación detecta similitud y exige revisión antes de guardar
+ok 21 - Importación detecta similitud y exige revisión antes de guardar
+  ---
+  duration_ms: 910.67468
+  type: 'test'
+  ...
+# Subtest: El marcador global huérfano no desplaza las vistas y el marcador del juego sigue disponible
+ok 22 - El marcador global huérfano no desplaza las vistas y el marcador del juego sigue disponible
+  ---
+  duration_ms: 2555.813824
+  type: 'test'
+  ...
+# Subtest: Servidor y dos teléfonos: reconexión, historia, aislamiento y desempate
+ok 23 - Servidor y dos teléfonos: reconexión, historia, aislamiento y desempate
+  ---
+  duration_ms: 66324.434062
+  type: 'test'
+  ...
+# Subtest: Catálogo usa solo la tarjeta para abrir el juego
+ok 24 - Catálogo usa solo la tarjeta para abrir el juego
+  ---
+  duration_ms: 2509.56999
+  type: 'test'
+  ...
+# Subtest: El inicio no promete funcionamiento offline ni un número incorrecto de juegos
+ok 25 - El inicio no promete funcionamiento offline ni un número incorrecto de juegos
+  ---
+  duration_ms: 2242.167401
+  type: 'test'
+  ...
+# Subtest: Cada tarjeta abre su juego desde ambos extremos en escritorio y móvil
+ok 26 - Cada tarjeta abre su juego desde ambos extremos en escritorio y móvil
+  ---
+  duration_ms: 27259.318493
+  type: 'test'
+  ...
+# Subtest: La tarjeta de Precio refleja la regla por defecto y el juego individual
+ok 27 - La tarjeta de Precio refleja la regla por defecto y el juego individual
+  ---
+  duration_ms: 2419.610647
+  type: 'test'
+  ...
+# Subtest: El tutorial de Más probable no promete puntos
+ok 28 - El tutorial de Más probable no promete puntos
+  ---
+  duration_ms: 2099.23284
+  type: 'test'
+  ...
+# Subtest: Verdad muestra controles de elección en fila en PC y columna en móvil
+ok 29 - Verdad muestra controles de elección en fila en PC y columna en móvil
+  ---
+  duration_ms: 2589.676621
+  type: 'test'
+  ...
+# Subtest: Verdad no avanza antes del veredicto y avanza una vez después
+ok 30 - Verdad no avanza antes del veredicto y avanza una vez después
+  ---
+  duration_ms: 8791.182183
+  type: 'test'
+  ...
+# Subtest: Verdad cancela el avance al salir del juego
+ok 31 - Verdad cancela el avance al salir del juego
+  ---
+  duration_ms: 7503.705241
+  type: 'test'
+  ...
+# Subtest: Trivia resuelve una vez y avanza después de mostrar el resultado
+ok 32 - Trivia resuelve una vez y avanza después de mostrar el resultado
+  ---
+  duration_ms: 8281.08633
+  type: 'test'
+  ...
+# Subtest: Trivia avanza tras agotarse el tiempo y cancela al salir
+ok 33 - Trivia avanza tras agotarse el tiempo y cancela al salir
+  ---
+  duration_ms: 13542.347969
+  type: 'test'
+  ...
+# Subtest: En modo servidor solo cuentan conexiones reales, no el anfitrión
+ok 34 - En modo servidor solo cuentan conexiones reales, no el anfitrión
+  ---
+  duration_ms: 2172.997375
+  type: 'test'
+  ...
+# Subtest: Al identificarse, un jugador nuevo no recibe provisionalmente el marcador ajeno
+ok 35 - Al identificarse, un jugador nuevo no recibe provisionalmente el marcador ajeno
+  ---
+  duration_ms: 2139.106895
+  type: 'test'
+  ...
+# Subtest: Si el último jugador se desconecta, el anfitrión todavía puede volver al hub
+ok 36 - Si el último jugador se desconecta, el anfitrión todavía puede volver al hub
+  ---
+  duration_ms: 2287.550835
+  type: 'test'
+  ...
+# Subtest: Avisos conservan texto legible, fondo translúcido y dejan pasar el clic
+ok 37 - Avisos conservan texto legible, fondo translúcido y dejan pasar el clic
+  ---
+  duration_ms: 4488.262429
+  type: 'test'
+  ...
+# Subtest: Al recargar durante el Dial se recupera el marcador individual sin perder el resultado de equipo
+ok 38 - Al recargar durante el Dial se recupera el marcador individual sin perder el resultado de equipo
+  ---
+  duration_ms: 2802.039
+  type: 'test'
+  ...
+# Subtest: Precio Justo no atribuye una referencia de otro mercado
+ok 39 - Precio Justo no atribuye una referencia de otro mercado
+  ---
+  duration_ms: 2104.709939
+  type: 'test'
+  ...
+# Subtest: La entrada ofrece anfitrión, local y mando, sin formar equipos automáticamente
+ok 40 - La entrada ofrece anfitrión, local y mando, sin formar equipos automáticamente
+  ---
+  duration_ms: 2473.647824
+  type: 'test'
+  ...
+# Subtest: Precio Justo muestra la misma escala proporcional en PC y teléfono
+ok 41 - Precio Justo muestra la misma escala proporcional en PC y teléfono
+  ---
+  duration_ms: 3415.73269
+  type: 'test'
+  ...
+# Subtest: Importador de Ranking valida y guarda una tarjeta objetiva desde la interfaz
+ok 42 - Importador de Ranking valida y guarda una tarjeta objetiva desde la interfaz
+  ---
+  duration_ms: 3857.626224
+  type: 'test'
+  ...
+# Subtest: La lista de sala conserva su scroll al actualizar y se adapta a móvil
+ok 43 - La lista de sala conserva su scroll al actualizar y se adapta a móvil
+  ---
+  duration_ms: 4144.281707
+  type: 'test'
+  ...
+# Subtest: Precio usa decimales exactos, seis categorías y empates configurables
+ok 44 - Precio usa decimales exactos, seis categorías y empates configurables
+  ---
+  duration_ms: 2498.798962
+  type: 'test'
+  ...
+# Subtest: Precio importa cifras grandes sin perder decimales y permite configurar reglas
+ok 45 - Precio importa cifras grandes sin perder decimales y permite configurar reglas
+  ---
+  duration_ms: 5119.859238
+  type: 'test'
+  ...
+# Subtest: Escala Precio mantiene márgenes y posiciones para decimales cercanos y enormes
+ok 46 - Escala Precio mantiene márgenes y posiciones para decimales cercanos y enormes
+  ---
+  duration_ms: 2353.39652
+  type: 'test'
+  ...
+# Subtest: Personaje: ronda con veredicto y 2 mandos
+ok 47 - Personaje: ronda con veredicto y 2 mandos
+  ---
+  duration_ms: 10886.349942
+  type: 'test'
+  ...
+# Subtest: Personaje: ronda con veredicto y 3 mandos
+ok 48 - Personaje: ronda con veredicto y 3 mandos
+  ---
+  duration_ms: 12778.43748
+  type: 'test'
+  ...
+# Subtest: Personaje: ronda con veredicto y 4 mandos
+ok 49 - Personaje: ronda con veredicto y 4 mandos
+  ---
+  duration_ms: 15373.421657
+  type: 'test'
+  ...
+# Subtest: Personaje entrega pistas acumuladas a dos mandos y limpia la ronda
+ok 50 - Personaje entrega pistas acumuladas a dos mandos y limpia la ronda
+  ---
+  duration_ms: 11785.461625
+  type: 'test'
+  ...
+# Subtest: Personaje rechaza respuestas sin ronda o de antes de recargar, y acepta la actual
+ok 51 - Personaje rechaza respuestas sin ronda o de antes de recargar, y acepta la actual
+  ---
+  duration_ms: 11796.131852
+  type: 'test'
+  ...
+# Subtest: Precio: sala real, estimaciones y resultado con 2 mandos
+ok 52 - Precio: sala real, estimaciones y resultado con 2 mandos
+  ---
+  duration_ms: 9961.229249
+  type: 'test'
+  ...
+# Subtest: Precio: sala real, estimaciones y resultado con 3 mandos
+ok 53 - Precio: sala real, estimaciones y resultado con 3 mandos
+  ---
+  duration_ms: 13144.838046
+  type: 'test'
+  ...
+# Subtest: Precio: sala real, estimaciones y resultado con 4 mandos
+ok 54 - Precio: sala real, estimaciones y resultado con 4 mandos
+  ---
+  duration_ms: 17260.113669
+  type: 'test'
+  ...
+# Subtest: Precio compara umbrales proporcionales exactos, cero y cifras enormes
+ok 55 - Precio compara umbrales proporcionales exactos, cero y cifras enormes
+  ---
+  duration_ms: 1164.356126
+  type: 'test'
+  ...
+# Subtest: Entrada de jugar solo permite una persona y juega Precio en el dispositivo
+ok 56 - Entrada de jugar solo permite una persona y juega Precio en el dispositivo
+  ---
+  duration_ms: 6903.526032
+  type: 'test'
+  ...
+# Subtest: Trivia en solitario permite responder en pantalla y resuelve una vez
+ok 57 - Trivia en solitario permite responder en pantalla y resuelve una vez
+  ---
+  duration_ms: 4186.095688
+  type: 'test'
+  ...
+# Subtest: Modo solo atenúa los juegos para grupos y explica el cambio de modo
+ok 58 - Modo solo atenúa los juegos para grupos y explica el cambio de modo
+  ---
+  duration_ms: 2767.257074
+  type: 'test'
+  ...
+# Subtest: Ranking y Personaje funcionan con una persona en la pantalla
+ok 59 - Ranking y Personaje funcionan con una persona en la pantalla
+  ---
+  duration_ms: 6675.125381
+  type: 'test'
+  ...
+# Subtest: Precio rechaza estimaciones de antes de recargar y acepta la actual
+ok 60 - Precio rechaza estimaciones de antes de recargar y acepta la actual
+  ---
+  duration_ms: 14236.130175
+  type: 'test'
+  ...
+# Subtest: Más probable: sala real y votación completa con 2 mandos
+ok 61 - Más probable: sala real y votación completa con 2 mandos
+  ---
+  duration_ms: 9630.300162
+  type: 'test'
+  ...
+# Subtest: Más probable: sala real y votación completa con 3 mandos
+ok 62 - Más probable: sala real y votación completa con 3 mandos
+  ---
+  duration_ms: 11441.876427
+  type: 'test'
+  ...
+# Subtest: Más probable: sala real y votación completa con 4 mandos
+ok 63 - Más probable: sala real y votación completa con 4 mandos
+  ---
+  duration_ms: 15037.878914
+  type: 'test'
+  ...
+# Subtest: Ranking: sala real, turnos y resultado con 2 mandos
+ok 64 - Ranking: sala real, turnos y resultado con 2 mandos
+  ---
+  duration_ms: 10437.043985
+  type: 'test'
+  ...
+# Subtest: Ranking: sala real, turnos y resultado con 3 mandos
+ok 65 - Ranking: sala real, turnos y resultado con 3 mandos
+  ---
+  duration_ms: 13212.021884
+  type: 'test'
+  ...
+# Subtest: Ranking: sala real, turnos y resultado con 4 mandos
+ok 66 - Ranking: sala real, turnos y resultado con 4 mandos
+  ---
+  duration_ms: 16861.837586
+  type: 'test'
+  ...
+# Subtest: Ranking rechaza pulsaciones de antes de recargar y acepta la actual
+ok 67 - Ranking rechaza pulsaciones de antes de recargar y acepta la actual
+  ---
+  duration_ms: 12118.552014
+  type: 'test'
+  ...
+# Subtest: Más probable local conserva votación y resultado, rechaza voto repetido y no cambia puntos
+ok 68 - Más probable local conserva votación y resultado, rechaza voto repetido y no cambia puntos
+  ---
+  duration_ms: 10748.21854
+  type: 'test'
+  ...
+# Subtest: Más probable local rechaza un guardado alterado sin tocar el marcador
+ok 69 - Más probable local rechaza un guardado alterado sin tocar el marcador
+  ---
+  duration_ms: 5749.827783
+  type: 'test'
+  ...
+# Subtest: Más probable recupera votos y resultado después de dos recargas del anfitrión
+ok 70 - Más probable recupera votos y resultado después de dos recargas del anfitrión
+  ---
+  duration_ms: 22556.483661
+  type: 'test'
+  ...
+# Subtest: Tabú no transmite las palabras prohibidas en el reloj público
+ok 71 - Tabú no transmite las palabras prohibidas en el reloj público
+  ---
+  duration_ms: 5.393348
+  type: 'test'
+  ...
+# Subtest: Probable cierra la votación con resultado sin adjudicar puntos
+ok 72 - Probable cierra la votación con resultado sin adjudicar puntos
+  ---
+  duration_ms: 6.46562
+  type: 'test'
+  ...
+# Subtest: Probable muestra empates y rechaza votos de jugadores inexistentes
+ok 73 - Probable muestra empates y rechaza votos de jugadores inexistentes
+  ---
+  duration_ms: 5.210955
+  type: 'test'
+  ...
+# Subtest: Historia en cadena personaliza la última frase para el siguiente jugador
+ok 74 - Historia en cadena personaliza la última frase para el siguiente jugador
+  ---
+  duration_ms: 5.110855
+  type: 'test'
+  ...
+# Subtest: Todos los bloques JavaScript del HTML se pueden analizar
+ok 75 - Todos los bloques JavaScript del HTML se pueden analizar
+  ---
+  duration_ms: 45.515958
+  type: 'test'
+  ...
+# Subtest: Un voto atrasado de una ronda anterior no se aplica en la siguiente
+ok 76 - Un voto atrasado de una ronda anterior no se aplica en la siguiente
+  ---
+  duration_ms: 4.567767
+  type: 'test'
+  ...
+# Subtest: El registro compartido no inventa jugadores cuando la sala está vacía
+ok 77 - El registro compartido no inventa jugadores cuando la sala está vacía
+  ---
+  duration_ms: 4.046452
+  type: 'test'
+  ...
+# Subtest: Probable permite desempatar entre los empatados sin puntuar ni aceptar votos antiguos
+ok 78 - Probable permite desempatar entre los empatados sin puntuar ni aceptar votos antiguos
+  ---
+  duration_ms: 4.16055
+  type: 'test'
+  ...
+# Subtest: El Dial respeta las parejas elegidas, no el orden de conexión
+ok 79 - El Dial respeta las parejas elegidas, no el orden de conexión
+  ---
+  duration_ms: 5.009958
+  type: 'test'
+  ...
+# Subtest: Ranking usa criterios con datos y fuente y rechaza acciones viejas o ajenas
+ok 80 - Ranking usa criterios con datos y fuente y rechaza acciones viejas o ajenas
+  ---
+  duration_ms: 14.622428
+  type: 'test'
+  ...
+# Subtest: Las ilustraciones de los juegos conservan la imagen correspondiente
+ok 81 - Las ilustraciones de los juegos conservan la imagen correspondiente
+  ---
+  duration_ms: 51.705871
+  type: 'test'
+  ...
+# Subtest: Recarga del anfitrión recupera sala y marcadores sin continuar una ronda incompleta
+ok 82 - Recarga del anfitrión recupera sala y marcadores sin continuar una ronda incompleta
+  ---
+  duration_ms: 20048.581228
+  type: 'test'
+  ...
+# Subtest: Catálogo y vistas activas sin franja redundante en escritorio y móvil
+ok 83 - Catálogo y vistas activas sin franja redundante en escritorio y móvil
+  ---
+  duration_ms: 7388.497133
+  type: 'test'
+  ...
+# Subtest: Tres mandos emulados excluyen al anfitrión y rechazan asientos inválidos
+ok 84 - Tres mandos emulados excluyen al anfitrión y rechazan asientos inválidos
+  ---
+  duration_ms: 9025.607785
+  type: 'test'
+  ...
+# Subtest: Tabú rechaza propuestas de antes de recargar y admite las actuales
+ok 85 - Tabú rechaza propuestas de antes de recargar y admite las actuales
+  ---
+  duration_ms: 12146.850555
+  type: 'test'
+  ...
+# Subtest: Trivia: partida de diez preguntas con 2 mandos
+ok 86 - Trivia: partida de diez preguntas con 2 mandos
+  ---
+  duration_ms: 59108.357925
+  type: 'test'
+  ...
+# Subtest: Trivia: partida de diez preguntas con 3 mandos
+ok 87 - Trivia: partida de diez preguntas con 3 mandos
+  ---
+  duration_ms: 61071.727366
+  type: 'test'
+  ...
+# Subtest: Trivia: partida de diez preguntas con 4 mandos
+ok 88 - Trivia: partida de diez preguntas con 4 mandos
+  ---
+  duration_ms: 62820.034923
+  type: 'test'
+  ...
+# Subtest: Trivia rechaza respuestas de antes de recargar y acepta la actual
+ok 89 - Trivia rechaza respuestas de antes de recargar y acepta la actual
+  ---
+  duration_ms: 10477.536831
+  type: 'test'
+  ...
+# Subtest: Barra de turno local no cubre la mesa y el control de Dial no corta su texto
+ok 90 - Barra de turno local no cubre la mesa y el control de Dial no corta su texto
+  ---
+  duration_ms: 3138.636639
+  type: 'test'
+  ...
+# Subtest: Solo el mando acusado puede tomar su decisión en Yo Nunca Nunca
+ok 91 - Solo el mando acusado puede tomar su decisión en Yo Nunca Nunca
+  ---
+  duration_ms: 8385.60516
+  type: 'test'
+  ...
+# Subtest: Yo Nunca Nunca: acusación completa con 2 mandos
+ok 92 - Yo Nunca Nunca: acusación completa con 2 mandos
+  ---
+  duration_ms: 8540.311113
+  type: 'test'
+  ...
+# Subtest: Yo Nunca Nunca: acusación completa con 3 mandos
+ok 93 - Yo Nunca Nunca: acusación completa con 3 mandos
+  ---
+  duration_ms: 10238.180358
+  type: 'test'
+  ...
+# Subtest: Yo Nunca Nunca: acusación completa con 4 mandos
+ok 94 - Yo Nunca Nunca: acusación completa con 4 mandos
+  ---
+  duration_ms: 12690.143967
+  type: 'test'
+  ...
+1..94
+# tests 94
+# suites 0
+# pass 93
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 909604.8241

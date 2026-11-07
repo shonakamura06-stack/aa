@@ -1,0 +1,46 @@
+TAP version 13
+# Subtest: Precio compara umbrales proporcionales exactos, cero y cifras enormes
+ok 1 - Precio compara umbrales proporcionales exactos, cero y cifras enormes
+  ---
+  duration_ms: 860.549843
+  type: 'test'
+  ...
+# Subtest: Entrada de jugar solo permite una persona y juega Precio en el dispositivo
+ok 2 - Entrada de jugar solo permite una persona y juega Precio en el dispositivo
+  ---
+  duration_ms: 7106.389023
+  type: 'test'
+  ...
+# Subtest: Trivia en solitario permite responder en pantalla y resuelve una vez
+ok 3 - Trivia en solitario permite responder en pantalla y resuelve una vez
+  ---
+  duration_ms: 4046.907615
+  type: 'test'
+  ...
+# Subtest: Modo solo atenúa los juegos para grupos y explica el cambio de modo
+ok 4 - Modo solo atenúa los juegos para grupos y explica el cambio de modo
+  ---
+  duration_ms: 2418.232923
+  type: 'test'
+  ...
+# Subtest: Ranking y Personaje funcionan con una persona en la pantalla
+ok 5 - Ranking y Personaje funcionan con una persona en la pantalla
+  ---
+  duration_ms: 6689.804622
+  type: 'test'
+  ...
+# Subtest: Precio rechaza estimaciones de antes de recargar y acepta la actual
+ok 6 - Precio rechaza estimaciones de antes de recargar y acepta la actual
+  ---
+  duration_ms: 12798.463232
+  type: 'test'
+  ...
+1..6
+# tests 6
+# suites 0
+# pass 6
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 34855.865284

@@ -1,0 +1,112 @@
+[
+  {
+    "juego": "dial",
+    "vista": "view-dial",
+    "ancho": 360,
+    "anchoDocumento": 360,
+    "altura": 800,
+    "alturaDocumento": 1042,
+    "botones": 12,
+    "debajoViewport": 2
+  },
+  {
+    "juego": "impostor",
+    "vista": "view-impostor",
+    "ancho": 360,
+    "anchoDocumento": 360,
+    "altura": 800,
+    "alturaDocumento": 864,
+    "botones": 5,
+    "debajoViewport": 0
+  },
+  {
+    "juego": "ranking",
+    "vista": "view-ranking",
+    "ancho": 360,
+    "anchoDocumento": 360,
+    "altura": 800,
+    "alturaDocumento": 864,
+    "botones": 5,
+    "debajoViewport": 0
+  },
+  {
+    "juego": "precio",
+    "vista": "view-precio",
+    "ancho": 360,
+    "anchoDocumento": 360,
+    "altura": 800,
+    "alturaDocumento": 864,
+    "botones": 5,
+    "debajoViewport": 0
+  },
+  {
+    "juego": "tabu",
+    "vista": "view-tabu",
+    "ancho": 360,
+    "anchoDocumento": 360,
+    "altura": 800,
+    "alturaDocumento": 864,
+    "botones": 11,
+    "debajoViewport": 0
+  },
+  {
+    "juego": "personaje",
+    "vista": "view-personaje",
+    "ancho": 360,
+    "anchoDocumento": 360,
+    "altura": 800,
+    "alturaDocumento": 864,
+    "botones": 5,
+    "debajoViewport": 0
+  },
+  {
+    "juego": "trivia",
+    "vista": "view-trivia",
+    "ancho": 360,
+    "anchoDocumento": 360,
+    "altura": 800,
+    "alturaDocumento": 864,
+    "botones": 5,
+    "debajoViewport": 0
+  },
+  {
+    "juego": "verdad",
+    "vista": "view-verdad",
+    "ancho": 360,
+    "anchoDocumento": 360,
+    "altura": 800,
+    "alturaDocumento": 864,
+    "botones": 7,
+    "debajoViewport": 0
+  },
+  {
+    "juego": "yonunca",
+    "vista": "view-yonunca",
+    "ancho": 360,
+    "anchoDocumento": 360,
+    "altura": 800,
+    "alturaDocumento": 864,
+    "botones": 5,
+    "debajoViewport": 0
+  },
+  {
+    "juego": "probable",
+    "vista": "view-probable",
+    "ancho": 360,
+    "anchoDocumento": 360,
+    "altura": 800,
+    "alturaDocumento": 864,
+    "botones": 5,
+    "debajoViewport": 0
+  },
+  {
+    "juego": "cadena",
+    "vista": "view-cadena",
+    "ancho": 360,
+    "anchoDocumento": 360,
+    "altura": 800,
+    "alturaDocumento": 864,
+    "botones": 5,
+    "debajoViewport": 0
+  }
+]

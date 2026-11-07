@@ -1,0 +1,22 @@
+TAP version 13
+# Subtest: Impostor: reparto privado y resultado con 3 mandos
+ok 1 - Impostor: reparto privado y resultado con 3 mandos
+  ---
+  duration_ms: 16978.766162
+  type: 'test'
+  ...
+# Subtest: Impostor: reparto privado y resultado con 4 mandos
+ok 2 - Impostor: reparto privado y resultado con 4 mandos
+  ---
+  duration_ms: 19435.961419
+  type: 'test'
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 2
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 36771.608969

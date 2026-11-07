@@ -1,0 +1,32 @@
+TAP version 13
+# Subtest: Los nombres de participantes se muestran como texto, no como HTML
+not ok 1 - Los nombres de participantes se muestran como texto, no como HTML
+  ---
+  duration_ms: 2850.560474
+  type: 'test'
+  location: '/home/user/aa/tests/nombres-seguros.cjs:3:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    el nombre no debe crear elementos SVG
+    
+    1 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 1
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/home/user/aa/tests/nombres-seguros.cjs:7:93)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3235.45401

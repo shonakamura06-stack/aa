@@ -1,0 +1,82 @@
+TAP version 13
+# Subtest: El Dial conserva parejas elegidas y distribuye fases por conexión
+ok 1 - El Dial conserva parejas elegidas y distribuye fases por conexión
+  ---
+  duration_ms: 36270.299991
+  type: 'test'
+  ...
+# Subtest: El Dial rechaza el inicio de una ronda anterior a la recarga
+ok 2 - El Dial rechaza el inicio de una ronda anterior a la recarga
+  ---
+  duration_ms: 15221.17628
+  type: 'test'
+  ...
+# Subtest: Impostor: reparto privado y resultado con 3 mandos
+ok 3 - Impostor: reparto privado y resultado con 3 mandos
+  ---
+  duration_ms: 14428.6643
+  type: 'test'
+  ...
+# Subtest: Impostor: reparto privado y resultado con 4 mandos
+not ok 4 - Impostor: reparto privado y resultado con 4 mandos
+  ---
+  duration_ms: 15043.310021
+  type: 'test'
+  location: '/home/user/aa/tests/impostor-partidas-completas.cjs:9:29'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + 'Tus roles llegan a tu teléfono'
+    - '¡ERES EL IMPOSTOR!'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: '¡ERES EL IMPOSTOR!'
+  actual: 'Tus roles llegan a tu teléfono'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/home/user/aa/tests/impostor-partidas-completas.cjs:41:85)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: El marcador global huérfano no desplaza las vistas y el marcador del juego sigue disponible
+ok 5 - El marcador global huérfano no desplaza las vistas y el marcador del juego sigue disponible
+  ---
+  duration_ms: 2260.500608
+  type: 'test'
+  ...
+# Subtest: Servidor y dos teléfonos: reconexión, historia, aislamiento y desempate
+ok 6 - Servidor y dos teléfonos: reconexión, historia, aislamiento y desempate
+  ---
+  duration_ms: 62218.941987
+  type: 'test'
+  ...
+# Subtest: Precio rechaza estimaciones de antes de recargar y acepta la actual
+ok 7 - Precio rechaza estimaciones de antes de recargar y acepta la actual
+  ---
+  duration_ms: 10945.182487
+  type: 'test'
+  ...
+# Subtest: Recarga del anfitrión recupera sala y marcadores sin continuar una ronda incompleta
+ok 8 - Recarga del anfitrión recupera sala y marcadores sin continuar una ronda incompleta
+  ---
+  duration_ms: 18925.772888
+  type: 'test'
+  ...
+# Subtest: Tres mandos emulados excluyen al anfitrión y rechazan asientos inválidos
+ok 9 - Tres mandos emulados excluyen al anfitrión y rechazan asientos inválidos
+  ---
+  duration_ms: 8251.155311
+  type: 'test'
+  ...
+1..9
+# tests 9
+# suites 0
+# pass 8
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 187008.948317

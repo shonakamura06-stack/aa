@@ -1,0 +1,315 @@
+ENSAYO 1
+TAP version 13
+# DIAG {
+#   game: 'dial',
+#   dial: {
+#     ronda: 0,
+#     roundId: 2,
+#     phase: 'idle',
+#     locked: false,
+#     needleMoved: false,
+#     pair: null,
+#     pairStatus: [ [Object] ]
+#   },
+#   can: { ok: true },
+#   conns: [
+#     {
+#       name: 'Luis',
+#       slot: 0,
+#       id: 'ebb6e055-7650-4879-81b1-cfb783525731',
+#       online: true,
+#       open: true
+#     },
+#     {
+#       name: 'Ana',
+#       slot: 0,
+#       id: '75c065bc-f8a4-4ddf-8bee-fcc0fc3939c8',
+#       online: true,
+#       open: true
+#     }
+#   ]
+# } [
+#   {
+#     slot: 0,
+#     screen: {
+#       kicker: 'El Dial',
+#       title: 'Esperando a quien dará la pista',
+#       text: 'El compañero iniciará la ronda.',
+#       sub: '',
+#       actions: [],
+#       turnName: 'Equipo 1',
+#       lockTo: 'Equipo 1',
+#       hostOnly: 0,
+#       wait: '',
+#       secret: null,
+#       secretWord: null,
+#       word: null,
+#       hideTitle: false,
+#       guess: false,
+#       dial: null,
+#       result: null,
+#       note: '',
+#       guesser: false
+#     }
+#   },
+#   {
+#     slot: 0,
+#     screen: {
+#       kicker: 'El Dial',
+#       title: 'Tu turno: dar la pista',
+#       text: 'Inicia la ronda desde tu teléfono.',
+#       sub: '',
+#       actions: [],
+#       turnName: 'Equipo 1',
+#       lockTo: 'Equipo 1',
+#       hostOnly: 0,
+#       wait: '',
+#       secret: [Object],
+#       secretWord: null,
+#       word: null,
+#       hideTitle: false,
+#       guess: false,
+#       dial: null,
+#       result: null,
+#       note: '',
+#       guesser: false
+#     }
+#   }
+# ]
+# Subtest: El Dial rechaza el inicio de una ronda anterior a la recarga
+not ok 1 - El Dial rechaza el inicio de una ronda anterior a la recarga
+  ---
+  duration_ms: 23339.905091
+  type: 'test'
+  location: '/home/user/aa/tests/dial-ronda-recarga.cjs:8:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    locator.waitFor: Timeout 10000ms exceeded.
+    Call log:
+      - waiting for locator('#rm-dial-start') to be visible
+    
+  code: 'ERR_TEST_FAILURE'
+  name: 'TimeoutError'
+  stack: |-
+    abrir (/home/user/aa/tests/dial-ronda-recarga.cjs:15:966)
+    async TestContext.<anonymous> (/home/user/aa/tests/dial-ronda-recarga.cjs:17:454)
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 23946.780438
+ENSAYO 2
+TAP version 13
+# DIAG {
+#   game: 'dial',
+#   dial: {
+#     ronda: 0,
+#     roundId: 2,
+#     phase: 'idle',
+#     locked: false,
+#     needleMoved: false,
+#     pair: null,
+#     pairStatus: [ [Object] ]
+#   },
+#   can: { ok: true },
+#   conns: [
+#     {
+#       name: 'Luis',
+#       slot: 0,
+#       id: '4a547781-2ab0-4ea4-965e-e0475c7b7054',
+#       online: true,
+#       open: true
+#     },
+#     {
+#       name: 'Ana',
+#       slot: 0,
+#       id: '9d14e05c-bde9-4ca6-9561-00a40c619020',
+#       online: true,
+#       open: true
+#     }
+#   ]
+# } [
+#   {
+#     slot: 0,
+#     screen: {
+#       kicker: 'El Dial',
+#       title: 'Esperando a quien dará la pista',
+#       text: 'El compañero iniciará la ronda.',
+#       sub: '',
+#       actions: [],
+#       turnName: 'Equipo 1',
+#       lockTo: 'Equipo 1',
+#       hostOnly: 0,
+#       wait: '',
+#       secret: null,
+#       secretWord: null,
+#       word: null,
+#       hideTitle: false,
+#       guess: false,
+#       dial: null,
+#       result: null,
+#       note: '',
+#       guesser: false
+#     }
+#   },
+#   {
+#     slot: 0,
+#     screen: {
+#       kicker: 'El Dial',
+#       title: 'Tu turno: dar la pista',
+#       text: 'Inicia la ronda desde tu teléfono.',
+#       sub: '',
+#       actions: [],
+#       turnName: 'Equipo 1',
+#       lockTo: 'Equipo 1',
+#       hostOnly: 0,
+#       wait: '',
+#       secret: [Object],
+#       secretWord: null,
+#       word: null,
+#       hideTitle: false,
+#       guess: false,
+#       dial: null,
+#       result: null,
+#       note: '',
+#       guesser: false
+#     }
+#   }
+# ]
+# Subtest: El Dial rechaza el inicio de una ronda anterior a la recarga
+not ok 1 - El Dial rechaza el inicio de una ronda anterior a la recarga
+  ---
+  duration_ms: 22882.706072
+  type: 'test'
+  location: '/home/user/aa/tests/dial-ronda-recarga.cjs:8:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    locator.waitFor: Timeout 10000ms exceeded.
+    Call log:
+      - waiting for locator('#rm-dial-start') to be visible
+    
+  code: 'ERR_TEST_FAILURE'
+  name: 'TimeoutError'
+  stack: |-
+    abrir (/home/user/aa/tests/dial-ronda-recarga.cjs:15:966)
+    async TestContext.<anonymous> (/home/user/aa/tests/dial-ronda-recarga.cjs:17:454)
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 23511.127941
+ENSAYO 3
+TAP version 13
+# DIAG {
+#   game: 'dial',
+#   dial: {
+#     ronda: 0,
+#     roundId: 2,
+#     phase: 'idle',
+#     locked: false,
+#     needleMoved: false,
+#     pair: null,
+#     pairStatus: [ [Object] ]
+#   },
+#   can: { ok: true },
+#   conns: [
+#     {
+#       name: 'Luis',
+#       slot: 0,
+#       id: 'e5517252-01be-4e14-a515-b935b6e655d9',
+#       online: true,
+#       open: true
+#     },
+#     {
+#       name: 'Ana',
+#       slot: 0,
+#       id: 'ff2b4099-2920-438a-9a84-522b5707c4c6',
+#       online: true,
+#       open: true
+#     }
+#   ]
+# } [
+#   {
+#     slot: 0,
+#     screen: {
+#       kicker: 'El Dial',
+#       title: 'Esperando a quien dará la pista',
+#       text: 'El compañero iniciará la ronda.',
+#       sub: '',
+#       actions: [],
+#       turnName: 'Equipo 1',
+#       lockTo: 'Equipo 1',
+#       hostOnly: 0,
+#       wait: '',
+#       secret: null,
+#       secretWord: null,
+#       word: null,
+#       hideTitle: false,
+#       guess: false,
+#       dial: null,
+#       result: null,
+#       note: '',
+#       guesser: false
+#     }
+#   },
+#   {
+#     slot: 0,
+#     screen: {
+#       kicker: 'El Dial',
+#       title: 'Tu turno: dar la pista',
+#       text: 'Inicia la ronda desde tu teléfono.',
+#       sub: '',
+#       actions: [],
+#       turnName: 'Equipo 1',
+#       lockTo: 'Equipo 1',
+#       hostOnly: 0,
+#       wait: '',
+#       secret: [Object],
+#       secretWord: null,
+#       word: null,
+#       hideTitle: false,
+#       guess: false,
+#       dial: null,
+#       result: null,
+#       note: '',
+#       guesser: false
+#     }
+#   }
+# ]
+# Subtest: El Dial rechaza el inicio de una ronda anterior a la recarga
+not ok 1 - El Dial rechaza el inicio de una ronda anterior a la recarga
+  ---
+  duration_ms: 22927.57635
+  type: 'test'
+  location: '/home/user/aa/tests/dial-ronda-recarga.cjs:8:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    locator.waitFor: Timeout 10000ms exceeded.
+    Call log:
+      - waiting for locator('#rm-dial-start') to be visible
+    
+  code: 'ERR_TEST_FAILURE'
+  name: 'TimeoutError'
+  stack: |-
+    abrir (/home/user/aa/tests/dial-ronda-recarga.cjs:15:966)
+    async TestContext.<anonymous> (/home/user/aa/tests/dial-ronda-recarga.cjs:17:454)
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 23511.515919

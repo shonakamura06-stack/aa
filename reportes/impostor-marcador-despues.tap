@@ -1,0 +1,89 @@
+TAP version 13
+# Subtest: Impostor: reparto privado y resultado con 3 mandos
+not ok 1 - Impostor: reparto privado y resultado con 3 mandos
+  ---
+  duration_ms: 8075.741373
+  type: 'test'
+  location: '/home/user/aa/tests/impostor-partidas-completas.cjs:9:29'
+  failureType: 'testCodeFailure'
+  error: |-
+    el marcador debe mostrar los participantes reales
+    + actual - expected
+    
+      [
+    +   '🦁Ana',
+    +   '🦊Luis',
+    +   '🐸María'
+    -   'Ana',
+    -   'Luis',
+    -   'María'
+      ]
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    0: 'Ana'
+    1: 'Luis'
+    2: 'María'
+  actual:
+    0: '🦁Ana'
+    1: '🦊Luis'
+    2: '🐸María'
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (/home/user/aa/tests/impostor-partidas-completas.cjs:20:10)
+    runNextTicks (node:internal/process/task_queues:64:5)
+    process.processImmediate (node:internal/timers:452:9)
+    process.callbackTrampoline (node:internal/async_hooks:130:17)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: Impostor: reparto privado y resultado con 4 mandos
+not ok 2 - Impostor: reparto privado y resultado con 4 mandos
+  ---
+  duration_ms: 10064.616269
+  type: 'test'
+  location: '/home/user/aa/tests/impostor-partidas-completas.cjs:9:29'
+  failureType: 'testCodeFailure'
+  error: |-
+    el marcador debe mostrar los participantes reales
+    + actual - expected
+    
+      [
+    +   '🦁Ana',
+    +   '🦊Luis',
+    +   '🐸María',
+    +   '🦉José'
+    -   'Ana',
+    -   'Luis',
+    -   'María',
+    -   'José'
+      ]
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    0: 'Ana'
+    1: 'Luis'
+    2: 'María'
+    3: 'José'
+  actual:
+    0: '🦁Ana'
+    1: '🦊Luis'
+    2: '🐸María'
+    3: '🦉José'
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (/home/user/aa/tests/impostor-partidas-completas.cjs:20:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 0
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 18519.10517

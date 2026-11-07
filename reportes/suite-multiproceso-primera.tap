@@ -1,0 +1,103 @@
+TAP version 13
+# Subtest: Un fallo al guardar la sesión se comunica, conserva el estado en memoria y permite reintentar
+ok 1 - Un fallo al guardar la sesión se comunica, conserva el estado en memoria y permite reintentar
+  ---
+  duration_ms: 1563.644927
+  type: 'test'
+  ...
+# Subtest: El aviso permite reintentar y no revive una eliminación fallida
+ok 2 - El aviso permite reintentar y no revive una eliminación fallida
+  ---
+  duration_ms: 1454.727853
+  type: 'test'
+  ...
+# Subtest: El historial de cada banco sobrevive al cierre y reapertura del navegador
+ok 3 - El historial de cada banco sobrevive al cierre y reapertura del navegador
+  ---
+  duration_ms: 1510.990374
+  type: 'test'
+  ...
+# Subtest: Una frase atrasada de Historia no se acepta tras recargar al anfitrión
+ok 4 - Una frase atrasada de Historia no se acepta tras recargar al anfitrión
+  ---
+  duration_ms: 9063.742487
+  type: 'test'
+  ...
+# Subtest: El lote General está integrado, no duplica al sincronizar y no se repite tras recargar
+ok 5 - El lote General está integrado, no duplica al sincronizar y no se repite tras recargar
+  ---
+  duration_ms: 1199.547503
+  type: 'test'
+  ...
+# Subtest: El Dial conserva parejas elegidas y distribuye fases por conexión
+ok 6 - El Dial conserva parejas elegidas y distribuye fases por conexión
+  ---
+  duration_ms: 38287.453236
+  type: 'test'
+  ...
+# Subtest: El Dial: formación y resultado con 2 mandos
+ok 7 - El Dial: formación y resultado con 2 mandos
+  ---
+  duration_ms: 10292.364433
+  type: 'test'
+  ...
+# Subtest: El Dial: formación y resultado con 3 mandos
+ok 8 - El Dial: formación y resultado con 3 mandos
+  ---
+  duration_ms: 8989.118161
+  type: 'test'
+  ...
+# Subtest: El Dial: formación y resultado con 4 mandos
+ok 9 - El Dial: formación y resultado con 4 mandos
+  ---
+  duration_ms: 16529.865942
+  type: 'test'
+  ...
+# Subtest: El Dial rechaza el inicio de una ronda anterior a la recarga
+not ok 10 - El Dial rechaza el inicio de una ronda anterior a la recarga
+  ---
+  duration_ms: 23908.67544
+  type: 'test'
+  location: '/home/user/aa/tests/dial-ronda-recarga.cjs:8:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    locator.waitFor: Timeout 10000ms exceeded.
+    Call log:
+      - waiting for locator('#rm-dial-start') to be visible
+    
+  code: 'ERR_TEST_FAILURE'
+  name: 'TimeoutError'
+  stack: |-
+    abrir (/home/user/aa/tests/dial-ronda-recarga.cjs:15:962)
+    async TestContext.<anonymous> (/home/user/aa/tests/dial-ronda-recarga.cjs:17:454)
+  ...
+# Subtest: Modo local configura jugadores reales sin red y abre el catálogo
+ok 11 - Modo local configura jugadores reales sin red y abre el catálogo
+  ---
+  duration_ms: 4987.401348
+  type: 'test'
+  ...
+# Subtest: Servidor y dos mandos atraviesan la sala previa con conexiones reales
+ok 12 - Servidor y dos mandos atraviesan la sala previa con conexiones reales
+  ---
+  duration_ms: 8019.691096
+  type: 'test'
+  ...
+# Subtest: Votación local de Más probable entrega un voto privado por participante
+ok 13 - Votación local de Más probable entrega un voto privado por participante
+  ---
+  duration_ms: 3302.076972
+  type: 'test'
+  ...
+# Subtest: Tabú local recoge propuesta sin transmitir ni mostrar la carta al participante
+ok 14 - Tabú local recoge propuesta sin transmitir ni mostrar la carta al participante
+  ---
+  duration_ms: 5053.143324
+  type: 'test'
+  ...
+# Subtest: Dial local divide el resultado entre las personas de la pareja elegida
+ok 15 - Dial local divide el resultado entre las personas de la pareja elegida
+  ---
+  duration_ms: 2338.100879
+  type: 'test'
+  ...

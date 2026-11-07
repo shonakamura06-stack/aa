@@ -1,0 +1,16 @@
+TAP version 13
+# Subtest: El Dial: formación y resultado con 2 mandos
+ok 1 - El Dial: formación y resultado con 2 mandos
+  ---
+  duration_ms: 10527.230445
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 10898.054502

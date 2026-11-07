@@ -1,0 +1,22 @@
+TAP version 13
+# Subtest: Personaje entrega pistas acumuladas a dos mandos y limpia la ronda
+ok 1 - Personaje entrega pistas acumuladas a dos mandos y limpia la ronda
+  ---
+  duration_ms: 10805.500012
+  type: 'test'
+  ...
+# Subtest: Personaje rechaza respuestas sin ronda o de antes de recargar, y acepta la actual
+ok 2 - Personaje rechaza respuestas sin ronda o de antes de recargar, y acepta la actual
+  ---
+  duration_ms: 12000.149947
+  type: 'test'
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 2
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 23758.108236

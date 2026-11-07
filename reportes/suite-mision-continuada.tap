@@ -1,0 +1,79 @@
+TAP version 13
+# Subtest: Un fallo al guardar la sesión se comunica, conserva el estado en memoria y permite reintentar
+ok 1 - Un fallo al guardar la sesión se comunica, conserva el estado en memoria y permite reintentar
+  ---
+  duration_ms: 1729.22527
+  type: 'test'
+  ...
+# Subtest: El aviso permite reintentar y no revive una eliminación fallida
+ok 2 - El aviso permite reintentar y no revive una eliminación fallida
+  ---
+  duration_ms: 1794.144906
+  type: 'test'
+  ...
+# Subtest: El historial de cada banco sobrevive al cierre y reapertura del navegador
+ok 3 - El historial de cada banco sobrevive al cierre y reapertura del navegador
+  ---
+  duration_ms: 2545.869226
+  type: 'test'
+  ...
+# Subtest: Una frase atrasada de Historia no se acepta tras recargar al anfitrión
+ok 4 - Una frase atrasada de Historia no se acepta tras recargar al anfitrión
+  ---
+  duration_ms: 10387.650889
+  type: 'test'
+  ...
+# Subtest: El lote General está integrado, no duplica al sincronizar y no se repite tras recargar
+ok 5 - El lote General está integrado, no duplica al sincronizar y no se repite tras recargar
+  ---
+  duration_ms: 1849.698575
+  type: 'test'
+  ...
+# Subtest: El Dial conserva parejas elegidas y distribuye fases por conexión
+ok 6 - El Dial conserva parejas elegidas y distribuye fases por conexión
+  ---
+  duration_ms: 42632.379036
+  type: 'test'
+  ...
+# Subtest: El Dial rechaza el inicio de una ronda anterior a la recarga
+ok 7 - El Dial rechaza el inicio de una ronda anterior a la recarga
+  ---
+  duration_ms: 14306.466064
+  type: 'test'
+  ...
+# Subtest: Modo local configura jugadores reales sin red y abre el catálogo
+ok 8 - Modo local configura jugadores reales sin red y abre el catálogo
+  ---
+  duration_ms: 5700.551318
+  type: 'test'
+  ...
+# Subtest: Servidor y dos mandos atraviesan la sala previa con conexiones reales
+ok 9 - Servidor y dos mandos atraviesan la sala previa con conexiones reales
+  ---
+  duration_ms: 12516.92055
+  type: 'test'
+  ...
+# Subtest: Votación local de Más probable entrega un voto privado por participante
+ok 10 - Votación local de Más probable entrega un voto privado por participante
+  ---
+  duration_ms: 4908.994404
+  type: 'test'
+  ...
+# Subtest: Tabú local recoge propuesta sin transmitir ni mostrar la carta al participante
+ok 11 - Tabú local recoge propuesta sin transmitir ni mostrar la carta al participante
+  ---
+  duration_ms: 4925.262096
+  type: 'test'
+  ...
+# Subtest: Dial local divide el resultado entre las personas de la pareja elegida
+ok 12 - Dial local divide el resultado entre las personas de la pareja elegida
+  ---
+  duration_ms: 2687.341928
+  type: 'test'
+  ...
+# Subtest: Historia: sala real y una historia completa con 2 mandos
+ok 13 - Historia: sala real y una historia completa con 2 mandos
+  ---
+  duration_ms: 12235.696849
+  type: 'test'
+  ...
