@@ -1,0 +1,4 @@
+# El repo es público: los datos privados y los binarios se generan en local.
+datos_contacto.json
+*.pdf
+*.docx
