@@ -147,6 +147,12 @@ HABILIDADES = [
     ("Idiomas", "Español nativo; inglés B1–B2 autoevaluado."),
 ]
 
+# Solo se incluye cuando PERFIL_INCLUYE_DEPORTE = True (versión administrativa).
+DEPORTE = ("Participación continua en las confraternizaciones deportivas de la colectividad "
+           "nikkei de Santa Cruz (fútbol y vóleibol, 2015–2017) y en los Juegos Deportivos "
+           "Estudiantiles del municipio.")
+PERFIL_INCLUYE_DEPORTE = False
+
 DISPONIBILIDAD = ("Remoto, tiempo parcial y flexible, compatible con el inicio de estudios "
                   "universitarios en 2027.")
 
@@ -262,6 +268,10 @@ def construir_docx(ruta):
         r2 = par.add_run(detalle)
         r2.font.size = Pt(9.2)
 
+    if PERFIL_INCLUYE_DEPORTE:
+        seccion("Actividad deportiva")
+        p(DEPORTE, size=9.2)
+
     seccion("Habilidades")
     for etiqueta, detalle in HABILIDADES:
         par = doc.add_paragraph()
@@ -351,6 +361,10 @@ def construir_pdf(ruta):
     fl += sec("Otros antecedentes")
     for titulo, detalle in ANTECEDENTES:
         fl.append(Paragraph(f"<b>{titulo}.</b> {detalle}", st["vineta_b"]))
+
+    if PERFIL_INCLUYE_DEPORTE:
+        fl += sec("Actividad deportiva")
+        fl.append(Paragraph(DEPORTE, st["cuerpo"]))
 
     fl += sec("Habilidades")
     for etiqueta, detalle in HABILIDADES:
