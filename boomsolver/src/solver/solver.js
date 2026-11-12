@@ -403,7 +403,7 @@ export function solve(level, objectives, options = {}) {
   const bestBombs = list.length ? Math.min(...list.map((s) => s.physicalBombs)) : null;
   const bestPowder = list.length ? Math.min(...list.map((s) => s.powder)) : null;
 
-  const proofNote = buildProofNote(status, provenUpTo, opts.mode, list);
+  const proofNote = buildProofNote(status, provenUpTo, opts.mode, list, K);
 
   return {
     mode: opts.mode,
@@ -433,14 +433,17 @@ export function solve(level, objectives, options = {}) {
   };
 }
 
-function buildProofNote(status, provenUpTo, mode, list) {
+function buildProofNote(status, provenUpTo, mode, list, maxBombsSearched) {
   if (status === 'optimalityProven') {
     const b = list.length ? Math.min(...list.map((s) => s.physicalBombs)) : null;
     if (mode === 'fewest_bombs') {
       return `Enumeración exhaustiva completada: ${list.length} solución(es) con el mínimo de ${b} bomba(s) física(s). ` +
         'Todas verificadas por el mismo simulador.';
     }
-    return `Enumeración exhaustiva completada hasta ${b} bomba(s); orden por ${mode === 'least_powder' ? 'pólvora' : 'frente de Pareto'}.`;
+    const powderBest = list.length ? Math.min(...list.map((s) => s.powder)) : null;
+    return `Enumeración exhaustiva completada hasta ${maxBombsSearched} bomba(s) física(s) (${provenUpTo} niveles de tamaño agotados): ` +
+      `mínimo de pólvora ${powderBest} entre ${list.length} soluciones no dominadas. ` +
+      'Ninguna jugada con menos bombas usa menos pólvora.';
   }
   if (status === 'bestKnown') {
     return `Mejor solución encontrada hasta ahora. La enumeración NO terminó (límite de tiempo o de combinaciones): ` +

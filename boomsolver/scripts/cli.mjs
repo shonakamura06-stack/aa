@@ -175,9 +175,9 @@ function runSimulate() {
   const file = positional[0];
   const level = loadLevel(file);
   const placements = new Map();
-  for (const p of String(flags.bombs || '').split(',').filter(Boolean)) {
-    const m = /^(\d+),(\d+):(\d)$/.exec(p.trim());
-    if (!m) throw new Error(`Bomba mal formada: ${p}. Formato: col,fila:nivel`);
+  for (const p of String(flags.bombs || '').split(/[;|]/).map((x) => x.trim()).filter(Boolean)) {
+    const m = /^(\d+),(\d+):(\d)$/.exec(p);
+    if (!m) throw new Error(`Bomba mal formada: ${p}. Formato: --bombs="col,fila:nivel;col,fila:nivel"`);
     placements.set(Number(m[2]) * level.cols + Number(m[1]), Number(m[3]));
   }
   if (!placements.size) throw new Error('Indica --bombs=col,fila:nivel,...');
@@ -242,6 +242,6 @@ function printHelp() {
       --n1=3 --n2=1 --n3=0 --n4=0 --out=nivel.json
   verify nivel.json sol.json     Revalida una solución con el simulador oficial.
   explain nivel.json            Dice por qué un nivel es imposible o difícil.
-  simulate nivel.json --bombs=0,1:2,3,2:1 --mecha=0,1
+  simulate nivel.json --bombs="0,1:2;3,2:1" --mecha=0,1
 `);
 }
