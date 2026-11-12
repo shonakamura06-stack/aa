@@ -1,0 +1,89 @@
+{
+  "id": "p05-n33-detonador",
+  "origen": "humano",
+  "captura": "captures/p05-n33-detonador.png",
+  "pagina_pdf": 5,
+  "nivel": 33,
+  "nombre": "El detonador",
+  "tema": "mina",
+  "resolucion": {
+    "width": 525,
+    "height": 375
+  },
+  "cuadricula": {
+    "cols": 7,
+    "rows": 5
+  },
+  "geometria": {
+    "cuadricula": {
+      "cols": 7,
+      "rows": 5
+    },
+    "lado": 75,
+    "origen_recorte": {
+      "x": 0,
+      "y": 0
+    },
+    "fase_casilla": {
+      "x": -1,
+      "y": -53.5,
+      "lado": 75,
+      "metodo": "fase que maximiza la coincidencia entre el centro de cada casilla etiquetada y el centro del objeto dibujado (blobs de arte saturado)",
+      "puntuacion": 1.46,
+      "puntuacion_declarada": 0.23
+    },
+    "nota": "origen_recorte = dónde se recortó la captura dentro de la página (medido, exacto). fase_casilla = desplazamiento de la rejilla de casillas dentro de la captura, calibrado con los centros del arte (las capturas NO empiezan siempre en la frontera de casilla)."
+  },
+  "directriz": "Abre los cofres 0/1",
+  "restricciones": [],
+  "bandeja": [
+    {
+      "type": "blue_bomb_2",
+      "count": 2
+    }
+  ],
+  "temporizadores": [],
+  "enlaces": [
+    {
+      "from": [
+        0,
+        1
+      ],
+      "to": [
+        6,
+        4
+      ]
+    }
+  ],
+  "portales": [],
+  "desconocidos": [],
+  "recuento": {
+    "detonator": 1,
+    "chest_wood": 1,
+    "dynamite": 1
+  },
+  "revision": {
+    "estado": "revisado_humano",
+    "fecha": "2026-11-12",
+    "metodo": "inspección visual de cada página con rejilla superpuesta + mapa de varianza por casilla; sólo se etiquetan objetos",
+    "nota": "las casillas SIN objeto no se etiquetan: no se distingue con seguridad el suelo del \"fuera del mapa\" sombreado"
+  },
+  "etiqueta": "objetos",
+  "objetos": [
+    {
+      "x": 0,
+      "y": 1,
+      "type": "detonator"
+    },
+    {
+      "x": 5,
+      "y": 4,
+      "type": "chest_wood"
+    },
+    {
+      "x": 6,
+      "y": 4,
+      "type": "dynamite"
+    }
+  ]
+}

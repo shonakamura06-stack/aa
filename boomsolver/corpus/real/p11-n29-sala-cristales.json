@@ -1,0 +1,118 @@
+{
+  "id": "p11-n29-sala-cristales",
+  "origen": "humano",
+  "captura": "captures/p11-n29-sala-cristales.png",
+  "pagina_pdf": 11,
+  "nivel": 29,
+  "nombre": "Sala de cristales",
+  "tema": "pradera",
+  "resolucion": {
+    "width": 600,
+    "height": 375
+  },
+  "cuadricula": {
+    "cols": 8,
+    "rows": 5
+  },
+  "geometria": {
+    "cuadricula": {
+      "cols": 8,
+      "rows": 5
+    },
+    "lado": 75,
+    "origen_recorte": {
+      "x": 0,
+      "y": 0
+    },
+    "fase_casilla": {
+      "x": 1,
+      "y": 2.5,
+      "lado": 75,
+      "metodo": "fase que maximiza la coincidencia entre el centro de cada casilla etiquetada y el centro del objeto dibujado (blobs de arte saturado)",
+      "puntuacion": 3.3,
+      "puntuacion_declarada": 3.15
+    },
+    "nota": "origen_recorte = dónde se recortó la captura dentro de la página (medido, exacto). fase_casilla = desplazamiento de la rejilla de casillas dentro de la captura, calibrado con los centros del arte (las capturas NO empiezan siempre en la frontera de casilla)."
+  },
+  "directriz": "Abre los cofres 0/4 · sin romper cristales",
+  "restricciones": [
+    "sin romper cristales"
+  ],
+  "bandeja": [],
+  "temporizadores": [],
+  "enlaces": [],
+  "portales": [],
+  "desconocidos": [
+    "bandeja vacía: el jugador no ha colocado bombas todavía"
+  ],
+  "recuento": {
+    "chest_iron": 4,
+    "crystal": 2,
+    "enemy_2": 4,
+    "enemy_1": 1
+  },
+  "revision": {
+    "estado": "revisado_humano",
+    "fecha": "2026-11-12",
+    "metodo": "inspección visual de cada página con rejilla superpuesta + mapa de varianza por casilla; sólo se etiquetan objetos",
+    "nota": "las casillas SIN objeto no se etiquetan: no se distingue con seguridad el suelo del \"fuera del mapa\" sombreado"
+  },
+  "etiqueta": "objetos",
+  "objetos": [
+    {
+      "x": 0,
+      "y": 0,
+      "type": "chest_iron"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "type": "crystal"
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "type": "chest_iron"
+    },
+    {
+      "x": 0,
+      "y": 2,
+      "type": "enemy_2"
+    },
+    {
+      "x": 2,
+      "y": 2,
+      "type": "enemy_2"
+    },
+    {
+      "x": 3,
+      "y": 2,
+      "type": "enemy_1"
+    },
+    {
+      "x": 4,
+      "y": 2,
+      "type": "enemy_2"
+    },
+    {
+      "x": 6,
+      "y": 2,
+      "type": "enemy_2"
+    },
+    {
+      "x": 0,
+      "y": 4,
+      "type": "chest_iron"
+    },
+    {
+      "x": 3,
+      "y": 4,
+      "type": "crystal"
+    },
+    {
+      "x": 6,
+      "y": 4,
+      "type": "chest_iron"
+    }
+  ]
+}

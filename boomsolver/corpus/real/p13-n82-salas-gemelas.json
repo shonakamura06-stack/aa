@@ -1,0 +1,151 @@
+{
+  "id": "p13-n82-salas-gemelas",
+  "origen": "humano",
+  "captura": "captures/p13-n82-salas-gemelas.png",
+  "pagina_pdf": 13,
+  "nivel": 82,
+  "nombre": "Salas gemelas",
+  "tema": "dorado",
+  "resolucion": {
+    "width": 549,
+    "height": 366
+  },
+  "cuadricula": {
+    "cols": 9,
+    "rows": 6
+  },
+  "geometria": {
+    "cuadricula": {
+      "cols": 9,
+      "rows": 6
+    },
+    "lado": 61,
+    "origen_recorte": {
+      "x": 0,
+      "y": 0
+    },
+    "fase_casilla": {
+      "x": -1.5,
+      "y": 0,
+      "lado": 61,
+      "metodo": "fase que maximiza la coincidencia entre el centro de cada casilla etiquetada y el centro del objeto dibujado (blobs de arte saturado)",
+      "puntuacion": 6.65,
+      "puntuacion_declarada": 6.56
+    },
+    "nota": "origen_recorte = dónde se recortó la captura dentro de la página (medido, exacto). fase_casilla = desplazamiento de la rejilla de casillas dentro de la captura, calibrado con los centros del arte (las capturas NO empiezan siempre en la frontera de casilla)."
+  },
+  "directriz": "Abre los cofres 0/4 · sin romper cristales",
+  "restricciones": [
+    "sin romper cristales"
+  ],
+  "bandeja": [
+    {
+      "type": "blue_bomb_2",
+      "count": 5
+    },
+    {
+      "type": "enemy_2",
+      "count": 1
+    }
+  ],
+  "temporizadores": [],
+  "enlaces": [],
+  "portales": [
+    {
+      "color": "purple",
+      "at": [
+        [
+          0,
+          2
+        ],
+        [
+          5,
+          3
+        ]
+      ]
+    },
+    {
+      "color": "blue",
+      "at": [
+        [
+          7,
+          2
+        ],
+        [
+          0,
+          3
+        ]
+      ]
+    }
+  ],
+  "desconocidos": [],
+  "recuento": {
+    "chest_wood": 4,
+    "portal": 4,
+    "crystal": 3
+  },
+  "revision": {
+    "estado": "revisado_humano",
+    "fecha": "2026-11-12",
+    "metodo": "inspección visual de cada página con rejilla superpuesta + mapa de varianza por casilla; sólo se etiquetan objetos",
+    "nota": "las casillas SIN objeto no se etiquetan: no se distingue con seguridad el suelo del \"fuera del mapa\" sombreado"
+  },
+  "etiqueta": "objetos",
+  "objetos": [
+    {
+      "x": 3,
+      "y": 0,
+      "type": "chest_wood"
+    },
+    {
+      "x": 2,
+      "y": 1,
+      "type": "chest_wood"
+    },
+    {
+      "x": 0,
+      "y": 2,
+      "type": "portal"
+    },
+    {
+      "x": 2,
+      "y": 2,
+      "type": "crystal"
+    },
+    {
+      "x": 5,
+      "y": 2,
+      "type": "crystal"
+    },
+    {
+      "x": 6,
+      "y": 2,
+      "type": "chest_wood"
+    },
+    {
+      "x": 7,
+      "y": 2,
+      "type": "portal"
+    },
+    {
+      "x": 0,
+      "y": 3,
+      "type": "portal"
+    },
+    {
+      "x": 5,
+      "y": 3,
+      "type": "portal"
+    },
+    {
+      "x": 5,
+      "y": 4,
+      "type": "chest_wood"
+    },
+    {
+      "x": 1,
+      "y": 5,
+      "type": "crystal"
+    }
+  ]
+}

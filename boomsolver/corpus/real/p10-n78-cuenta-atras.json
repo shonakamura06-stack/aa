@@ -1,0 +1,184 @@
+{
+  "id": "p10-n78-cuenta-atras",
+  "origen": "humano",
+  "captura": "captures/p10-n78-cuenta-atras.png",
+  "pagina_pdf": 10,
+  "nivel": 78,
+  "nombre": "Cuenta atrás",
+  "tema": "mina oscura",
+  "resolucion": {
+    "width": 612,
+    "height": 340
+  },
+  "cuadricula": {
+    "cols": 9,
+    "rows": 5
+  },
+  "geometria": {
+    "cuadricula": {
+      "cols": 9,
+      "rows": 5
+    },
+    "lado": 68,
+    "origen_recorte": {
+      "x": 0,
+      "y": 0
+    },
+    "fase_casilla": {
+      "x": 0,
+      "y": 2,
+      "lado": 68,
+      "metodo": "fase que maximiza la coincidencia entre el centro de cada casilla etiquetada y el centro del objeto dibujado (blobs de arte saturado)",
+      "puntuacion": 7.76,
+      "puntuacion_declarada": 7.65
+    },
+    "nota": "origen_recorte = dónde se recortó la captura dentro de la página (medido, exacto). fase_casilla = desplazamiento de la rejilla de casillas dentro de la captura, calibrado con los centros del arte (las capturas NO empiezan siempre en la frontera de casilla)."
+  },
+  "directriz": "Abre los cofres 0/2 · Recoge las gemas 0/2 · sin romper cristales",
+  "restricciones": [
+    "sin romper cristales"
+  ],
+  "bandeja": [
+    {
+      "type": "blue_bomb_2",
+      "count": 5
+    }
+  ],
+  "temporizadores": [
+    {
+      "at": [
+        3,
+        0
+      ],
+      "value": 1
+    },
+    {
+      "at": [
+        2,
+        3
+      ],
+      "value": 3
+    },
+    {
+      "at": [
+        5,
+        3
+      ],
+      "value": 5
+    }
+  ],
+  "enlaces": [],
+  "portales": [],
+  "desconocidos": [
+    "roca gris (2,2) y (5,2): no está en el catálogo (¿roca dura?)",
+    "auditoría 2026-11-12 (completitud): se añadieron etiquetas que faltaban en (6,3)=enemy_1; detectadas con blobs de arte independientes del clasificador y confirmadas mirando la casilla ampliada"
+  ],
+  "recuento": {
+    "*": 2,
+    "chest_wood": 2,
+    "crystal": 2,
+    "enemy_1": 5,
+    "gem": 2,
+    "geyser": 3,
+    "magma_rock": 2
+  },
+  "revision": {
+    "estado": "revisado_humano",
+    "fecha": "2026-11-12",
+    "metodo": "inspección visual de cada página con rejilla superpuesta + mapa de varianza por casilla; sólo se etiquetan objetos",
+    "nota": "las casillas SIN objeto no se etiquetan: no se distingue con seguridad el suelo del \"fuera del mapa\" sombreado"
+  },
+  "etiqueta": "objetos",
+  "objetos": [
+    {
+      "x": 0,
+      "y": 0,
+      "type": "chest_wood"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "type": "enemy_1"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "type": "magma_rock"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "type": "geyser"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "type": "magma_rock"
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "type": "enemy_1"
+    },
+    {
+      "x": 7,
+      "y": 0,
+      "type": "chest_wood"
+    },
+    {
+      "x": 0,
+      "y": 2,
+      "type": "crystal"
+    },
+    {
+      "x": 2,
+      "y": 2,
+      "type": "*"
+    },
+    {
+      "x": 5,
+      "y": 2,
+      "type": "*"
+    },
+    {
+      "x": 7,
+      "y": 2,
+      "type": "crystal"
+    },
+    {
+      "x": 2,
+      "y": 3,
+      "type": "geyser"
+    },
+    {
+      "x": 5,
+      "y": 3,
+      "type": "geyser"
+    },
+    {
+      "x": 6,
+      "y": 3,
+      "type": "enemy_1"
+    },
+    {
+      "x": 0,
+      "y": 4,
+      "type": "gem"
+    },
+    {
+      "x": 1,
+      "y": 4,
+      "type": "enemy_1"
+    },
+    {
+      "x": 6,
+      "y": 4,
+      "type": "enemy_1"
+    },
+    {
+      "x": 7,
+      "y": 4,
+      "type": "gem"
+    }
+  ]
+}

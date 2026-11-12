@@ -1,0 +1,127 @@
+{
+  "id": "p06-n66-magma-cristal",
+  "origen": "humano",
+  "captura": "captures/p06-n66-magma-cristal.png",
+  "pagina_pdf": 6,
+  "nivel": 66,
+  "nombre": "Magma y cristal",
+  "tema": "mina",
+  "resolucion": {
+    "width": 600,
+    "height": 375
+  },
+  "cuadricula": {
+    "cols": 8,
+    "rows": 5
+  },
+  "geometria": {
+    "cuadricula": {
+      "cols": 8,
+      "rows": 5
+    },
+    "lado": 75,
+    "origen_recorte": {
+      "x": 0,
+      "y": 0
+    },
+    "fase_casilla": {
+      "x": 1,
+      "y": 40.5,
+      "lado": 75,
+      "metodo": "fase que maximiza la coincidencia entre el centro de cada casilla etiquetada y el centro del objeto dibujado (blobs de arte saturado)",
+      "puntuacion": 4.32,
+      "puntuacion_declarada": 1.58
+    },
+    "nota": "origen_recorte = dónde se recortó la captura dentro de la página (medido, exacto). fase_casilla = desplazamiento de la rejilla de casillas dentro de la captura, calibrado con los centros del arte (las capturas NO empiezan siempre en la frontera de casilla)."
+  },
+  "directriz": "Abre los cofres 0/2 · sin romper cristales",
+  "restricciones": [
+    "sin romper cristales"
+  ],
+  "bandeja": [
+    {
+      "type": "blue_bomb_2",
+      "count": 4
+    }
+  ],
+  "temporizadores": [],
+  "enlaces": [],
+  "portales": [],
+  "desconocidos": [
+    "auditoría 2026-11-12 (completitud): se añadieron etiquetas que faltaban en (4,0)=crystal, (0,3)=crystal, (6,3)=crystal; detectadas con blobs de arte independientes del clasificador y confirmadas mirando la casilla ampliada"
+  ],
+  "recuento": {
+    "chest_wood": 2,
+    "crystal": 7,
+    "magma_rock": 3
+  },
+  "revision": {
+    "estado": "revisado_humano",
+    "fecha": "2026-11-12",
+    "metodo": "inspección visual de cada página con rejilla superpuesta + mapa de varianza por casilla; sólo se etiquetan objetos",
+    "nota": "las casillas SIN objeto no se etiquetan: no se distingue con seguridad el suelo del \"fuera del mapa\" sombreado"
+  },
+  "etiqueta": "objetos",
+  "objetos": [
+    {
+      "x": 0,
+      "y": 0,
+      "type": "chest_wood"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "type": "crystal"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "type": "crystal"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "type": "crystal"
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "type": "chest_wood"
+    },
+    {
+      "x": 1,
+      "y": 1,
+      "type": "magma_rock"
+    },
+    {
+      "x": 5,
+      "y": 1,
+      "type": "magma_rock"
+    },
+    {
+      "x": 3,
+      "y": 2,
+      "type": "magma_rock"
+    },
+    {
+      "x": 0,
+      "y": 3,
+      "type": "crystal"
+    },
+    {
+      "x": 6,
+      "y": 3,
+      "type": "crystal"
+    },
+    {
+      "x": 0,
+      "y": 4,
+      "type": "crystal"
+    },
+    {
+      "x": 6,
+      "y": 4,
+      "type": "crystal"
+    }
+  ]
+}

@@ -1,0 +1,166 @@
+{
+  "id": "p07-n46-corazon-mina",
+  "origen": "humano",
+  "captura": "captures/p07-n46-corazon-mina.png",
+  "pagina_pdf": 7,
+  "nivel": 46,
+  "nombre": "El corazón de la mina",
+  "tema": "mina",
+  "resolucion": {
+    "width": 600,
+    "height": 450
+  },
+  "cuadricula": {
+    "cols": 8,
+    "rows": 6
+  },
+  "geometria": {
+    "cuadricula": {
+      "cols": 8,
+      "rows": 6
+    },
+    "lado": 75,
+    "origen_recorte": {
+      "x": 0,
+      "y": 0
+    },
+    "fase_casilla": {
+      "x": -2.5,
+      "y": 2.5,
+      "lado": 75,
+      "metodo": "fase que maximiza la coincidencia entre el centro de cada casilla etiquetada y el centro del objeto dibujado (blobs de arte saturado)",
+      "puntuacion": 7.25,
+      "puntuacion_declarada": 6.82
+    },
+    "nota": "origen_recorte = dónde se recortó la captura dentro de la página (medido, exacto). fase_casilla = desplazamiento de la rejilla de casillas dentro de la captura, calibrado con los centros del arte (las capturas NO empiezan siempre en la frontera de casilla)."
+  },
+  "directriz": "Activa los interruptores a la vez 0/4 · sin romper cristales",
+  "restricciones": [
+    "sin romper cristales"
+  ],
+  "bandeja": [
+    {
+      "type": "blue_bomb_2",
+      "count": 5
+    },
+    {
+      "type": "enemy_2",
+      "count": 1
+    }
+  ],
+  "temporizadores": [],
+  "enlaces": [
+    {
+      "from": [
+        1,
+        4
+      ],
+      "to": [
+        6,
+        4
+      ]
+    },
+    {
+      "from": [
+        1,
+        4
+      ],
+      "to": [
+        5,
+        5
+      ]
+    },
+    {
+      "from": [
+        1,
+        4
+      ],
+      "to": [
+        4,
+        2
+      ]
+    }
+  ],
+  "portales": [],
+  "desconocidos": [],
+  "recuento": {
+    "switch": 4,
+    "crystal": 5,
+    "dynamite": 3,
+    "detonator": 1
+  },
+  "revision": {
+    "estado": "revisado_humano",
+    "fecha": "2026-11-12",
+    "metodo": "inspección visual de cada página con rejilla superpuesta + mapa de varianza por casilla; sólo se etiquetan objetos",
+    "nota": "las casillas SIN objeto no se etiquetan: no se distingue con seguridad el suelo del \"fuera del mapa\" sombreado"
+  },
+  "etiqueta": "objetos",
+  "objetos": [
+    {
+      "x": 3,
+      "y": 0,
+      "type": "switch"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "type": "switch"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "type": "crystal"
+    },
+    {
+      "x": 0,
+      "y": 1,
+      "type": "switch"
+    },
+    {
+      "x": 0,
+      "y": 2,
+      "type": "crystal"
+    },
+    {
+      "x": 2,
+      "y": 2,
+      "type": "crystal"
+    },
+    {
+      "x": 4,
+      "y": 2,
+      "type": "dynamite"
+    },
+    {
+      "x": 6,
+      "y": 2,
+      "type": "crystal"
+    },
+    {
+      "x": 1,
+      "y": 4,
+      "type": "detonator"
+    },
+    {
+      "x": 6,
+      "y": 4,
+      "type": "dynamite"
+    },
+    {
+      "x": 0,
+      "y": 5,
+      "type": "crystal"
+    },
+    {
+      "x": 1,
+      "y": 5,
+      "type": "switch"
+    },
+    {
+      "x": 5,
+      "y": 5,
+      "type": "dynamite"
+    }
+  ]
+}

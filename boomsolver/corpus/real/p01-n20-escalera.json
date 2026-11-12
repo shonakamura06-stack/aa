@@ -1,0 +1,86 @@
+{
+  "id": "p01-n20-escalera",
+  "origen": "humano",
+  "captura": "captures/p01-n20-escalera.png",
+  "pagina_pdf": 1,
+  "nivel": 20,
+  "nombre": "Escalera",
+  "tema": "pradera",
+  "resolucion": {
+    "width": 679,
+    "height": 679
+  },
+  "cuadricula": {
+    "cols": 7,
+    "rows": 7
+  },
+  "geometria": {
+    "cuadricula": {
+      "cols": 7,
+      "rows": 7
+    },
+    "lado": 97,
+    "origen_recorte": {
+      "x": 0,
+      "y": 0
+    },
+    "fase_casilla": {
+      "x": 0,
+      "y": 2,
+      "lado": 97,
+      "metodo": "fase que maximiza la coincidencia entre el centro de cada casilla etiquetada y el centro del objeto dibujado (blobs de arte saturado)",
+      "puntuacion": 4.98,
+      "puntuacion_declarada": 4.82
+    },
+    "nota": "origen_recorte = dónde se recortó la captura dentro de la página (medido, exacto). fase_casilla = desplazamiento de la rejilla de casillas dentro de la captura, calibrado con los centros del arte (las capturas NO empiezan siempre en la frontera de casilla)."
+  },
+  "directriz": "Abre los cofres 0/5",
+  "restricciones": [],
+  "bandeja": [
+    {
+      "type": "enemy_2",
+      "count": 4
+    }
+  ],
+  "temporizadores": [],
+  "enlaces": [],
+  "portales": [],
+  "desconocidos": [],
+  "recuento": {
+    "chest_wood": 5
+  },
+  "revision": {
+    "estado": "revisado_humano",
+    "fecha": "2026-11-12",
+    "metodo": "inspección visual de cada página con rejilla superpuesta + mapa de varianza por casilla; sólo se etiquetan objetos",
+    "nota": "las casillas SIN objeto no se etiquetan: no se distingue con seguridad el suelo del \"fuera del mapa\" sombreado"
+  },
+  "etiqueta": "objetos",
+  "objetos": [
+    {
+      "x": 1,
+      "y": 1,
+      "type": "chest_wood"
+    },
+    {
+      "x": 2,
+      "y": 2,
+      "type": "chest_wood"
+    },
+    {
+      "x": 3,
+      "y": 3,
+      "type": "chest_wood"
+    },
+    {
+      "x": 4,
+      "y": 4,
+      "type": "chest_wood"
+    },
+    {
+      "x": 5,
+      "y": 5,
+      "type": "chest_wood"
+    }
+  ]
+}

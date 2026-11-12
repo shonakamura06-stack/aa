@@ -552,8 +552,14 @@ export function detectBoard(input, options = {}) {
     ? { cols: options.cols, rows: options.rows, cellW: region.width / options.cols, cellH: region.height / options.rows, confidence: 1, warnings: [] }
     : buildGrid(data, width, region);
 
-  const cellW = region.width / grid.cols;
-  const cellH = region.height / grid.rows;
+  // Una rejilla medida (capturas reales) trae origen y paso propios: las casillas
+  // no empiezan en el borde de la región, porque la región incluye el marco.
+  // Sin esto, recortar con la rejilla medida pero dividir la región entera movería
+  // todas las casillas media casilla y el clasificador fallaría por el recorte,
+  // no por el reconocimiento.
+  const explicit = options.cellGrid && options.cellGrid.length ? options.cellGrid : null;
+  const cellW = explicit ? 0 : region.width / grid.cols;
+  const cellH = explicit ? 0 : region.height / grid.rows;
   const cells = [];
   const gridOut = [];
   const warnings = [...(region.warnings || []), ...(grid.warnings || [])];
@@ -562,10 +568,11 @@ export function detectBoard(input, options = {}) {
   for (let r = 0; r < grid.rows; r++) {
     const row = [];
     for (let c = 0; c < grid.cols; c++) {
-      const x0 = Math.round(region.x0 + c * cellW + cellW * 0.12);
-      const x1 = Math.round(region.x0 + (c + 1) * cellW - cellW * 0.12);
-      const y0 = Math.round(region.y0 + r * cellH + cellH * 0.12);
-      const y1 = Math.round(region.y0 + (r + 1) * cellH - cellH * 0.12);
+      const box = explicit ? explicit[r][c] : null;
+      const x0 = box ? box.x0 : Math.round(region.x0 + c * cellW + cellW * 0.12);
+      const x1 = box ? box.x1 : Math.round(region.x0 + (c + 1) * cellW - cellW * 0.12);
+      const y0 = box ? box.y0 : Math.round(region.y0 + r * cellH + cellH * 0.12);
+      const y1 = box ? box.y1 : Math.round(region.y0 + (r + 1) * cellH - cellH * 0.12);
       const norm = normalizeCell(data, width, Math.max(0, x0), Math.max(0, y0), Math.min(width, x1), Math.min(height, y1));
       const result = classifyCell(norm);
       const cell = {

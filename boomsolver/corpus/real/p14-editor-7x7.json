@@ -1,0 +1,55 @@
+{
+  "id": "p14-editor-7x7",
+  "origen": "humano",
+  "captura": "captures/p14-editor-7x7.png",
+  "pagina_pdf": 14,
+  "nivel": null,
+  "nombre": "Editor de niveles",
+  "tema": "pradera (editor)",
+  "resolucion": {
+    "width": 630,
+    "height": 630
+  },
+  "cuadricula": {
+    "cols": 7,
+    "rows": 7
+  },
+  "geometria": {
+    "cuadricula": {
+      "cols": 7,
+      "rows": 7
+    },
+    "lado": 90,
+    "origen_recorte": {
+      "x": 0,
+      "y": 0
+    },
+    "fase_casilla": {
+      "x": -90,
+      "y": -90,
+      "lado": 90,
+      "metodo": "fase que maximiza la coincidencia entre el centro de cada casilla etiquetada y el centro del objeto dibujado (blobs de arte saturado)",
+      "puntuacion": 0,
+      "puntuacion_declarada": 0
+    },
+    "nota": "origen_recorte = dónde se recortó la captura dentro de la página (medido, exacto). fase_casilla = desplazamiento de la rejilla de casillas dentro de la captura, calibrado con los centros del arte (las capturas NO empiezan siempre en la frontera de casilla)."
+  },
+  "directriz": "Estilo: Pradera · ancho 7 · alto 7 · Pieza: Borrar · Sin superar",
+  "restricciones": [],
+  "bandeja": [],
+  "temporizadores": [],
+  "enlaces": [],
+  "portales": [],
+  "desconocidos": [
+    "tablero vacío en el editor: no es un nivel jugable"
+  ],
+  "recuento": {},
+  "revision": {
+    "estado": "revisado_humano",
+    "fecha": "2026-11-12",
+    "metodo": "inspección visual de cada página con rejilla superpuesta + mapa de varianza por casilla; sólo se etiquetan objetos",
+    "nota": "las casillas SIN objeto no se etiquetan: no se distingue con seguridad el suelo del \"fuera del mapa\" sombreado"
+  },
+  "etiqueta": "objetos",
+  "objetos": []
+}

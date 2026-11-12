@@ -1,0 +1,146 @@
+{
+  "id": "p03-n83-atajo",
+  "origen": "humano",
+  "captura": "captures/p03-n83-atajo.png",
+  "pagina_pdf": 3,
+  "nivel": 83,
+  "nombre": "Atajo dorado",
+  "tema": "dorado",
+  "resolucion": {
+    "width": 600,
+    "height": 375
+  },
+  "cuadricula": {
+    "cols": 8,
+    "rows": 5
+  },
+  "geometria": {
+    "cuadricula": {
+      "cols": 8,
+      "rows": 5
+    },
+    "lado": 75,
+    "origen_recorte": {
+      "x": 0,
+      "y": 0
+    },
+    "fase_casilla": {
+      "x": -0.5,
+      "y": 4,
+      "lado": 75,
+      "metodo": "fase que maximiza la coincidencia entre el centro de cada casilla etiquetada y el centro del objeto dibujado (blobs de arte saturado)",
+      "puntuacion": 8.47,
+      "puntuacion_declarada": 8.2
+    },
+    "nota": "origen_recorte = dónde se recortó la captura dentro de la página (medido, exacto). fase_casilla = desplazamiento de la rejilla de casillas dentro de la captura, calibrado con los centros del arte (las capturas NO empiezan siempre en la frontera de casilla)."
+  },
+  "directriz": "Abre los cofres 0/4 · sin romper cristales",
+  "restricciones": [
+    "sin romper cristales"
+  ],
+  "bandeja": [],
+  "temporizadores": [],
+  "enlaces": [],
+  "portales": [],
+  "desconocidos": [
+    "los discos de 4 brazos son portales (azul y morado) pero el emparejamiento por color no se puede comprobar en una captura estática",
+    "columna 3 en las filas 0-3 está tapada por una franja del marco: esas casillas no se etiquetan",
+    "auditoría 2026-11-12 (completitud): se añadieron etiquetas que faltaban en (6,1)=crystal; detectadas con blobs de arte independientes del clasificador y confirmadas mirando la casilla ampliada"
+  ],
+  "recuento": {
+    "chest_wood": 3,
+    "crystal": 5,
+    "enemy_1": 3,
+    "enemy_2": 1,
+    "portal": 4
+  },
+  "revision": {
+    "estado": "revisado_humano",
+    "fecha": "2026-11-12",
+    "metodo": "inspección visual de cada página con rejilla superpuesta + mapa de varianza por casilla; sólo se etiquetan objetos",
+    "nota": "las casillas SIN objeto no se etiquetan: no se distingue con seguridad el suelo del \"fuera del mapa\" sombreado"
+  },
+  "etiqueta": "objetos",
+  "objetos": [
+    {
+      "x": 0,
+      "y": 0,
+      "type": "chest_wood"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "type": "crystal"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "type": "portal"
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "type": "enemy_1"
+    },
+    {
+      "x": 0,
+      "y": 1,
+      "type": "enemy_1"
+    },
+    {
+      "x": 1,
+      "y": 1,
+      "type": "portal"
+    },
+    {
+      "x": 6,
+      "y": 1,
+      "type": "crystal"
+    },
+    {
+      "x": 1,
+      "y": 2,
+      "type": "crystal"
+    },
+    {
+      "x": 3,
+      "y": 2,
+      "type": "crystal"
+    },
+    {
+      "x": 6,
+      "y": 2,
+      "type": "portal"
+    },
+    {
+      "x": 0,
+      "y": 3,
+      "type": "portal"
+    },
+    {
+      "x": 4,
+      "y": 3,
+      "type": "enemy_1"
+    },
+    {
+      "x": 5,
+      "y": 3,
+      "type": "chest_wood"
+    },
+    {
+      "x": 6,
+      "y": 3,
+      "type": "enemy_2"
+    },
+    {
+      "x": 3,
+      "y": 4,
+      "type": "crystal"
+    },
+    {
+      "x": 4,
+      "y": 4,
+      "type": "chest_wood"
+    }
+  ]
+}

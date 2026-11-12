@@ -24,6 +24,11 @@ import {
   synthCase, evaluateCase, summarizeCorpus, watchedConfusionReport,
   renderReport, splitTrainEval, loadRealCorpus,
 } from '../src/vision/evaluation.js';
+import {
+  loadRealCorpusFs,
+  evaluateRealCorpus,
+  renderRealCrossReport,
+} from '../src/vision/realEval.js';
 import { readFileSync, readdirSync } from 'node:fs';
 import { bruteForce, bruteSignature, solverSignature } from '../src/solver/bruteforce.js';
 
@@ -357,32 +362,40 @@ function runVision() {
 
   let real = { casos: [], warnings: [], errors: [] };
   if (flags.real) {
+    // Corpus real nuevo: `corpus/real/*.json` con la captura recortada al
+    // tablero. Se evalúa con validación cruzada por nivel (ver
+    // `evaluateRealCorpus`), que es lo único defendible con 13 capturas.
     try {
-      real = loadRealCorpus({ dir: flags.real, readFile: readFileSync, readDir: readdirSync });
+      const { casos, errores } = loadRealCorpusFs({ dir: flags.real, readFile: readFileSync, readDir: readdirSync });
+      real = { casos, warnings: [], errors: errores };
     } catch (err) {
       throw new Error(`No se pudo leer el corpus real "${flags.real}": ${err.message}`);
     }
-    for (const w of real.warnings) console.warn(`AVISO: ${w}`);
     for (const e of real.errors) console.warn(`CASO IGNORADO ${e.id}: ${e.error}`);
   }
 
   const syntheticResults = casos.map((c) => evaluateCase(c));
-  const realResults = real.casos.map((c) => evaluateCase(c));
   const syntheticSummary = summarizeCorpus(syntheticResults);
-  const realSummary = real.casos.length ? summarizeCorpus(realResults) : null;
-  const watched = watchedConfusionReport(realSummary || syntheticSummary);
+  const realCross = real.casos.length ? evaluateRealCorpus(real.casos) : null;
+  const realSummary = realCross ? realCross.agregado : null;
+  // `watchedConfusionReport` espera un resumen del corpus SINTÉTICO (con su
+  // matriz); el real trae la suya en `confusiones`. Mezclarlos reventaba.
+  const watched = watchedConfusionReport(realSummary ? { matrix: {} } : syntheticSummary);
   const split = splitTrainEval(real.casos.length ? real.casos : casos);
 
   if (flags.json) {
     console.log(JSON.stringify({
       synthetic: { summary: syntheticSummary, watched: watchedConfusionReport(syntheticSummary) },
-      real: realSummary ? {
-        summary: realSummary,
-        watched,
-        warnings: real.warnings,
+      real: realCross ? {
+        agregado: realCross.agregado,
+        pliegues: realCross.pliegues.map((p) => ({
+          grupo: p.grupo, dev: p.dev, eval: p.eval, resumen: p.resumen,
+        })),
+        porClase: realCross.porClase,
+        confusiones: realCross.confusiones,
+        notas: realCross.notas,
         errors: real.errors,
       } : null,
-      split: { train: split.train.length, eval: split.eval.length, corpus: real.casos.length ? 'real' : 'sintético' },
     }, null, 2));
     return;
   }
@@ -400,7 +413,7 @@ function runVision() {
     console.log('humana del tablero). El formato está documentado en corpus/real/README.md.');
   } else {
     console.log('');
-    console.log(renderReport(realSummary, watched, { realImages: real.casos.length }));
+    console.log(renderRealCrossReport(realCross));
     if (real.errors.length) {
       console.log('');
       console.log(`Casos ignorados: ${real.errors.length}`);

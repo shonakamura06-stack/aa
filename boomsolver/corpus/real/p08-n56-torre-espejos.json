@@ -1,0 +1,83 @@
+{
+  "id": "p08-n56-torre-espejos",
+  "origen": "humano",
+  "captura": "captures/p08-n56-torre-espejos.png",
+  "pagina_pdf": 8,
+  "nivel": 56,
+  "nombre": "Torre de espejos",
+  "tema": "azul",
+  "resolucion": {
+    "width": 679,
+    "height": 485
+  },
+  "cuadricula": {
+    "cols": 7,
+    "rows": 5
+  },
+  "geometria": {
+    "cuadricula": {
+      "cols": 7,
+      "rows": 5
+    },
+    "lado": 97,
+    "origen_recorte": {
+      "x": 0,
+      "y": 0
+    },
+    "fase_casilla": {
+      "x": -2,
+      "y": -0.5,
+      "lado": 97,
+      "metodo": "fase que maximiza la coincidencia entre el centro de cada casilla etiquetada y el centro del objeto dibujado (blobs de arte saturado)",
+      "puntuacion": 1.99,
+      "puntuacion_declarada": 1.94
+    },
+    "nota": "origen_recorte = dónde se recortó la captura dentro de la página (medido, exacto). fase_casilla = desplazamiento de la rejilla de casillas dentro de la captura, calibrado con los centros del arte (las capturas NO empiezan siempre en la frontera de casilla)."
+  },
+  "directriz": "Activa los interruptores a la vez 0/2",
+  "restricciones": [],
+  "bandeja": [
+    {
+      "type": "enemy_2",
+      "count": 3
+    },
+    {
+      "type": "blue_bomb_2",
+      "count": 1
+    }
+  ],
+  "temporizadores": [],
+  "enlaces": [],
+  "portales": [],
+  "desconocidos": [
+    "los dos espejos de la fila 2 son casi horizontales: su orientación no se puede fijar con seguridad"
+  ],
+  "recuento": {
+    "switch": 2,
+    "mirror_backslash": 1
+  },
+  "revision": {
+    "estado": "revisado_humano",
+    "fecha": "2026-11-12",
+    "metodo": "inspección visual de cada página con rejilla superpuesta + mapa de varianza por casilla; sólo se etiquetan objetos",
+    "nota": "las casillas SIN objeto no se etiquetan: no se distingue con seguridad el suelo del \"fuera del mapa\" sombreado"
+  },
+  "etiqueta": "objetos",
+  "objetos": [
+    {
+      "x": 1,
+      "y": 0,
+      "type": "switch"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "type": "mirror_backslash"
+    },
+    {
+      "x": 1,
+      "y": 4,
+      "type": "switch"
+    }
+  ]
+}

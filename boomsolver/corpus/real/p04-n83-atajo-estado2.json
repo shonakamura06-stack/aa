@@ -1,0 +1,129 @@
+{
+  "id": "p04-n83-atajo-estado2",
+  "origen": "humano",
+  "captura": "captures/p04-n83-atajo-estado2.png",
+  "pagina_pdf": 4,
+  "nivel": 83,
+  "nombre": "Atajo dorado (estado 2)",
+  "tema": "dorado",
+  "resolucion": {
+    "width": 600,
+    "height": 375
+  },
+  "cuadricula": {
+    "cols": 8,
+    "rows": 5
+  },
+  "geometria": {
+    "cuadricula": {
+      "cols": 8,
+      "rows": 5
+    },
+    "lado": 75,
+    "origen_recorte": {
+      "x": 0,
+      "y": 0
+    },
+    "fase_casilla": {
+      "x": 2,
+      "y": 1,
+      "lado": 75,
+      "metodo": "fase que maximiza la coincidencia entre el centro de cada casilla etiquetada y el centro del objeto dibujado (blobs de arte saturado)",
+      "puntuacion": 7.62,
+      "puntuacion_declarada": 7.5
+    },
+    "nota": "origen_recorte = dónde se recortó la captura dentro de la página (medido, exacto). fase_casilla = desplazamiento de la rejilla de casillas dentro de la captura, calibrado con los centros del arte (las capturas NO empiezan siempre en la frontera de casilla)."
+  },
+  "directriz": "Abre los cofres 0/4 · sin romper cristales",
+  "restricciones": [
+    "sin romper cristales"
+  ],
+  "bandeja": [
+    {
+      "type": "enemy_2",
+      "count": 5
+    }
+  ],
+  "temporizadores": [],
+  "enlaces": [],
+  "portales": [],
+  "desconocidos": [
+    "mismos objetos no catalogados que la página 3",
+    "faltan los dos enemigos de la fila 3 respecto a la página 3: el estado es distinto",
+    "auditoría 2026-11-12: las casillas (6,3) estaban etiquetadas pero en el ráster están vacías (varianza de suelo); se han retirado"
+  ],
+  "recuento": {
+    "chest_wood": 5,
+    "crystal": 3,
+    "portal": 4
+  },
+  "revision": {
+    "estado": "revisado_humano",
+    "fecha": "2026-11-12",
+    "metodo": "inspección visual de cada página con rejilla superpuesta + mapa de varianza por casilla; sólo se etiquetan objetos",
+    "nota": "las casillas SIN objeto no se etiquetan: no se distingue con seguridad el suelo del \"fuera del mapa\" sombreado"
+  },
+  "etiqueta": "objetos",
+  "objetos": [
+    {
+      "x": 0,
+      "y": 0,
+      "type": "chest_wood"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "type": "crystal"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "type": "portal"
+    },
+    {
+      "x": 1,
+      "y": 1,
+      "type": "portal"
+    },
+    {
+      "x": 6,
+      "y": 1,
+      "type": "chest_wood"
+    },
+    {
+      "x": 1,
+      "y": 2,
+      "type": "crystal"
+    },
+    {
+      "x": 6,
+      "y": 2,
+      "type": "portal"
+    },
+    {
+      "x": 0,
+      "y": 3,
+      "type": "portal"
+    },
+    {
+      "x": 3,
+      "y": 3,
+      "type": "chest_wood"
+    },
+    {
+      "x": 3,
+      "y": 4,
+      "type": "crystal"
+    },
+    {
+      "x": 4,
+      "y": 4,
+      "type": "chest_wood"
+    },
+    {
+      "x": 5,
+      "y": 4,
+      "type": "chest_wood"
+    }
+  ]
+}

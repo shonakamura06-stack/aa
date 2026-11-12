@@ -1,0 +1,131 @@
+{
+  "id": "p12-n74-rio-lava",
+  "origen": "humano",
+  "captura": "captures/p12-n74-rio-lava.png",
+  "pagina_pdf": 12,
+  "nivel": 74,
+  "nombre": "Río de lava",
+  "tema": "mina oscura",
+  "resolucion": {
+    "width": 612,
+    "height": 340
+  },
+  "cuadricula": {
+    "cols": 9,
+    "rows": 5
+  },
+  "geometria": {
+    "cuadricula": {
+      "cols": 9,
+      "rows": 5
+    },
+    "lado": 68,
+    "origen_recorte": {
+      "x": 0,
+      "y": 0
+    },
+    "fase_casilla": {
+      "x": -0.5,
+      "y": 0.5,
+      "lado": 68,
+      "metodo": "fase que maximiza la coincidencia entre el centro de cada casilla etiquetada y el centro del objeto dibujado (blobs de arte saturado)",
+      "puntuacion": 3.97,
+      "puntuacion_declarada": 3.93
+    },
+    "nota": "origen_recorte = dónde se recortó la captura dentro de la página (medido, exacto). fase_casilla = desplazamiento de la rejilla de casillas dentro de la captura, calibrado con los centros del arte (las capturas NO empiezan siempre en la frontera de casilla)."
+  },
+  "directriz": "Abre los cofres 0/2 · Recoge las gemas 0/2",
+  "restricciones": [],
+  "bandeja": [
+    {
+      "type": "blue_bomb_2",
+      "count": 4
+    }
+  ],
+  "temporizadores": [
+    {
+      "at": [
+        2,
+        2
+      ],
+      "value": 2
+    },
+    {
+      "at": [
+        5,
+        2
+      ],
+      "value": 4
+    }
+  ],
+  "enlaces": [],
+  "portales": [],
+  "desconocidos": [
+    "gema cian: no catalogada"
+  ],
+  "recuento": {
+    "chest_wood": 2,
+    "magma_rock": 4,
+    "gem": 2,
+    "geyser": 2
+  },
+  "revision": {
+    "estado": "revisado_humano",
+    "fecha": "2026-11-12",
+    "metodo": "inspección visual de cada página con rejilla superpuesta + mapa de varianza por casilla; sólo se etiquetan objetos",
+    "nota": "las casillas SIN objeto no se etiquetan: no se distingue con seguridad el suelo del \"fuera del mapa\" sombreado"
+  },
+  "etiqueta": "objetos",
+  "objetos": [
+    {
+      "x": 0,
+      "y": 0,
+      "type": "chest_wood"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "type": "magma_rock"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "type": "magma_rock"
+    },
+    {
+      "x": 7,
+      "y": 0,
+      "type": "gem"
+    },
+    {
+      "x": 2,
+      "y": 2,
+      "type": "geyser"
+    },
+    {
+      "x": 5,
+      "y": 2,
+      "type": "geyser"
+    },
+    {
+      "x": 0,
+      "y": 4,
+      "type": "gem"
+    },
+    {
+      "x": 2,
+      "y": 4,
+      "type": "magma_rock"
+    },
+    {
+      "x": 5,
+      "y": 4,
+      "type": "magma_rock"
+    },
+    {
+      "x": 7,
+      "y": 4,
+      "type": "chest_wood"
+    }
+  ]
+}

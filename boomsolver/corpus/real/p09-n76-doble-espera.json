@@ -1,0 +1,112 @@
+{
+  "id": "p09-n76-doble-espera",
+  "origen": "humano",
+  "captura": "captures/p09-n76-doble-espera.png",
+  "pagina_pdf": 9,
+  "nivel": 76,
+  "nombre": "Doble espera",
+  "tema": "mina oscura",
+  "resolucion": {
+    "width": 600,
+    "height": 375
+  },
+  "cuadricula": {
+    "cols": 8,
+    "rows": 5
+  },
+  "geometria": {
+    "cuadricula": {
+      "cols": 8,
+      "rows": 5
+    },
+    "lado": 75,
+    "origen_recorte": {
+      "x": 0,
+      "y": 0
+    },
+    "fase_casilla": {
+      "x": 0.5,
+      "y": -35,
+      "lado": 75,
+      "metodo": "fase que maximiza la coincidencia entre el centro de cada casilla etiquetada y el centro del objeto dibujado (blobs de arte saturado)",
+      "puntuacion": 1.99,
+      "puntuacion_declarada": 0.67
+    },
+    "nota": "origen_recorte = dónde se recortó la captura dentro de la página (medido, exacto). fase_casilla = desplazamiento de la rejilla de casillas dentro de la captura, calibrado con los centros del arte (las capturas NO empiezan siempre en la frontera de casilla)."
+  },
+  "directriz": "Abre los cofres 0/2",
+  "restricciones": [],
+  "bandeja": [
+    {
+      "type": "blue_bomb_2",
+      "count": 5
+    }
+  ],
+  "temporizadores": [
+    {
+      "at": [
+        1,
+        1
+      ],
+      "value": 2
+    },
+    {
+      "at": [
+        5,
+        1
+      ],
+      "value": 4
+    }
+  ],
+  "enlaces": [],
+  "portales": [],
+  "desconocidos": [
+    "roca gris: no está en el catálogo (¿roca dura?)",
+    "auditoría 2026-11-12: las casillas (6,1) estaban etiquetadas pero en el ráster están vacías (varianza de suelo); se han retirado",
+    "auditoría 2026-11-12 (completitud): se añadieron etiquetas que faltaban en (5,1)=geyser; detectadas con blobs de arte independientes del clasificador y confirmadas mirando la casilla ampliada"
+  ],
+  "recuento": {
+    "*": 2,
+    "chest_wood": 2,
+    "geyser": 2
+  },
+  "revision": {
+    "estado": "revisado_humano",
+    "fecha": "2026-11-12",
+    "metodo": "inspección visual de cada página con rejilla superpuesta + mapa de varianza por casilla; sólo se etiquetan objetos",
+    "nota": "las casillas SIN objeto no se etiquetan: no se distingue con seguridad el suelo del \"fuera del mapa\" sombreado"
+  },
+  "etiqueta": "objetos",
+  "objetos": [
+    {
+      "x": 1,
+      "y": 1,
+      "type": "geyser"
+    },
+    {
+      "x": 5,
+      "y": 1,
+      "type": "geyser"
+    },
+    {
+      "x": 1,
+      "y": 3,
+      "type": "*"
+    },
+    {
+      "x": 5,
+      "y": 3,
+      "type": "*"
+    },
+    {
+      "x": 1,
+      "y": 4,
+      "type": "chest_wood"
+    },
+    {
+      "x": 5,
+      "y": 4,
+      "type": "chest_wood"
+    }
+  ]
+}
