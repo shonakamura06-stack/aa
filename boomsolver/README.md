@@ -28,9 +28,10 @@ pruebas para el juego de bombas descrito en los materiales del proyecto.
 **Análisis para la UI** | `src/analysis/sessions.js` | Ondas, recorrido de portales, temporizadores de géiser, libro de daño y grafo de cadena: el workbench explica *por qué* pasó cada cosa. |
 **Validación de mecánicas** | `src/validation/` | Arnés con casos P01–P18 de portales y 16 de géiseres, cada uno con estado `hypothesis`/`unknown`; **ninguno** se presenta como verificado. |
 **Evaluación de visión** | `src/vision/evaluation.js` | Métricas por clase, matriz de confusión con columna de abstención, pares vigilados, split train/eval e informe que declara cuántas capturas **reales** hay. |
+**Lector de capturas** | `src/vision/png.js` | PNG sin dependencias (8 bits, RGB/RGBA, sin entrelazar). Rechaza con mensaje lo que no soporta en vez de aproximar píxeles. |
 **Fuerza bruta** | `src/solver/bruteforce.js` | Oráculo independiente que contrasta al buscador: si discrepan, el test falla. |
 **CLI** | `scripts/cli.mjs` | `catalog`, `solve`, `generate`, `verify`, `explain`, `simulate`, `validate`, `oracle`, `vision`. |
-**Pruebas** | `tests/` | 205 pruebas con `node --test`. Sin dependencias. |
+**Pruebas** | `tests/` | 213 pruebas con `node --test`. Sin dependencias. |
 
 ---
 
@@ -38,9 +39,10 @@ pruebas para el juego de bombas descrito en los materiales del proyecto.
 
 ```bash
 cd boomsolver
-node --test "tests/*.test.mjs"        # 205 pruebas
+node --test "tests/*.test.mjs"        # 213 pruebas
 node scripts/cli.mjs validate         # mecánicas: portales y géiseres
 node scripts/cli.mjs vision           # informe de visión (declara si hay capturas reales)
+node scripts/cli.mjs vision --real=./corpus/real   # capturas reales con etiqueta humana
 node scripts/serve.mjs                # http://localhost:5173
 ```
 
@@ -132,15 +134,16 @@ Novedades frente al v21:
   reentrante y sin estado global, así que moverlo a un Worker es mecánico.
 - **OCR real** cableado a los temporizadores: la firma `ocrDigits` está
   inyectada y probada con un doble; falta conectar Tesseract.
-- **Fixtures del PDF de capturas**: el PDF no está en el repositorio, así que
-  las pruebas de visión usan tableros sintéticos. Sin capturas etiquetadas no
-  se puede afirmar precisión real por objeto.
+- **Fixtures del PDF de capturas**: el PDF no está en el repositorio. El canal
+  para meterlas ya está hecho (`corpus/real/` + `vision --real=…`, lector PNG
+  sin dependencias); falta la imagen. Sin capturas etiquetadas no se puede
+  afirmar precisión real por objeto.
 - **Calibración por tema visual** (pradera, mina, lava, sala azul): depende de
   los fixtures.
 - Los objetos con **candado** y la **figura naranja** del editor: su `typeId`
   no aparece en el código del v21. Están registrados como desconocidos.
 - **Validación contra el juego real**: ninguna mecánica está marcada como
-  verificada. Las 205 pruebas demuestran que el código cumple *nuestra*
+  verificada. Las 213 pruebas demuestran que el código cumple *nuestra*
   especificación; el contraste con el juego depende de las capturas. Ver
   `FASE_2_INFORME.md` §5 y §6.
 
@@ -159,11 +162,12 @@ boomsolver/
 │   ├── core/{catalog,engine,goals}.js
 │   ├── solver/{solver,bruteforce}.js
 │   ├── generator/generator.js
-│   ├── vision/{detector,evaluation}.js
+│   ├── vision/{detector,evaluation,png}.js
 │   ├── validation/{harness,cases.portals,cases.geysers}.js
 │   ├── analysis/sessions.js
 │   ├── analysis.js  difficulty.js  rng.js
+├── corpus/real/             capturas del juego + etiqueta humana (plantilla en README)
 ├── public/                  UI (index.html, app.js, styles.css)
 ├── scripts/                 serve.mjs, cli.mjs
-└── tests/                   205 pruebas
+└── tests/                   213 pruebas
 ```

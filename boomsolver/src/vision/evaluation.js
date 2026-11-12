@@ -22,6 +22,7 @@
 //   · confusiones a vigilar declaradas explícitamente
 
 import { detectBoard, REVIEW } from './detector.js';
+import { decodePng } from './png.js';
 
 // Pares de confusión que el encargo exige vigilar (§5).
 export const WATCHED_CONFUSIONS = [
@@ -547,4 +548,115 @@ export function renderReport(summary, watched, { realImages = 0 } = {}) {
     lines.push('de color de arriba; si ese canal no aparece, no hay portales etiquetados.');
   }
   return lines.join('\n');
+}
+
+// ------------------------------------------------------------
+// Corpus REAL en disco
+// ------------------------------------------------------------
+/**
+ * Carga un caso real desde disco: `<id>.png` + `<id>.json`.
+ *
+ * El JSON es la etiqueta HUMANA del tablero:
+ *
+ * ```json
+ * {
+ *   "id": "nivel-12",
+ *   "origen": "humano",
+ *   "tema": "mina",
+ *   "resolucion": { "width": 1280, "height": 720 },
+ *   "notas": "captura del nivel 12, zoom 100 %",
+ *   "etiqueta": [
+ *     [{ "type": "empty" }, { "type": "gem" }],
+ *     [{ "type": "chest_wood" }, { "type": "portal", "color": "blue" }]
+ *   ]
+ * }
+ * ```
+ *
+ * Reglas duras (para que nadie evalúe a ciegas):
+ *   · `origen` debe ser `"humano"`: una captura sin etiqueta humana no es corpus.
+ *   · `etiqueta` debe existir y ser rectangular.
+ *   · la resolución declarada debe coincidir con la del PNG; si no, se avisa y
+ *     se usa la real (una captura reescalada invalidaría las coordenadas).
+ *   · el PNG tiene que ser legible por `decodePng`; si no, el caso se devuelve
+ *     como error en vez de inventar métricas.
+ *
+ * @param {{id: string, png: Buffer, descriptor: object}} entrada
+ */
+export function loadRealCaseFromBuffer({ id, png, descriptor }) {
+  const etiqueta = descriptor.etiqueta;
+  if (!etiqueta || !etiqueta.length) {
+    throw new Error(`El caso ${id} no tiene etiqueta: no se puede evaluar.`);
+  }
+  const anchoFila = etiqueta[0].length;
+  if (!anchoFila) throw new Error(`El caso ${id} tiene una etiqueta vacía.`);
+  etiqueta.forEach((fila, y) => {
+    if (!Array.isArray(fila) || fila.length !== anchoFila) {
+      throw new Error(`Etiqueta no rectangular en el caso ${id}: la fila ${y} tiene ${fila && fila.length} celdas y la 0 tiene ${anchoFila}.`);
+    }
+  });
+
+  const img = decodePng(png);
+  const warnings = [];
+  if (descriptor.resolucion) {
+    const d = descriptor.resolucion;
+    if (d.width !== img.width || d.height !== img.height) {
+      warnings.push(`resolución declarada ${d.width}x${d.height} ≠ PNG ${img.width}x${img.height}: se usa la del PNG.`);
+    }
+  } else {
+    warnings.push('el descriptor no declara resolución: se usa la del PNG.');
+  }
+  if (descriptor.origen !== 'humano') {
+    warnings.push(`origen "${descriptor.origen}" no es "humano": el caso se evalúa pero NO cuenta como captura real validada.`);
+  }
+
+  return {
+    caso: {
+      id: descriptor.id || id,
+      tema: descriptor.tema || null,
+      origen: descriptor.origen === 'humano' ? 'humano' : 'sintetico',
+      declarado: descriptor.origen || null,
+      resolucion: { width: img.width, height: img.height },
+      image: { data: img.data, width: img.width, height: img.height },
+      etiqueta,
+      notas: descriptor.notas || '',
+    },
+    warnings,
+  };
+}
+
+/**
+ * Carga todos los pares `<id>.png` + `<id>.json` de una carpeta.
+ *
+ * Devuelve `{ casos, warnings, errors }`. Un caso roto NO detiene la carga:
+ * entra en `errors` y el informe lo dice. Preferimos un corpus incompleto y
+ * declarado a un corpus que se cae o que se salta ficheros en silencio.
+ *
+ * `readFile` y `readDir` se inyectan para poder probar sin tocar el disco.
+ */
+export function loadRealCorpus({ dir, files, readFile, readDir }) {
+  const nombres = files || readDir(dir);
+  const ids = [...new Set(nombres.filter((f) => f.endsWith('.png')).map((f) => f.slice(0, -4)))].sort();
+  const casos = [];
+  const warnings = [];
+  const errors = [];
+  for (const id of ids) {
+    try {
+      if (!nombres.includes(`${id}.json`)) {
+        errors.push({ id, error: 'falta la etiqueta JSON' });
+        continue;
+      }
+      const png = readFile(`${dir}/${id}.png`);
+      const descriptor = JSON.parse(String(readFile(`${dir}/${id}.json`)));
+      const { caso, warnings: w } = loadRealCaseFromBuffer({ id, png, descriptor });
+      casos.push(caso);
+      warnings.push(...w.map((m) => `${id}: ${m}`));
+    } catch (err) {
+      errors.push({ id, error: err.message });
+    }
+  }
+  for (const f of nombres.filter((x) => x.endsWith('.json'))) {
+    const id = f.slice(0, -5);
+    if (!nombres.includes(`${id}.png`)) errors.push({ id, error: 'hay etiqueta pero falta el PNG' });
+  }
+  return { casos, warnings, errors };
 }

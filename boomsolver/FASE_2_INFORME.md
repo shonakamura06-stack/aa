@@ -34,8 +34,8 @@ Este informe cierra la Fase 2 con una regla por delante:
 
 ```
 $ cd boomsolver && node --test "tests/*.test.mjs"
-# tests 205
-# pass 205
+# tests 213
+# pass 213
 # fail 0
 # duration_ms 13731
 ```
@@ -55,6 +55,7 @@ $ cd boomsolver && node --test "tests/*.test.mjs"
 | `vision.test.mjs` | 14 | región, rejilla (incluido el barrido de robustez), clasificación, temporizador, bandeja, portales, hipótesis |
 | `vision.evaluation.test.mjs` | 16 | métricas, abstención sin premiar ni penalizar, matriz, pares vigilados, split, casos no evaluables |
 | `analysis.sessions.test.mjs` | 14 | ondas, portales, temporizadores, daño, cadena, comparador, banner |
+| `vision.png.test.mjs` | 8 | lector PNG sin dependencias, rechazo de formatos no soportados y carga de capturas reales con etiqueta humana |
 | `performance.test.mjs` | 10 | límites de tiempo/tamaño y honestidad ante el truncado |
 
 Comprobaciones fuera de la suite (`node scripts/cli.mjs …`):
@@ -179,11 +180,35 @@ los eventos. Hay una prueba de la tubería completa que lo fija.
 
 ---
 
+## 4-ter. Cómo entrarán las capturas reales (hecho, a la espera de las imágenes)
+
+El bloqueo de la visión nunca fue el detector: era que no había capturas. Para
+que deje de ser un bloqueo, la infraestructura ya está:
+
+- **`src/vision/png.js`**: lector de PNG **sin dependencias** (8 bits,
+  color type 0/2/6, sin entrelazado). Lo que no soporta lo **rechaza con
+  mensaje** —16 bits, paleta, Adam7, archivo truncado sin IEND— en vez de
+  devolver píxeles aproximados, que producirían métricas falsas.
+- **`loadRealCaseFromBuffer` / `loadRealCorpus`**: cargan pares `<id>.png` +
+  `<id>.json`. Exigen `origen: "humano"`, etiqueta rectangular y avisan si la
+  resolución declarada no coincide con el PNG.
+- **`node scripts/cli.mjs vision --real=./corpus/real`**: informa por separado
+  **corpus real** y **corpus sintético**. Un fichero roto o sin etiqueta aparece
+  como «caso ignorado» con su motivo; nunca se evalúa a ciegas.
+- **`corpus/real/README.md`**: el formato exacto, con ejemplo y lista de
+  `type` válidos, para que etiquetar una captura sea mecánico.
+
+Cuando lleguen las imágenes, el flujo es: dejarlas en `corpus/real/`, ejecutar
+`vision --real=…` y leer el número. Si no cuadra con el juego, se ajusta el
+perfil del objeto o la regla declarada, **no** el motor.
+
+---
+
 ## 5. Lo que esta fase NO demuestra
 
 | Afirmación | ¿Demostrada? | Por qué |
 |---|---|---|
-| El motor respeta la especificación escrita | sí | 205 pruebas + arnés de mecánicas |
+| El motor respeta la especificación escrita | sí | 213 pruebas + arnés de mecánicas |
 | El solver devuelve el mínimo de bombas | sí, para los niveles probados | contraste con fuerza bruta independiente |
 | Las reglas coinciden con el juego real | **no** | ningún caso del arnés está marcado `verified`; las mecánicas son `hypothesis`/`unknown` |
 | El detector reconoce capturas reales | **no** | corpus real: 0 imágenes |
@@ -194,9 +219,9 @@ los eventos. Hay una prueba de la tubería completa que lo fija.
 ## 6. Lo que necesito para cerrar la validación real
 
 1. **El PDF (o capturas sueltas) con los niveles del juego.** Con una captura
-   por nivel basta; si además vienen las etiquetas (qué hay en cada casilla,
-   temporizadores, colores de portal), se convierten en `loadRealCase` y el
-   informe pasa a decir `reales: N`.
+   por nivel basta. Se dejan en `corpus/real/` como `<id>.png` + `<id>.json`
+   (plantilla en `corpus/real/README.md`) y `node scripts/cli.mjs vision
+   --real=./corpus/real` pasa a informar `reales: N` con métricas por clase.
 2. **Una partida grabada de 3–4 niveles con portales** para cerrar Q1–Q3
    (emparejamiento cuando hay 4 del mismo color, alcance al salir, destino
    ocupado).

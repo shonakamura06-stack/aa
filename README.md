@@ -4,7 +4,7 @@ Repositorio de trabajo. El proyecto vive en [`boomsolver/`](boomsolver/README.md
 
 ```bash
 cd boomsolver
-node --test "tests/*.test.mjs"   # 204 pruebas, sin dependencias
+node --test "tests/*.test.mjs"   # 213 pruebas, sin dependencias
 node scripts/cli.mjs validate    # mecánicas de portales y géiseres
 node scripts/serve.mjs           # workbench en http://localhost:5173
 ```

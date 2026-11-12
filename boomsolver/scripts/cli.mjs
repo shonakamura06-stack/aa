@@ -22,8 +22,9 @@ import { portalCases } from '../src/validation/cases.portals.js';
 import { geyserCases } from '../src/validation/cases.geysers.js';
 import {
   synthCase, evaluateCase, summarizeCorpus, watchedConfusionReport,
-  renderReport, splitTrainEval,
+  renderReport, splitTrainEval, loadRealCorpus,
 } from '../src/vision/evaluation.js';
+import { readFileSync, readdirSync } from 'node:fs';
 import { bruteForce, bruteSignature, solverSignature } from '../src/solver/bruteforce.js';
 
 const [cmd, ...rest] = process.argv.slice(2);
@@ -244,7 +245,7 @@ function printHelp() {
 
   validate [--json]              Ejecuta la batería de portales y géiseres contra el motor.
   oracle nivel.json [--max=2]    Fuerza bruta independiente y comparación con el solver.
-  vision [--json]                Evalúa la visión sobre el corpus sintético (no hay capturas reales).
+  vision [--json] [--real=DIR]   Evalúa visión: corpus sintético y, si se pasa --real, capturas reales.
   catalog                       Muestra el catálogo de objetos y las reglas por defecto.
   solve nivel.json [opciones]   Busca soluciones.
       --mode=fewest_bombs|least_powder|pareto
@@ -331,6 +332,10 @@ function runOracle() {
 // vision: evaluación sobre corpus sintético
 // ------------------------------------------------------------
 function runVision() {
+  // Dos corpus, nunca mezclados:
+  //   · sintético (siempre): comprueba que la tubería mide, no valida nada;
+  //   · real (si se pasa --real=<carpeta>): pares <id>.png + <id>.json con
+  //     etiqueta humana. Es el ÚNICO que puede decir algo sobre el juego.
   const casos = [
     synthCase({ id: 'S1', layout: [['empty', 'gem', 'empty', 'crystal'], ['chest_wood', 'empty', 'wall', 'empty']], cellPx: 48, seed: 3 }),
     synthCase({ id: 'S2', layout: [['portal', 'empty', 'empty'], ['empty', 'cat', 'empty'], ['empty', 'empty', 'mirror_slash']], cellPx: 56, seed: 7 }),
@@ -349,15 +354,64 @@ function runVision() {
       cellPx: 40, seed: 13,
     }),
   ];
-  const results = casos.map((c) => evaluateCase(c));
-  const summary = summarizeCorpus(results);
-  const watched = watchedConfusionReport(summary);
-  const split = splitTrainEval(casos);
+
+  let real = { casos: [], warnings: [], errors: [] };
+  if (flags.real) {
+    try {
+      real = loadRealCorpus({ dir: flags.real, readFile: readFileSync, readDir: readdirSync });
+    } catch (err) {
+      throw new Error(`No se pudo leer el corpus real "${flags.real}": ${err.message}`);
+    }
+    for (const w of real.warnings) console.warn(`AVISO: ${w}`);
+    for (const e of real.errors) console.warn(`CASO IGNORADO ${e.id}: ${e.error}`);
+  }
+
+  const syntheticResults = casos.map((c) => evaluateCase(c));
+  const realResults = real.casos.map((c) => evaluateCase(c));
+  const syntheticSummary = summarizeCorpus(syntheticResults);
+  const realSummary = real.casos.length ? summarizeCorpus(realResults) : null;
+  const watched = watchedConfusionReport(realSummary || syntheticSummary);
+  const split = splitTrainEval(real.casos.length ? real.casos : casos);
+
   if (flags.json) {
-    console.log(JSON.stringify({ summary, watched, split: { train: split.train.length, eval: split.eval.length } }, null, 2));
+    console.log(JSON.stringify({
+      synthetic: { summary: syntheticSummary, watched: watchedConfusionReport(syntheticSummary) },
+      real: realSummary ? {
+        summary: realSummary,
+        watched,
+        warnings: real.warnings,
+        errors: real.errors,
+      } : null,
+      split: { train: split.train.length, eval: split.eval.length, corpus: real.casos.length ? 'real' : 'sintético' },
+    }, null, 2));
     return;
   }
-  console.log(renderReport(summary, watched, { realImages: 0 }));
+
+  console.log('# Informe de evaluación de visión\n');
+  console.log('## 1. Corpus REAL (capturas del juego con etiqueta humana)');
+  if (!real.casos.length) {
+    console.log('');
+    console.log('**No hay capturas reales.** Sin ellas no se puede afirmar nada sobre la precisión');
+    console.log('del detector frente al juego. Para añadirlas:');
+    console.log('');
+    console.log('  node scripts/cli.mjs vision --real=./corpus/real');
+    console.log('');
+    console.log('y en esa carpeta, por cada captura, `<id>.png` (la captura) y `<id>.json` (la etiqueta');
+    console.log('humana del tablero). El formato está documentado en corpus/real/README.md.');
+  } else {
+    console.log('');
+    console.log(renderReport(realSummary, watched, { realImages: real.casos.length }));
+    if (real.errors.length) {
+      console.log('');
+      console.log(`Casos ignorados: ${real.errors.length}`);
+      for (const e of real.errors) console.log(`  · ${e.id}: ${e.error}`);
+    }
+  }
   console.log('');
-  console.log(`Corte train/eval: ${split.train.length} train · ${split.eval.length} eval (el detector no aprende).`);
+  console.log('## 2. Corpus SINTÉTICO (regresión; no valida nada)');
+  console.log('');
+  console.log(renderReport(syntheticSummary, watchedConfusionReport(syntheticSummary), { realImages: 0 }));
+  console.log('');
+  console.log(`Split train/eval sobre ${real.casos.length ? 'las capturas reales' : 'el corpus sintético'}: `
+    + `${split.train.length} / ${split.eval.length}`);
 }
