@@ -12,6 +12,24 @@ Este informe cierra la Fase 2 con una regla por delante:
 
 ---
 
+## 0. Resumen en cinco líneas
+
+1. **213 pruebas, 0 fallos**; `validate` y `oracle` en verde. Eso valida la
+   *especificación*, no el juego.
+2. Se corrigió el defecto que leía un tablero **10×7 como 2×3**; ahora 240/240
+   rejillas exactas en el barrido de tamaño, zoom, ruido y marco.
+3. El corpus sintético ya no mide un caso imposible (casillas planas): dibuja un
+   emblema por objeto, y hay un test para el caso plano que documenta por qué
+   antes salía «0 aciertos».
+4. Aparecieron y se corrigieron **dos fallos silenciosos** en la UI: los paneles
+   de análisis aceptaban la salida del solver y las casillas de cada rayo se
+   publicaban como índices. Ambos «pintaban datos» sin error.
+5. Sigue **sin haber capturas reales**. El canal para meterlas ya está hecho
+   (lector PNG sin dependencias + `vision --real=DIR` + plantilla de etiqueta):
+   falta la imagen.
+
+---
+
 ## 1. Qué se ha hecho en esta fase
 
 | Bloque | Qué se añadió | Estado |
