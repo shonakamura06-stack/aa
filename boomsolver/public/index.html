@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>BoomSolver — banco de pruebas</title>
+<link rel="stylesheet" href="/public/styles.css" />
+</head>
+<body>
+<header>
+  <div class="brand">
+    <span class="logo">💥</span>
+    <div>
+      <h1>BoomSolver</h1>
+      <p>Motor determinista · buscador óptimo · generador</p>
+    </div>
+  </div>
+  <div class="header-actions">
+    <span id="engineBadge" class="pill">motor v2.0</span>
+    <span id="status" class="pill ok">listo</span>
+    <button id="btnHelp" class="ghost" type="button">¿Cómo funciona?</button>
+  </div>
+</header>
+
+<main>
+  <!-- ---------------- Tablero ---------------- -->
+  <section class="card board-card">
+    <div class="card-head">
+      <h2>Tablero</h2>
+      <div class="board-tools">
+        <button id="btnEditMode" class="ghost active" type="button">Editar</button>
+        <button id="btnSimMode" class="ghost" type="button">Simular</button>
+        <button id="btnNew" class="ghost" type="button">Nuevo</button>
+        <button id="btnExport" class="ghost" type="button">Exportar JSON</button>
+        <label class="ghost file">Importar<input id="fileImport" type="file" accept="application/json" hidden /></label>
+      </div>
+    </div>
+    <div class="board-wrap">
+      <div id="board" class="board" role="grid" aria-label="Tablero del nivel"></div>
+      <aside class="palette" id="palette" aria-label="Paleta de objetos"></aside>
+    </div>
+    <p class="hint" id="boardHint">Haz clic en una casilla para colocar el objeto seleccionado. En modo simular, coloca bombas de la bandeja.</p>
+  </section>
+
+  <!-- ---------------- Panel derecho ---------------- -->
+  <section class="col-right">
+    <div class="card">
+      <div class="card-head"><h2>Nivel</h2><span class="pill" id="levelSize">8×5</span></div>
+      <label class="field">Nombre<input id="levelName" type="text" value="Nivel sin título" /></label>
+      <label class="field">Directriz
+        <input id="directive" type="text" placeholder="Abre los cofres 0/2 · sin romper cristales" />
+      </label>
+      <button id="btnParseDirective" class="ghost" type="button">Interpretar directriz</button>
+      <div id="objectiveList" class="chips"></div>
+      <div class="row">
+        <label class="field small">Columnas<input id="cols" type="number" min="2" max="20" value="8" /></label>
+        <label class="field small">Filas<input id="rows" type="number" min="2" max="20" value="5" /></label>
+      </div>
+      <div class="row">
+        <label class="field small">N1<input id="t1" type="number" min="0" max="12" value="3" /></label>
+        <label class="field small">N2<input id="t2" type="number" min="0" max="12" value="1" /></label>
+        <label class="field small">N3<input id="t3" type="number" min="0" max="12" value="0" /></label>
+        <label class="field small">N4<input id="t4" type="number" min="0" max="12" value="0" /></label>
+      </div>
+      <p class="hint" id="trayInfo">Bandeja: 3×N1, 1×N2 · 5 de pólvora</p>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h2>Reglas físicas</h2></div>
+      <label class="field">Fusiones
+        <select id="fusionMode">
+          <option value="equal">Solo iguales (N1+N1→N2)</option>
+          <option value="sum">Suma libre (N2+N1→N3)</option>
+        </select>
+      </label>
+      <label class="field">Patrón de dinamita
+        <select id="dynamitePattern">
+          <option value="cross1">Cruz +1</option>
+          <option value="x3x3">3×3</option>
+          <option value="cross2">Cruz +2</option>
+          <option value="row">Fila completa</option>
+          <option value="col">Columna completa</option>
+        </select>
+      </label>
+      <label class="field">Alcance del magma
+        <select id="magmaRange"><option>1</option><option>2</option><option>3</option><option>4</option></select>
+      </label>
+      <label class="check"><input id="objectsBlock" type="checkbox" checked /> Los objetos sólidos detienen el rayo</label>
+      <label class="check"><input id="magmaBlocks" type="checkbox" checked /> La roca de magma detiene la onda</label>
+      <label class="check"><input id="bombBlocks" type="checkbox" /> Las bombas sin detonar detienen el rayo</label>
+      <label class="check"><input id="requireEnemy" type="checkbox" /> Exigir detonar todas las enemigas</label>
+      <label class="check"><input id="geyserDetonate" type="checkbox" /> Un géiser alcanzado explota (Q7)</label>
+      <label class="field">Alcance que transporta el portal
+        <select id="portalRangeMode">
+          <option value="full">Completo (regla del usuario)</option>
+          <option value="remaining">Sólo el sobrante</option>
+        </select>
+      </label>
+      <p class="hint">Las reglas marcadas como supuesto no están confirmadas en el juego real; ver <code>RULES_OPEN_QUESTIONS.md</code>.</p>
+    </div>
+  </section>
+
+  <!-- ---------------- Solver ---------------- -->
+  <section class="card solver-card">
+    <div class="card-head">
+      <h2>Buscador</h2>
+      <div class="row">
+        <select id="solveMode">
+          <option value="fewest_bombs">Mínimo de bombas físicas</option>
+          <option value="least_powder">Mínimo de pólvora</option>
+          <option value="pareto">Frontera de Pareto</option>
+        </select>
+        <button id="btnSolve" class="primary" type="button">Buscar</button>
+        <button id="btnCancel" class="ghost" type="button" disabled>Cancelar</button>
+      </div>
+    </div>
+    <div class="stats">
+      <div><span id="stStatus">—</span><small>optimalidad</small></div>
+      <div><span id="stBombs">—</span><small>bombas físicas</small></div>
+      <div><span id="stPowder">—</span><small>pólvora</small></div>
+      <div><span id="stCount">—</span><small>soluciones mínimas</small></div>
+      <div><span id="stTime">—</span><small>tiempo</small></div>
+      <div><span id="stEval">—</span><small>evaluaciones</small></div>
+    </div>
+    <p id="proofNote" class="proof">Pulsa «Buscar» para enumerar todas las soluciones mínimas.</p>
+    <div id="paretoBox" class="pareto" hidden></div>
+    <div id="solutions" class="solutions"></div>
+  </section>
+
+  <!-- ---------------- Simulación ---------------- -->
+  <section class="card sim-card">
+    <div class="card-head">
+      <h2>Simulación</h2>
+      <div class="row">
+        <button id="btnDetonate" class="primary" type="button">Detonar</button>
+        <button id="btnResetSim" class="ghost" type="button">Reiniciar</button>
+        <button id="btnPrevTick" class="ghost" type="button">◀ tick</button>
+        <button id="btnNextTick" class="ghost" type="button">tick ▶</button>
+        <button id="btnPlay" class="ghost" type="button">▶ auto</button>
+      </div>
+    </div>
+    <div id="simTray" class="sim-tray"></div>
+    <p class="hint" id="simHint">En modo simular: elige una bomba de la bandeja y haz clic en una casilla. Luego marca la mecha con clic derecho o con el botón «Mecha».</p>
+    <div id="simLog" class="sim-log" aria-live="polite"></div>
+  </section>
+
+  <!-- ---------------- Generador ---------------- -->
+  <section class="card gen-card">
+    <div class="card-head"><h2>Generador</h2></div>
+    <div class="row">
+      <label class="field small">Ancho<input id="gWidth" type="number" min="3" max="12" value="7" /></label>
+      <label class="field small">Alto<input id="gHeight" type="number" min="2" max="10" value="5" /></label>
+      <label class="field small">Semilla<input id="gSeed" type="number" value="1" /></label>
+    </div>
+    <div class="row">
+      <label class="field small">Gemas<input id="gGems" type="number" min="0" max="9" value="1" /></label>
+      <label class="field small">Cofres<input id="gChests" type="number" min="0" max="6" value="0" /></label>
+      <label class="field small">Cristales<input id="gCrystals" type="number" min="0" max="6" value="0" /></label>
+    </div>
+    <div class="row">
+      <label class="field small">Portales<input id="gPortals" type="number" min="0" max="3" value="0" /></label>
+      <label class="field small">Géiseres<input id="gGeysers" type="number" min="0" max="4" value="0" /></label>
+      <label class="field small">Espejos<input id="gMirrors" type="number" min="0" max="6" value="0" /></label>
+    </div>
+    <div class="row">
+      <label class="field">Dificultad
+        <select id="gDifficulty">
+          <option value="any">Cualquiera</option>
+          <option value="easy">Fácil</option>
+          <option value="medium">Medio</option>
+          <option value="hard">Difícil</option>
+          <option value="expert">Experto</option>
+        </select>
+      </label>
+      <label class="field">Soluciones
+        <select id="gSolutions">
+          <option value="any">Cualquiera</option>
+          <option value="unique">Única</option>
+          <option value="few">Pocas</option>
+          <option value="many">Muchas</option>
+        </select>
+      </label>
+    </div>
+    <button id="btnGenerate" class="primary" type="button">Generar y verificar</button>
+    <div id="genResult" class="gen-result"></div>
+  </section>
+</main>
+
+<dialog id="helpDialog">
+  <h2>Qué hace y qué no</h2>
+  <p><strong>Motor único:</strong> el buscador, la animación y el modo manual llaman a <code>source/core/engine.js</code>. Una solución que el buscador acepta se reproduce igual en el simulador.</p>
+  <p><strong>Dos métricas distintas:</strong> «bombas físicas colocadas» (después de fusionar) y «pólvora equivalente» (1, 2, 4 y 8 por N1..N4). Nunca se mezclan.</p>
+  <p><strong>Optimalidad honesta:</strong> «demostrado» solo aparece si la enumeración terminó. Si se cancela o se agota el tiempo, se muestra «mejor encontrado» con la cota alcanzada.</p>
+  <p><strong>Supuestos:</strong> las reglas marcadas como supuesto (cristal como peligro, bloqueo del cofre, orden de eventos...) están pendientes de confirmar en el juego real.</p>
+  <button id="btnCloseHelp" class="primary" type="button">Entendido</button>
+</dialog>
+
+<script type="module" src="/public/app.js"></script>
+</body>
+</html>

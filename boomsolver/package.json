@@ -1,0 +1,13 @@
+{
+  "name": "boomsolver",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "description": "BoomSolver: deterministic rule engine, optimal solver, level generator and interactive workbench for the bomb puzzle game.",
+  "scripts": {
+    "test": "node --test tests/",
+    "dev": "node scripts/serve.mjs",
+    "bench": "node scripts/bench.mjs"
+  },
+  "engines": { "node": ">=20" }
+}
