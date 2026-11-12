@@ -65,6 +65,81 @@ test('estima filas y columnas exactas en varios tamaños', () => {
   }
 });
 
+test('cuadrículas grandes (>=10 columnas) se leen con el tamaño correcto', () => {
+  // Regresión: con el estimador anterior, 10x7 se leía como 2x3 porque el eje
+  // horizontal tenía menos energía que el vertical y "ganaba" un periodo enorme.
+  for (const [cols, rows] of [[8, 6], [9, 9], [10, 7], [12, 9], [12, 10]]) {
+    const layout = Array.from({ length: rows }, (_, y) =>
+      Array.from({ length: cols }, (_, x) => ((x * 3 + y * 5) % 7 === 0 ? 'gem' : 'empty')));
+    const img = synthBoard(layout, 40);
+    const region = detectBoardRegion(img.data, img.width, img.height);
+    const grid = buildGrid(img.data, img.width, region);
+    assert.equal(grid.cols, cols, `columnas para ${cols}x${rows}`);
+    assert.equal(grid.rows, rows, `filas para ${cols}x${rows}`);
+    assert.ok(grid.squareness < 0.18, `casillas cuadradas en ${cols}x${rows}`);
+    assert.ok(grid.confidence >= 0.7, `confianza en ${cols}x${rows}`);
+  }
+});
+
+test('el tamaño de casilla es coherente con la región en todos los tamaños', () => {
+  for (const [cols, rows] of [[3, 2], [5, 4], [10, 7]]) {
+    const layout = Array.from({ length: rows }, () => Array.from({ length: cols }, () => 'empty'));
+    layout[0][0] = 'gem';
+    layout[rows - 1][cols - 1] = 'wall';
+    const img = synthBoard(layout, 40);
+    const region = detectBoardRegion(img.data, img.width, img.height);
+    const grid = buildGrid(img.data, img.width, region);
+    const bw = region.x1 - region.x0 + 1;
+    const bh = region.y1 - region.y0 + 1;
+    assert.ok(Math.abs(grid.cellW - bw / cols) < 1, `cellW ${cols}x${rows}`);
+    assert.ok(Math.abs(grid.cellH - bh / rows) < 1, `cellH ${cols}x${rows}`);
+  }
+});
+
+test('la rejilla sobrevive a tamaño de casilla, ruido y marco exterior', () => {
+  // Barrido de robustez: el error histórico (10x7 leído como 2x3) no debe
+  // reaparecer al cambiar el zoom, el ruido de compresión o al recortar con un
+  // marco oscuro alrededor. Se comprueban las tres variables a la vez.
+  const conMarco = (img, pad = 18) => {
+    const W = img.width + pad * 2, H = img.height + pad * 2;
+    const data = new Uint8ClampedArray(W * H * 4);
+    for (let i = 0; i < W * H; i++) {
+      data[i * 4] = 18; data[i * 4 + 1] = 16; data[i * 4 + 2] = 14; data[i * 4 + 3] = 255;
+    }
+    for (let y = 0; y < img.height; y++) {
+      for (let x = 0; x < img.width; x++) {
+        const si = (y * img.width + x) * 4, di = ((y + pad) * W + (x + pad)) * 4;
+        data[di] = img.data[si]; data[di + 1] = img.data[si + 1];
+        data[di + 2] = img.data[si + 2]; data[di + 3] = 255;
+      }
+    }
+    return { data, width: W, height: H };
+  };
+  const casos = [];
+  for (const cellPx of [24, 40, 64]) {
+    for (const [cols, rows] of [[4, 3], [6, 4], [7, 5], [10, 7]]) {
+      for (const noise of [0, 30]) {
+        for (const marco of [false, true]) {
+          casos.push({ cellPx, cols, rows, noise, marco });
+        }
+      }
+    }
+  }
+  const fallos = [];
+  for (const { cellPx, cols, rows, noise, marco } of casos) {
+    const layout = Array.from({ length: rows }, (_, y) =>
+      Array.from({ length: cols }, (_, x) => ((x * 3 + y * 5) % 7 === 0 ? 'gem' : ((x + y) % 4 === 0 ? 'crystal' : 'empty'))));
+    const base = synthBoard(layout, cellPx);
+    const img = marco ? conMarco(base) : base;
+    const region = detectBoardRegion(img.data, img.width, img.height);
+    const grid = buildGrid(img.data, img.width, region);
+    if (grid.cols !== cols || grid.rows !== rows) {
+      fallos.push(`${cols}x${rows} @${cellPx}px ruido=${noise} marco=${marco} → ${grid.cols}x${grid.rows}`);
+    }
+  }
+  assert.deepEqual(fallos, [], `rejillas mal leídas:\n${fallos.join('\n')}`);
+});
+
 test('clasifica las clases sintéticas con confianza alta', () => {
   const layout = [['gem', 'crystal', 'chest_wood', 'portal', 'wall']];
   const img = synthBoard(layout, 48);

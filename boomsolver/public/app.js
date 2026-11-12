@@ -10,6 +10,10 @@ import { evaluateOutcome, parseDirective } from '/src/core/goals.js';
 import { solve } from '/src/solver/solver.js';
 import { generate, toExportable } from '/src/generator/generator.js';
 import { scoreDifficulty } from '/src/difficulty.js';
+import {
+  waveBreakdown, portalTrail, geyserTimers, damageLedger, chainGraph,
+  compareSolutions, optimalityBanner, explainPlay,
+} from '/src/analysis/sessions.js';
 
 const ICONS = {
   empty: '·', void: '░', wall: '🧱', rock_soft: '🪨', rock_hard: '⛰️', gem: '💎',
@@ -34,6 +38,8 @@ const state = {
   rules: defaultRules(),
   playTimer: null,
   search: { cancelled: false, running: false },
+  activeTab: 'log',
+  lastSolve: null,
   levelName: 'Nivel sin título',
 };
 
@@ -316,7 +322,10 @@ async function runSolver() {
   $('stCount').textContent = result.totalKnown + (result.truncatedPresentation ? ` (${result.solutions.length} mostradas)` : '');
   $('stTime').textContent = `${ms} ms`;
   $('stEval').textContent = result.stats ? result.stats.evaluations.toLocaleString('es') : '—';
-  $('proofNote').textContent = result.proofNote + (result.reasons.length ? ' · ' + result.reasons.join(' ') : '');
+  $('proofNote').textContent = result.proofNote + (result.reasons && result.reasons.length ? ' · ' + result.reasons.join(' ') : '');
+  state.lastSolve = result;
+  renderOptimality(result);
+  syncCompareSelects();
 
   const paretoBox = $('paretoBox');
   paretoBox.replaceChildren();
@@ -332,6 +341,35 @@ async function runSolver() {
 
   renderSolutions();
   setStatus(result.optimalityProven ? 'Óptimo demostrado' : result.status, result.optimalityProven ? 'ok' : 'warn');
+}
+
+function renderOptimality(result) {
+  const banner = optimalityBanner(result);
+  const box = $('optimalityBanner');
+  if (!box) return;
+  box.hidden = false;
+  box.className = `banner ${banner.tone}`;
+  $('optLabel').textContent = banner.label;
+  $('optDetail').textContent = banner.detail
+    + (banner.truncated ? ` Se muestran ${banner.shown} de ${banner.totalKnown} (lista recortada).` : '');
+}
+
+function syncCompareSelects() {
+  const a = $('cmpA');
+  const b = $('cmpB');
+  if (!a || !b) return;
+  a.replaceChildren();
+  b.replaceChildren();
+  state.solutions.forEach((sol, i) => {
+    const label = `${i + 1}: ${sol.physicalBombs} bomba(s) · ${sol.powder} pólvora · ${sol.signature}`;
+    for (const sel of [a, b]) {
+      const o = document.createElement('option');
+      o.value = String(i);
+      o.textContent = label;
+      sel.appendChild(o);
+    }
+  });
+  if (state.solutions.length > 1) b.value = '1';
 }
 
 function renderSolutions() {
@@ -380,23 +418,41 @@ function renderSolutions() {
   });
 }
 
-function explainSolution(sol) {
-  const lines = [
-    `Por qué funciona esta jugada (${sol.physicalBombs} bomba(s), ${sol.powder} de pólvora):`,
-  ];
-  for (const t of sol.resultSummary ? [] : []) void t;
-  let tickIdx = 0;
-  for (const entry of sol.log) {
-    if (entry.type === 'portal-jump') {
-      tickIdx++;
-      lines.push(`tick ${entry.tick}: salto de portal ${entry.from} → ${entry.to} conservando dirección ${entry.dir} y alcance ${entry.rangeTransported}`);
-    }
+function renderComparison() {
+  const out = $('cmpResult');
+  out.replaceChildren();
+  if (state.solutions.length < 2) {
+    const p = document.createElement('p');
+    p.className = 'hint';
+    p.textContent = state.solutions.length === 1
+      ? 'Sólo hay una solución óptima con estas reglas: no hay nada que comparar.'
+      : 'Busca primero soluciones: no hay ninguna cargada.';
+    out.appendChild(p);
+    return;
   }
-  for (const c of sol.checks) lines.push(`· ${c.label}: ${c.done}/${c.total} ${c.ok ? '✔' : '✘'}`);
-  if (sol.fusionSteps.length) lines.push('· Fusiones necesarias: ' + sol.fusionSteps.join(' · '));
+  const ia = Number($('cmpA').value);
+  const ib = Number($('cmpB').value);
+  const diff = compareSolutions(state.solutions[ia], state.solutions[ib]);
+  const lines = [`A = solución ${ia + 1} · B = solución ${ib + 1}`];
+  if (diff.identical) lines.push('Las dos jugadas son idénticas: mismo conjunto de bombas, mecha y coste.');
+  else {
+    for (const v of diff.verdicts) lines.push(v);
+    if (diff.onlyA.length) lines.push(`Bombas sólo en A: ${diff.onlyA.map((i) => cellName(i)).join(', ')}`);
+    if (diff.onlyB.length) lines.push(`Bombas sólo en B: ${diff.onlyB.map((i) => cellName(i)).join(', ')}`);
+    for (const c of diff.levelChanged) {
+      lines.push(`${cellName(c.idx)}: en A es N${c.a}, en B es N${c.b}`);
+    }
+    for (const d of diff.diffs) lines.push(`${d.label}: A=${d.a} · B=${d.b}`);
+    for (const o of diff.objectiveDiffs) lines.push(`${o.label}: A=${o.a} · B=${o.b}`);
+  }
+  out.textContent = lines.join('\n');
+}
+
+function explainSolution(sol) {
+  const { lines } = explainPlay(sol);
+  switchTab('log');
   $('simLog').textContent = lines.join('\n');
   $('simLog').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  void tickIdx;
 }
 
 function loadSolution(i) {
@@ -430,6 +486,7 @@ function detonate() {
   state.sim.tickIdx = result.ticks.length - 1;
   renderBoard();
   renderSimLog(result);
+  renderAnalysis();
   const verdict = state.objectiveSpec.length ? evaluateOutcome(board, result, state.objectiveSpec) : null;
   if (result.status === 'lose') setStatus('Derrota: peligro alcanzado', 'err');
   else if (result.status === 'invalid') setStatus(`Jugada no válida: ${result.reason}`, 'err');
@@ -459,6 +516,80 @@ function renderSimLog(result) {
   }
   if (state.sim.result && state.sim.result.status === 'resolved') lines.push('<span class="win">Turno resuelto sin peligros.</span>');
   box.innerHTML = lines.join('\n');
+}
+
+// ------------------------------------------------------------
+// Paneles de análisis (pestañas)
+// ------------------------------------------------------------
+function switchTab(name) {
+  state.activeTab = name;
+  for (const tab of document.querySelectorAll('#analysisTabs .tab')) {
+    tab.classList.toggle('active', tab.dataset.tab === name);
+  }
+  for (const panel of document.querySelectorAll('[data-panel]')) {
+    panel.hidden = panel.dataset.panel !== name;
+  }
+}
+
+function renderAnalysis() {
+  const res = state.sim.result;
+  if (!res) {
+    for (const id of ['panelWaves', 'panelPortals', 'panelGeysers', 'panelChain', 'panelDamage']) {
+      const el = $(id);
+      if (el) el.textContent = 'Detona una jugada para ver este análisis.';
+    }
+    return;
+  }
+
+  const waves = waveBreakdown(res);
+  $('panelWaves').innerHTML = waves.length
+    ? waves.map((w) => `<div class="tick">TICK ${w.tick} · ${w.kind}${w.level ? ' N' + w.level : ''} en ${w.source} (${w.pattern})</div>`
+      + w.rays.map((r) => `<div>  rayo ${r.index + 1} dir=${r.dir}: ${r.cells.join(' ')}`
+        + (r.jumps.length ? ` · ${r.jumps.length} salto(s): ${r.jumps.map((j) => `${j.from}→${j.to} (${j.dir}, alcance ${j.range})`).join(' ')}` : '')
+        + (r.loopCut ? ' · bucle cortado' : '')
+        + (r.blockedByPortal ? ` · bloqueado en portal (${r.blockedByPortal.reason})` : '')
+        + '</div>').join('')).join('')
+    : 'Sin explosiones registradas.';
+
+  const trail = portalTrail(res);
+  $('panelPortals').textContent = trail.total === 0 && !trail.loopCuts.length && !trail.blocked.length
+    ? 'Esta jugada no atraviesa ningún portal.'
+    : [
+      `Saltos: ${trail.total}`,
+      ...trail.jumps.map((j) => `  ${j.order}. tick ${j.tick}: entra en ${j.from} → sale por ${j.to}, dirección ${j.dir}, alcance transportado ${j.rangeTransported}`),
+      ...(trail.loopCuts.length ? ['Bucles cortados:', ...trail.loopCuts.map((c) => `  tick ${c.tick}: ${c.cell} dir ${c.dir}`)] : []),
+      ...(trail.blocked.length ? ['Saltos bloqueados:', ...trail.blocked.map((b) => `  tick ${b.tick}: ${b.cell} (${b.reason})`)] : []),
+    ].join('\n');
+
+  const geysers = geyserTimers(res);
+  $('panelGeysers').textContent = geysers.length
+    ? [
+      'Unidad: tick de simulación (NO son segundos del juego; la unidad real no está confirmada).',
+      ...geysers.map((g) => `  ${g.cell}: temporizador ${g.timer} · armado en tick ${g.armedTick} · vence en ${g.dueTick}`
+        + (g.advancedFrom != null ? ` · adelantado desde el tick ${g.advancedFrom}` : '')
+        + (g.explodedTick != null ? ` · estalla en el tick ${g.explodedTick}` : ' · no llegó a estallar')),
+    ].join('\n')
+    : 'Este nivel no tiene géiseres.';
+
+  const chain = chainGraph(res);
+  $('panelChain').textContent = chain.count
+    ? [
+      `Reacciones: ${chain.count} · última en el tick ${chain.depth}`,
+      ...chain.edges.map((e) => `  ${e.order + 1}. tick ${e.tick}: ${e.from ? e.from + ' → ' : ''}${e.to} (${e.kind}${e.cause ? ', ' + e.cause : ''})`),
+    ].join('\n')
+    : 'Sin cadenas: sólo explotaron las bombas de la mecha.';
+
+  const ledger = damageLedger(res, res.board || null);
+  $('panelDamage').textContent = ledger.summary.length
+    ? [
+      `Objetos dañados: ${ledger.summary.length} · peligros alcanzados: ${ledger.hazardsReached}`,
+      ...ledger.summary.map((s) => `  ${s.object}: ${s.hits} golpe(s) en ${s.cells.join(' ')}, destruidos ${s.destroyed}${s.hazard ? ' · PELIGRO' : ''}`),
+      '',
+      ...ledger.rows.map((r) => `  tick ${r.tick}: ${r.object} en ${r.cell}`
+        + (r.hpAfter != null ? ` hp ${r.hpAfter}` : '')
+        + (r.destroyed ? ' destruido' : '')) ,
+    ].join('\n')
+    : 'Ningún objeto recibió daño.';
 }
 
 function stepTick(dir) {
@@ -706,6 +837,11 @@ for (const id of ['fusionMode', 'dynamitePattern', 'magmaRange', 'objectsBlock',
 }
 $('btnParseDirective').addEventListener('click', interpretDirective);
 $('btnSolve').addEventListener('click', runSolver);
+$('btnCompare') && $('btnCompare').addEventListener('click', renderComparison);
+for (const tab of document.querySelectorAll('#analysisTabs .tab')) {
+  tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+}
+
 $('btnCancel').addEventListener('click', () => { state.search.cancelled = true; setStatus('Cancelando…', 'warn'); });
 $('btnDetonate').addEventListener('click', detonate);
 $('btnResetSim').addEventListener('click', resetSim);

@@ -31,6 +31,13 @@ export const DEFAULT_CONSTRAINTS = {
   minBombs: 1, maxBombs: 6,
   minPowder: null, maxPowder: null,
   solutionCount: 'any',         // unique | few | many | any
+  exactSolutionCount: null,     // nº EXACTO de soluciones óptimas físicamente distintas
+  // Temporizadores: si se pide un géiser, se puede exigir un temporizador concreto
+  // (o una lista). Sigue siendo "tick de simulación", no una unidad del juego.
+  requireGeyserTimers: null,    // p.ej. [2] o [1,3]
+  difficultyMinScore: null,     // p.ej. 45
+  difficultyMaxScore: null,     // p.ej. 70
+  forbidObjects: [],            // tipos que no pueden aparecer en el tablero
   requiredMechanics: [],        // p.ej. ['portal'] obliga a que el óptimo use portales
   forbidMechanics: [],
   allowTrayFusions: true,
@@ -324,8 +331,56 @@ export function generate(input, options = {}) {
       rejected.push({ seed, reason: `Dificultad ${diff.band} ≠ solicitada ${c.difficulty}.` });
       continue;
     }
+    if (c.difficultyMinScore != null && diff.score < c.difficultyMinScore) {
+      rejected.push({ seed, reason: `Dificultad ${diff.score} < ${c.difficultyMinScore}.` });
+      continue;
+    }
+    if (c.difficultyMaxScore != null && diff.score > c.difficultyMaxScore) {
+      rejected.push({ seed, reason: `Dificultad ${diff.score} > ${c.difficultyMaxScore}.` });
+      continue;
+    }
+
+    // Temporizadores exigidos: el nivel debe contener un géiser con ese temporizador.
+    if (Array.isArray(c.requireGeyserTimers) && c.requireGeyserTimers.length) {
+      const timers = new Set();
+      candidate.cells.forEach((row) => row.forEach((cell) => {
+        if (cell && typeof cell === 'object' && cell.type === 'geyser') timers.add(Number(cell.timer));
+      }));
+      const okTimer = c.requireGeyserTimers.some((t) => timers.has(Number(t)));
+      if (!okTimer) {
+        rejected.push({
+          seed,
+          reason: `Se exigía un géiser con temporizador ${c.requireGeyserTimers.join('/')} `
+            + `y hay ${[...timers].join('/') || 'ninguno'}.`,
+        });
+        continue;
+      }
+    }
+
+    // Objetos prohibidos: ni uno solo en el tablero.
+    if (Array.isArray(c.forbidObjects) && c.forbidObjects.length) {
+      const present = new Set();
+      candidate.cells.forEach((row) => row.forEach((cell) => {
+        const t = typeof cell === 'string' ? cell : cell && cell.type;
+        if (t) present.add(t);
+      }));
+      const found = c.forbidObjects.filter((t) => present.has(t));
+      if (found.length) {
+        rejected.push({ seed, reason: `El tablero contiene objetos prohibidos: ${found.join(', ')}.` });
+        continue;
+      }
+    }
 
     const minimumCount = solved.solutions.length;
+    // Número EXACTO de soluciones óptimas (distintas físicamente, ya deduplicadas
+    // por el solver). Es más estricto que unique/few/many: se exige igualdad.
+    if (c.exactSolutionCount != null && minimumCount !== c.exactSolutionCount) {
+      rejected.push({
+        seed,
+        reason: `Se pedían exactamente ${c.exactSolutionCount} soluciones óptimas y hay ${minimumCount}.`,
+      });
+      continue;
+    }
     if (c.solutionCount === 'unique' && minimumCount !== 1) {
       rejected.push({ seed, reason: `Se pedía solución única y hay ${minimumCount}.` });
       continue;
@@ -352,12 +407,32 @@ export function generate(input, options = {}) {
 
     return {
       ok: true,
-      level: toExportable(candidate, objectives, c),
+      level: {
+        ...toExportable(candidate, objectives, c),
+        // Un nivel generado sólo es entregable si el buscador demostró la solvencia.
+        verified: true,
+        solverStatus: solved.status,
+        difficulty: diff,
+        difficultyExplanation: {
+          score: diff.score,
+          band: diff.band,
+          factors: diff.factors,
+          note: 'Los factores son medibles por el motor. playerDifficulty es una estimación '
+            + 'sin calibrar contra partidas reales: no presentarla como dificultad medida.',
+        },
+      },
       objectives,
       solution: best,
       solutionsAtMinimum: solved.solutions.length,
       optimalityProven: true,
       difficulty: diff,
+      difficultyExplanation: {
+        score: diff.score,
+        band: diff.band,
+        factors: diff.factors,
+        note: 'Los factores son medibles por el motor. playerDifficulty es una estimación '
+          + 'sin calibrar contra partidas reales: no presentarla como dificultad medida.',
+      },
       metrics: {
         physicalBombs: best.physicalBombs,
         powder: best.powder,

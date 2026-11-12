@@ -109,18 +109,47 @@ export function prepareBoard(level) {
     if (types[i] === 'gem' || types[i] === 'crystal' || types[i] === 'cat') hp0[i] = def.hp ?? 1;
   }
 
+  // Cables detonador→carga. Formato: { "x,y": ["x2,y2", ...] }.
+  // CRÍTICO: un cable mal escrito NO puede ignorarse en silencio. Si se descarta sin
+  // avisar, el solver puede declarar un nivel imposible cuando en realidad era
+  // resoluble. Por eso todo enlace inválido se registra como advertencia y como error.
   const links = new Map();
+  const linkErrors = [];
+  const parseCoord = (raw, what) => {
+    const parts = String(raw).split(',');
+    if (parts.length !== 2) {
+      linkErrors.push({ kind: 'bad-link', value: String(raw), reason: `${what}: se esperaba "x,y"` });
+      return null;
+    }
+    const [x, y] = parts.map(Number);
+    if (!Number.isInteger(x) || !Number.isInteger(y) || x < 0 || y < 0 || x >= cols || y >= rows) {
+      linkErrors.push({ kind: 'bad-link', value: String(raw), reason: `${what}: fuera del tablero (${cols}x${rows})` });
+      return null;
+    }
+    return y * cols + x;
+  };
   for (const [k, v] of Object.entries(level.links || {})) {
-    const [x, y] = k.split(',').map(Number);
-    const src = y * cols + x;
-    if (!Number.isInteger(src) || src < 0 || src >= n) continue;
-    const targets = (Array.isArray(v) ? v : [])
-      .map((s) => { const [tx, ty] = String(s).split(',').map(Number); return ty * cols + tx; })
-      .filter((t) => Number.isInteger(t) && t >= 0 && t < n);
+    const src = parseCoord(k, 'origen del cable');
+    if (src === null) continue;
+    const list = Array.isArray(v) ? v : [v];
+    const targets = [];
+    for (const raw of list) {
+      const t = parseCoord(raw, 'destino del cable');
+      if (t === null) continue;
+      if (t === src) {
+        linkErrors.push({ kind: 'bad-link', value: String(raw), reason: 'el cable apunta a su propia casilla' });
+        continue;
+      }
+      targets.push(t);
+    }
+    if (targets.length !== list.length) {
+      linkErrors.push({ kind: 'incomplete-link', source: String(k), from: list.length, kept: targets.length });
+    }
     links.set(src, targets);
   }
+  if (linkErrors.length) warnings.push(...linkErrors);
 
-  return { cols, rows, n, types, params, hp0, placeable, links, registry: portalPairs, portalInfo, warnings, rules };
+  return { cols, rows, n, types, params, hp0, placeable, links, linkErrors, registry: portalPairs, portalInfo, warnings, rules };
 }
 
 function cloneState(board) {
@@ -196,9 +225,28 @@ export function simulate(board, placements, mechaIdx, ruleOverrides = {}) {
   const log = [];
   const ticks = [];
 
-  const mechaOk = placements instanceof Map && placements.has(mechaIdx);
   const placedBombs = placements instanceof Map ? new Map(placements) : new Map();
   const exploded = new Set();
+
+  // Validación de la jugada: el juego no deja colocar una bomba sobre un objeto
+  // sólido. Si la jugada lo hace, no es una jugada legal y no se simula.
+  const illegal = [];
+  for (const [idx, level] of placedBombs) {
+    if (!Number.isInteger(idx) || idx < 0 || idx >= n) { illegal.push({ idx, why: 'fuera del tablero' }); continue; }
+    if (!board.placeable[idx]) illegal.push({ idx, cell: coordOf(idx, cols), why: `casilla ocupada por ${types[idx]}` });
+    if (!BOMB_LEVELS[level]) illegal.push({ idx, cell: coordOf(idx, cols), why: `nivel de bomba inexistente (${level})` });
+  }
+  if (illegal.length) {
+    log.push({ tick: 0, type: 'illegal-play', details: illegal });
+    return finish({
+      status: 'invalid', reason: 'illegal_placement', log, ticks, st, board, placedBombs, exploded,
+      metricsBase: {
+        placedCount: placedBombs.size, powder: powderOf(placedBombs), illegal,
+      },
+    });
+  }
+
+  const mechaOk = placements instanceof Map && placements.has(mechaIdx);
 
   if (!mechaOk) {
     return finish({
@@ -401,22 +449,41 @@ export function simulate(board, placements, mechaIdx, ruleOverrides = {}) {
       tickLog.push({ tick: tickNo, type: 'activated', cell: coordOf(cIdx, cols), object: types[cIdx] });
     }
 
-    // Programar reacciones para el tick siguiente (dedup por casilla).
-    const alreadyQueued = new Set(queue.filter((q) => q.due > tickNo).map((q) => q.cell));
+    // Reacciones a las ondas de este tick. Reglas:
+    //  - una sola explosión pendiente por casilla ('alreadyQueued' sólo desempata);
+    //  - si la reacción ya está programada para un tick POSTERIOR y la nueva sería
+    //    más temprana, la adelanta (es lo que significa "el impacto adelanta la
+    //    reacción"). Nunca la retrasa: un temporizador que ya va a vencer conserva
+    //    su tick, en cualquiera de los dos órdenes de procesamiento.
+    const pendingByCell = new Map(queue.filter((q) => q.due > tickNo).map((q) => [q.cell, q]));
     for (const s of scheduledExplosions) {
-      if (alreadyQueued.has(s.cell)) continue;
-      alreadyQueued.add(s.cell);
       const def = getObject(types[s.cell]);
       const delay = (def.onHit && def.onHit.delayTicks) || 1;
       if (s.cell === mechaIdx) continue;
+      const due = tickNo + delay;
+      const pending = pendingByCell.get(s.cell);
+      if (pending && pending.due <= due) continue; // ya estaba programada igual o antes
+      if (pending) {
+        const previousDueTick = pending.due;
+        pending.due = due;
+        pending.kind = s.kind;
+        pending.level = s.level;
+        pending.cause = s.cause || 'chain';
+        tickLog.push({
+          tick: tickNo, type: 'scheduled-explosion-advanced', cell: coordOf(s.cell, cols),
+          dueTick: due, previousDueTick, cause: s.cause || 'chain',
+        });
+      } else {
+        schedule({ due, cell: s.cell, kind: s.kind, level: s.level, cause: s.cause || 'chain' });
+        tickLog.push({
+          tick: tickNo, type: 'scheduled-explosion', cell: coordOf(s.cell, cols),
+          dueTick: due, cause: s.cause || 'chain', object: types[s.cell],
+        });
+      }
+      pendingByCell.set(s.cell, pending || { cell: s.cell, due });
+      chainDepth = Math.max(chainDepth, due);
       if (s.kind === 'bomb') exploded.add(s.cell);
-      schedule({ due: tickNo + delay, cell: s.cell, kind: s.kind, level: s.level, cause: s.cause || 'chain' });
-      chainDepth = Math.max(chainDepth, tickNo + delay);
       if (placedBombs.has(s.cell)) exploded.add(s.cell);
-      tickLog.push({
-        tick: tickNo, type: 'scheduled-explosion', cell: coordOf(s.cell, cols),
-        dueTick: tickNo + delay, cause: s.cause || 'chain', object: types[s.cell],
-      });
     }
 
     ticks.push({ tick: tickNo, events: tickLog, explosions, destroyed: [...destroyedNow].map((i) => coordOf(i, cols)) });

@@ -5,9 +5,11 @@
   "type": "module",
   "description": "BoomSolver: deterministic rule engine, optimal solver, level generator and interactive workbench for the bomb puzzle game.",
   "scripts": {
-    "test": "node --test tests/",
+    "test": "node --test \"tests/*.test.mjs\"",
     "dev": "node scripts/serve.mjs",
     "bench": "node scripts/bench.mjs"
   },
-  "engines": { "node": ">=20" }
+  "engines": {
+    "node": ">=20"
+  }
 }

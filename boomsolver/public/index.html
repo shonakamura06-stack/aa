@@ -122,6 +122,10 @@
       <div><span id="stTime">—</span><small>tiempo</small></div>
       <div><span id="stEval">—</span><small>evaluaciones</small></div>
     </div>
+    <div id="optimalityBanner" class="banner" role="status" hidden>
+      <strong id="optLabel">—</strong>
+      <span id="optDetail"></span>
+    </div>
     <p id="proofNote" class="proof">Pulsa «Buscar» para enumerar todas las soluciones mínimas.</p>
     <div id="paretoBox" class="pareto" hidden></div>
     <div id="solutions" class="solutions"></div>
@@ -141,7 +145,34 @@
     </div>
     <div id="simTray" class="sim-tray"></div>
     <p class="hint" id="simHint">En modo simular: elige una bomba de la bandeja y haz clic en una casilla. Luego marca la mecha con clic derecho o con el botón «Mecha».</p>
-    <div id="simLog" class="sim-log" aria-live="polite"></div>
+    <div class="tabs" role="tablist" id="analysisTabs">
+      <button class="tab active" type="button" data-tab="log" role="tab">Registro</button>
+      <button class="tab" type="button" data-tab="waves" role="tab">Ondas</button>
+      <button class="tab" type="button" data-tab="portals" role="tab">Portales</button>
+      <button class="tab" type="button" data-tab="geysers" role="tab">Géiseres</button>
+      <button class="tab" type="button" data-tab="chain" role="tab">Cadenas</button>
+      <button class="tab" type="button" data-tab="damage" role="tab">Daño</button>
+    </div>
+    <div id="simLog" class="sim-log" aria-live="polite" data-panel="log"></div>
+    <div id="panelWaves" class="sim-log" data-panel="waves" hidden></div>
+    <div id="panelPortals" class="sim-log" data-panel="portals" hidden></div>
+    <div id="panelGeysers" class="sim-log" data-panel="geysers" hidden></div>
+    <div id="panelChain" class="sim-log" data-panel="chain" hidden></div>
+    <div id="panelDamage" class="sim-log" data-panel="damage" hidden></div>
+  </section>
+
+  <!-- ---------------- Comparar soluciones ---------------- -->
+  <section class="card compare-card">
+    <div class="card-head">
+      <h2>Comparar soluciones</h2>
+      <div class="row">
+        <label class="field small">A<select id="cmpA"></select></label>
+        <label class="field small">B<select id="cmpB"></select></label>
+        <button id="btnCompare" class="ghost" type="button">Comparar</button>
+      </div>
+    </div>
+    <p class="hint">Compara dos soluciones óptimas: bombas, pólvora, orden de acontecimientos y por qué difieren. Si no hay dos soluciones, no hay nada que comparar y se avisa.</p>
+    <div id="cmpResult" class="sim-log" aria-live="polite"></div>
   </section>
 
   <!-- ---------------- Generador ---------------- -->

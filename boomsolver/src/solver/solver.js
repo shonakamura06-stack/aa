@@ -205,11 +205,33 @@ export function solve(level, objectives, options = {}) {
   };
 
   const { positive, negative } = normalizeObjectives(objectives);
+  // Los objetivos opcionales no condicionan la solución: se informan, no se exigen.
+  // Si sólo hay opcionales, no hay nada que resolver.
+  const requiredCount = [...positive, ...negative].filter((o) => o.required !== false).length;
+  if (requiredCount === 0) {
+    return infeasibleResult(
+      'No hay objetivos obligatorios: el nivel sólo tiene condiciones opcionales, '
+      + 'así que ninguna jugada puede considerarse necesaria ni mínima.',
+      opts.mode,
+    );
+  }
   if (!positive.length && !negative.length) {
     return infeasibleResult('No hay objetivos definidos: un nivel sin objetivo no es resoluble.', opts.mode);
   }
   if (!Array.isArray(level.tray) || level.tray.length === 0) {
     return infeasibleResult('La bandeja está vacía: sin bombas no hay jugada posible.', opts.mode);
+  }
+
+  // La bandeja debe contener niveles de bomba reales: si no, la fusión produce
+  // estados imposibles y el buscador fallaría con una excepción en vez de explicar.
+  const trayLevels = (level.tray || []).map(Number);
+  const badTray = trayLevels.filter((l) => !BOMB_LEVELS[l]);
+  if (badTray.length) {
+    return infeasibleResult(
+      `La bandeja contiene niveles de bomba inexistentes: ${[...new Set(badTray)].join(', ')}. `
+      + `Los niveles válidos son ${Object.keys(BOMB_LEVELS).join(', ')}.`,
+      opts.mode,
+    );
   }
 
   const board = prepareBoard({ ...level, rules: { ...(level.rules || {}), ...(opts.extraRules || {}) } });
@@ -218,6 +240,22 @@ export function solve(level, objectives, options = {}) {
     prunedDuplicate: 0, fusionStates: 0, candidates: 0, combos: 0, solutionsRejectedBySimulator: 0,
   };
   const reasons = [];
+
+  // Un cable mal escrito invalidaría la física entera del nivel: no se puede
+  // declarar nada sobre él hasta corregirlo (evita una falsa imposibilidad).
+  if (board.linkErrors && board.linkErrors.length) {
+    return {
+      ...infeasibleResult(
+        'El nivel tiene cables ilegibles, así que su física es desconocida: '
+        + board.linkErrors.map((e) => `${e.reason} (${e.value})`).join('; ')
+        + '. Corrige el formato "x,y" antes de resolver.',
+        opts.mode, null, board,
+      ),
+      status: 'invalid-level',
+      note: 'Cables inválidos: no se evalúa el nivel.',
+      linkErrors: board.linkErrors,
+    };
+  }
 
   const { cells, cands } = analyseCandidates(board, board.rules);
   stats.candidates = cands.size;
@@ -238,8 +276,16 @@ export function solve(level, objectives, options = {}) {
 
   const targetCells = new Set();
   for (const o of positive) {
-    if (o.kind !== 'destroy' && o.kind !== 'activate') continue;
-    const types = o.types || [o.type];
+    if (o.required === false) continue; // opcional: no exige cobertura
+    if (o.kind !== 'destroy' && o.kind !== 'activate' && o.kind !== 'destroyAt') continue;
+    if (o.cells && o.kind !== 'activate') {
+      for (const c of o.cells) {
+        const [x, y] = String(c).split(',').map(Number);
+        if (board.hp0[y * board.cols + x] > 0) targetCells.add(y * board.cols + x);
+      }
+      continue;
+    }
+    const types = o.types || (o.type ? [o.type] : []);
     for (let i = 0; i < board.n; i++) if (board.hp0[i] > 0 && types.includes(board.types[i])) targetCells.add(i);
   }
   const reachable = new Set();
@@ -273,7 +319,10 @@ export function solve(level, objectives, options = {}) {
   stats.fusionStates = states.size;
   const maxAvailable = Math.max(...states.map((s) => s.levels.length));
   const K = Math.max(0, Math.min(opts.maxBombs ?? maxAvailable, maxAvailable, cells.length));
-  const comboCap = 20000; // protección de memoria, declarada en el resultado
+  // Protección de memoria. CRÍTICO: cuando se activa, el resultado NUNCA puede
+  // declararse 'infeasible'. Se declara 'bestKnown' con exhaustive=false y se
+  // informa exactamente de cuántas combinaciones quedaron sin probar.
+  const comboCap = Number.isFinite(opts.comboCap) ? Math.max(1, opts.comboCap) : 20000;
 
   const solutions = [];
   const seenSig = new Set();
@@ -281,6 +330,9 @@ export function solve(level, objectives, options = {}) {
   let cancelled = false;
   let timedOut = false;
   let combosSkipped = 0;
+  let levelsIncomplete = 0;      // niveles de k donde no se probó todo
+  let stoppedAtLevel = 0;        // primer k no agotado
+  let truncatedByCap = false;
 
   const limits = () => {
     if (opts.shouldCancel()) { cancelled = true; return true; }
@@ -346,8 +398,12 @@ export function solve(level, objectives, options = {}) {
     if (!usable.length) { stats.prunedUnsafe++; continue; }
 
     const combos = combinations(cells.length, k);
-    if (combos.length > comboCap) {
-      combosSkipped += combos.length - comboCap;
+    const skippedHere = Math.max(0, combos.length - comboCap);
+    if (skippedHere > 0) {
+      combosSkipped += skippedHere;
+      truncatedByCap = true;
+      levelsIncomplete++;
+      if (!stoppedAtLevel) stoppedAtLevel = k;
     }
     const comboList = combos.slice(0, comboCap);
 
@@ -387,11 +443,15 @@ export function solve(level, objectives, options = {}) {
     list = pareto.map((p) => p.solution);
   }
 
+  // Estado de optimalidad HONESTO. Regla dura: 'infeasible' sólo si la
+  // enumeración fue exhaustiva. Cualquier límite de seguridad produce
+  // 'bestKnown' o 'timedOut', jamás una falsa imposibilidad.
+  const exhaustive = !cancelled && !timedOut && combosSkipped === 0 && levelsIncomplete === 0;
   let status;
   if (cancelled) status = 'cancelled';
   else if (timedOut) status = solutions.length ? 'bestKnown' : 'timedOut';
-  else if (solutions.length === 0) status = 'infeasible';
-  else if (combosSkipped > 0) status = 'bestKnown';
+  else if (solutions.length === 0) status = exhaustive ? 'infeasible' : 'unknown';
+  else if (!exhaustive) status = 'bestKnown';
   else status = 'optimalityProven';
 
   const groups = new Map();
@@ -403,7 +463,9 @@ export function solve(level, objectives, options = {}) {
   const bestBombs = list.length ? Math.min(...list.map((s) => s.physicalBombs)) : null;
   const bestPowder = list.length ? Math.min(...list.map((s) => s.powder)) : null;
 
-  const proofNote = buildProofNote(status, provenUpTo, opts.mode, list, K);
+  const proofNote = buildProofNote(status, provenUpTo, opts.mode, list, {
+    kSearch: K, incompleteReason: cancelled ? 'cancelled' : timedOut ? 'timeout' : combosSkipped > 0 ? 'combination-cap' : null,
+  });
 
   return {
     mode: opts.mode,
@@ -419,6 +481,10 @@ export function solve(level, objectives, options = {}) {
     },
     solutions: list.slice(0, opts.maxSolutions),
     totalKnown: list.length,
+    exhaustive,
+    incompleteReason: cancelled ? 'cancelled' : timedOut ? 'timeout'
+      : combosSkipped > 0 ? 'combination-cap' : null,
+    firstUnprovenBombs: stoppedAtLevel || (timedOut || cancelled ? provenUpTo + 1 : null),
     truncatedPresentation: list.length > opts.maxSolutions,
     presentationLimit: opts.maxSolutions,
     groups: [...groups.entries()].map(([sig, variants]) => ({ outcomeSig: sig, variants })),
@@ -429,6 +495,7 @@ export function solve(level, objectives, options = {}) {
     elapsedMs: stats.timeMs,
     engineVersion: '2.0.0',
     combosSkipped,
+    levelsIncomplete,
     stoppedMidLevel,
   };
 }
@@ -441,12 +508,14 @@ function buildProofNote(status, provenUpTo, mode, list, maxBombsSearched) {
         'Todas verificadas por el mismo simulador.';
     }
     const powderBest = list.length ? Math.min(...list.map((s) => s.powder)) : null;
-    return `Enumeración exhaustiva completada hasta ${maxBombsSearched} bomba(s) física(s) (${provenUpTo} niveles de tamaño agotados): ` +
+    return `Enumeración exhaustiva completada hasta ${maxBombsSearched.kSearch} bomba(s) física(s) (${provenUpTo} niveles de tamaño agotados): ` +
       `mínimo de pólvora ${powderBest} entre ${list.length} soluciones no dominadas. ` +
       'Ninguna jugada con menos bombas usa menos pólvora.';
   }
   if (status === 'bestKnown') {
-    return `Mejor solución encontrada hasta ahora. La enumeración NO terminó (límite de tiempo o de combinaciones): ` +
+    const why = maxBombsSearched && maxBombsSearched.incompleteReason
+      ? maxBombsSearched.incompleteReason : 'límite de tiempo o de combinaciones';
+    return `Mejor solución encontrada hasta ahora. La enumeración NO terminó (${why}): ` +
       `mínimo de bombas probado sólo hasta ${provenUpTo}. No se puede afirmar que sea el óptimo global.`;
   }
   if (status === 'cancelled') {
@@ -454,6 +523,10 @@ function buildProofNote(status, provenUpTo, mode, list, maxBombsSearched) {
   }
   if (status === 'timedOut') {
     return 'Se agotó el tiempo antes de encontrar ninguna solución. Estado: sin solución conocida (no equivale a "imposible").';
+  }
+  if (status === 'unknown') {
+    return 'No se encontró solución, pero la enumeración NO fue exhaustiva (límite de combinaciones o de tiempo). ' +
+      'NO se puede afirmar que el nivel sea imposible: sube comboCap/timeBudgetMs o reduce maxBombs para demostrarlo.';
   }
   return 'No se encontró ninguna solución dentro de los límites explorados.';
 }
@@ -486,6 +559,7 @@ function infeasibleResult(message, mode, stats = null, board = null) {
   return {
     mode, status: 'infeasible', optimalityProven: false,
     proofNote: message,
+    note: message, // alias usado por la UI y el CLI
     provenUpToBombs: 0,
     bounds: { lowerPhysicalBombs: null, upperPhysicalBombs: null, lowerPowder: null, maxBombsSearched: 0 },
     solutions: [], totalKnown: 0, truncatedPresentation: false, presentationLimit: 0,
@@ -512,5 +586,8 @@ export function verifySolution(level, objectives, solution) {
 export function proveMinimum(level, objectives, options = {}) {
   const k = options.maxBombs;
   const r = solve({ ...level, tray: level.tray }, objectives, { ...options, maxBombs: k });
-  return { status: r.status, solutions: r.solutions.length, provenUpTo: r.provenUpToBombs };
+  return {
+    status: r.status, solutions: r.solutions.length, provenUpTo: r.provenUpToBombs,
+    note: r.note, reasons: r.reasons, exhaustive: r.exhaustive,
+  };
 }

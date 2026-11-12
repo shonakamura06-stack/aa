@@ -23,6 +23,23 @@ export function objective(spec) {
   if (o.count !== undefined && (!Number.isInteger(o.count) || o.count < 1)) {
     throw new Error('count debe ser un entero ≥ 1');
   }
+  if (o.atMost !== undefined && (!Number.isInteger(o.atMost) || o.atMost < 0)) {
+    throw new Error('atMost debe ser un entero ≥ 0');
+  }
+  if (o.cells !== undefined) {
+    if (!Array.isArray(o.cells) || !o.cells.length) throw new Error('cells debe ser un array no vacío');
+    for (const c of o.cells) {
+      if (!/^\d+,\d+$/.test(String(c))) throw new Error(`Coordenada inválida en objetivo: ${c}`);
+    }
+  }
+  if (o.kind === 'custom' && typeof o.test !== 'function') {
+    throw new Error('Un objetivo custom necesita una función test(board, result)');
+  }
+  // 'optional' significa que no impide ganar, pero se informa de su progreso.
+  // 'required' (por defecto) es obligatorio.
+  if (o.required !== undefined && typeof o.required !== 'boolean') {
+    throw new Error('required debe ser booleano');
+  }
   return o;
 }
 
@@ -31,7 +48,8 @@ export function normalizeObjectives(input) {
   const positive = [], negative = [];
   for (const raw of src) {
     const o = objective(raw);
-    if (o.negative === true || o.kind.startsWith('no')) negative.push(o);
+    const isNegative = o.negative === true || o.kind.startsWith('no') || o.kind === 'avoidHazard';
+    if (isNegative) negative.push(o);
     else positive.push(o);
   }
   return { positive, negative };
@@ -115,20 +133,79 @@ export function evaluateOutcome(board, result, objectivesInput) {
     });
   }
 
+  // Índice por celda de lo destruido / activado, para objetivos por coordenada.
+  const destroyedCells = new Set();
+  for (let i = 0; i < board.n; i++) {
+    if (board.hp0[i] > 0 && result.final.alive[i] !== 1) destroyedCells.add(`${i % cols},${Math.floor(i / cols)}`);
+  }
+
+  const countIn = (types, set, map) => (set
+    ? [...set].filter((c) => {
+      const [x, y] = c.split(',').map(Number);
+      return types.includes(board.types[y * cols + x]);
+    }).length
+    : types.reduce((a, t) => a + (map.get(t) || 0), 0));
+
   for (const o of positive) {
     const types = typesOf(o);
-    if (o.kind === 'destroy') {
-      const total = types.reduce((a, t) => a + (totalByType.get(t) || 0), 0);
-      const done = types.reduce((a, t) => a + (destroyedByType.get(t) || 0), 0);
+    const optional = o.required === false;
+    const entry = {
+      kind: o.kind,
+      label: labelFor(o.kind, types, o.count, o.simultaneous),
+      optional,
+      ok: true,
+      done: 0,
+      total: null,
+      progress: 0,
+      detail: '',
+    };
+
+    if (o.kind === 'destroy' || o.kind === 'destroyAt') {
+      let total;
+      let done;
+      if (o.cells) {
+        total = o.cells.length;
+        done = o.cells.filter((c) => destroyedCells.has(String(c))).length;
+      } else {
+        total = types.reduce((a, t) => a + (totalByType.get(t) || 0), 0);
+        done = countIn(types, null, destroyedByType);
+      }
       const required = o.count ?? total;
-      const ok = done >= required;
-      checks.push({ label: labelFor('destroy', types), done: Math.min(done, required), total: required, ok, kind: 'destroy', types });
-      if (!ok) failures.push({ kind: 'objective', message: `Objetivo incompleto: ${labelFor('destroy', types)} (${Math.min(done, required)}/${required})` });
+      entry.total = required;
+      entry.done = Math.min(done, required);
+      // Objetivo vacuo: pide destruir algo que el tablero no tiene. No puede darse
+      // por cumplido, o un nivel mal diseñado se declararía ganado sin jugar.
+      entry.vacuous = required === 0;
+      entry.ok = required === 0 ? false : done >= required;
+      if (entry.vacuous) entry.detail = '0/0: el tablero no contiene ese objeto';
+      entry.progress = required === 0 ? 1 : Math.min(1, done / required);
+      entry.detail = `${entry.done}/${required}`;
+      checks.push(entry);
+      if (!entry.ok && !optional) {
+        failures.push({
+          kind: 'objective',
+          message: entry.vacuous
+            ? `Objetivo sin efecto: ${entry.label} — el tablero no contiene ese objeto, `
+              + 'así que no puede cumplirse. Revisa el objetivo o el tablero.'
+            : `Objetivo incompleto: ${entry.label} (${entry.done}/${required})`,
+        });
+      }
     } else if (o.kind === 'activate') {
-      const total = types.reduce((a, t) => a + (totalByType.get(t) || 0), 0);
-      const done = types.reduce((a, t) => a + (activatedByType.get(t) || 0), 0);
+      let total;
+      let done;
+      if (o.cells) {
+        total = o.cells.length;
+        done = o.cells.filter((c) => {
+          const [x, y] = c.split(',').map(Number);
+          return !!result.final.activated[y * cols + x];
+        }).length;
+      } else {
+        total = types.reduce((a, t) => a + (totalByType.get(t) || 0), 0);
+        done = countIn(types, null, activatedByType);
+      }
       const required = o.count ?? total;
-      let ok = done >= required;
+      const vacuous = required === 0 && !o.cells;
+      let ok = required === 0 ? false : done >= required;
       let simultaneousOk = true;
       if (o.simultaneous) {
         const ticks = [];
@@ -137,57 +214,116 @@ export function evaluateOutcome(board, result, objectivesInput) {
         simultaneousOk = ticks.length >= required && uniq.size <= 1;
         ok = ok && simultaneousOk;
       }
-      checks.push({
-        label: labelFor('activate', types, required, o.simultaneous),
-        done: Math.min(done, required), total: required, ok, kind: 'activate', types,
-        simultaneous: !!o.simultaneous, simultaneousOk,
-      });
-      if (!ok) {
+      entry.total = required;
+      entry.done = Math.min(done, required);
+      entry.ok = ok;
+      entry.vacuous = vacuous;
+      if (vacuous) entry.detail = '0/0: el tablero no contiene ese objeto';
+      entry.simultaneous = !!o.simultaneous;
+      entry.simultaneousOk = simultaneousOk;
+      entry.progress = required === 0 ? 1 : (ok ? 1 : Math.min(1, done / required));
+      entry.detail = `${entry.done}/${required}`;
+      checks.push(entry);
+      if (!ok && !optional) {
         failures.push({
           kind: 'objective',
-          message: o.simultaneous && !simultaneousOk
-            ? `Los ${types.join('/')} no se activaron en el mismo tick (${done}/${required}).`
-            : `Objetivo incompleto: ${labelFor('activate', types)} (${Math.min(done, required)}/${required})`,
+          message: vacuous
+            ? `Objetivo sin efecto: ${entry.label} — el tablero no contiene ese objeto.`
+            : o.simultaneous && !simultaneousOk
+              ? `Los ${types.join('/')} no se activaron en el mismo tick (${done}/${required}).`
+              : `Objetivo incompleto: ${entry.label} (${entry.done}/${required})`,
         });
       }
     } else if (o.kind === 'enemyBombs') {
-      const total = [...totalByType.entries()]
-        .filter(([t]) => t.startsWith('enemy_'))
-        .reduce((a, [, c]) => a + c, 0);
-      const done = [...destroyedByType.entries()]
-        .filter(([t]) => t.startsWith('enemy_'))
-        .reduce((a, [, c]) => a + c, 0);
+      const total = [...totalByType.entries()].filter(([t]) => t.startsWith('enemy_')).reduce((a, [, c]) => a + c, 0);
+      const done = [...destroyedByType.entries()].filter(([t]) => t.startsWith('enemy_')).reduce((a, [, c]) => a + c, 0);
       const ok = total === 0 ? true : done >= total;
-      checks.push({ label: labelFor('enemyBombs', [], total), done, total, ok, kind: 'enemyBombs' });
-      if (!ok) failures.push({ kind: 'objective', message: `Bombas enemigas sin detonar (${done}/${total})` });
+      entry.label = labelFor('enemyBombs', [], total);
+      entry.total = total;
+      entry.done = done;
+      entry.ok = ok;
+      entry.progress = total === 0 ? 1 : done / total;
+      entry.detail = `${done}/${total}`;
+      checks.push(entry);
+      if (!ok && !optional) failures.push({ kind: 'objective', message: `Bombas enemigas sin detonar (${done}/${total})` });
+    } else if (o.kind === 'custom') {
+      let ok = false;
+      let detail = '';
+      try {
+        const raw = o.test(board, result);
+        if (raw && typeof raw === 'object') { ok = !!raw.ok; detail = raw.detail || ''; }
+        else { ok = !!raw; }
+      } catch (err) {
+        ok = false;
+        detail = `error en la condición: ${err.message}`;
+      }
+      entry.label = o.label || 'Condición personalizada';
+      entry.ok = ok;
+      entry.progress = ok ? 1 : 0;
+      entry.detail = detail;
+      checks.push(entry);
+      if (!ok && !optional) failures.push({ kind: 'objective', message: `Condición personalizada incumplida: ${entry.label}${detail ? ` (${detail})` : ''}` });
     } else {
       throw new Error(`Tipo de objetivo desconocido: ${o.kind}`);
     }
   }
 
+  // Condiciones negativas: si son opcionales no hacen perder, pero se informa.
   for (const o of negative) {
     const types = typesOf(o);
+    const optional = o.required === false;
     if (o.kind === 'noDestroy' || (o.negative && o.type)) {
       const broken = types.reduce((a, t) => a + (destroyedByType.get(t) || 0) + (hitByType.get(t) || 0), 0);
-      const ok = broken === 0;
-      checks.push({ label: labelFor('noDestroy', types), done: broken, total: 0, ok, kind: 'noDestroy', types, negative: true });
-      if (!ok) failures.push({ kind: 'negative', message: `Condición negativa incumplida: se rompieron ${broken} ${types.join('/')}.` });
+      const limit = o.atMost ?? 0;
+      const ok = broken <= limit;
+      checks.push({
+        label: labelFor('noDestroy', types), done: broken, total: limit, ok,
+        kind: 'noDestroy', types, negative: true, optional,
+        progress: limit === 0 ? (broken === 0 ? 1 : 0) : Math.max(0, 1 - broken / (limit + 1)),
+        detail: `${broken} alcanzados, máximo ${limit}`,
+      });
+      if (!ok && !optional) failures.push({ kind: 'negative', message: `Condición negativa incumplida: se rompieron ${broken} ${types.join('/')} (máximo ${limit}).` });
     } else if (o.kind === 'noActivate') {
       const act = types.reduce((a, t) => a + (activatedByType.get(t) || 0), 0);
-      const ok = act === 0;
-      checks.push({ label: labelFor('noActivate', types), done: act, total: 0, ok, kind: 'noActivate', types, negative: true });
-      if (!ok) failures.push({ kind: 'negative', message: `Condición negativa incumplida: se activaron ${act} ${types.join('/')}.` });
+      const limit = o.atMost ?? 0;
+      const ok = act <= limit;
+      checks.push({
+        label: labelFor('noActivate', types), done: act, total: limit, ok,
+        kind: 'noActivate', types, negative: true, optional,
+        progress: limit === 0 ? (act === 0 ? 1 : 0) : Math.max(0, 1 - act / (limit + 1)),
+        detail: `${act} activados, máximo ${limit}`,
+      });
+      if (!ok && !optional) failures.push({ kind: 'negative', message: `Condición negativa incumplida: se activaron ${act} ${types.join('/')} (máximo ${limit}).` });
     } else if (o.kind === 'avoidHazard') {
       const ok = (result.metrics.hazardsHit || 0) === 0;
-      checks.push({ label: labelFor('avoidHazard', [], 0), ok, kind: 'avoidHazard', negative: true });
-      if (!ok) failures.push({ kind: 'negative', message: 'La explosión alcanzó un peligro.' });
+      checks.push({
+        label: labelFor('avoidHazard', [], 0), ok, kind: 'avoidHazard',
+        negative: true, optional, progress: ok ? 1 : 0, detail: ok ? 'sin peligros' : 'tocó un peligro',
+      });
+      if (!ok && !optional) failures.push({ kind: 'negative', message: 'La explosión alcanzó un peligro.' });
     } else {
       throw new Error(`Condición negativa desconocida: ${o.kind}`);
     }
   }
 
-  const win = statusOk && failures.length === 0 && checks.every((c) => c.ok);
-  return { win, checks, failures, status: result.status, reason: result.reason };
+  const requiredChecks = checks.filter((c) => !c.optional);
+  const optionalChecks = checks.filter((c) => c.optional);
+  const win = statusOk && failures.length === 0 && requiredChecks.every((c) => c.ok);
+  const progress = requiredChecks.length === 0
+    ? (statusOk ? 1 : 0)
+    : requiredChecks.reduce((a, c) => a + (c.ok ? 1 : (c.progress || 0)), 0) / requiredChecks.length;
+  return {
+    win,
+    checks,
+    required: requiredChecks,
+    optional: optionalChecks,
+    progress: Number(Math.min(1, progress).toFixed(4)),
+    requiredCount: requiredChecks.length,
+    optionalCount: optionalChecks.length,
+    failures,
+    status: result.status,
+    reason: result.reason,
+  };
 }
 
 // ------------------------------------------------------------

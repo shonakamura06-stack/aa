@@ -94,154 +94,203 @@ export function buildGrid(data, w, gridRegion) {
     }
   }
   // Energía de borde vertical (entre columnas) y horizontal (entre filas).
+  // Se mide en COLOR, no en luminancia: dos casillas distintas (p. ej. suelo y
+  // gema) pueden tener brillo casi idéntico y aun así ser un borde evidente.
+  const rgb = new Float64Array(bw * bh * 3);
+  for (let y = 0; y < bh; y++) {
+    for (let x = 0; x < bw; x++) {
+      const [r, g, b] = rgbAt(data, w, x0 + x, y0 + y);
+      const o = (y * bw + x) * 3;
+      rgb[o] = r; rgb[o + 1] = g; rgb[o + 2] = b;
+    }
+  }
+  const colorDist = (i, j) => {
+    const dr = rgb[i * 3] - rgb[j * 3];
+    const dg = rgb[i * 3 + 1] - rgb[j * 3 + 1];
+    const db = rgb[i * 3 + 2] - rgb[j * 3 + 2];
+    return Math.sqrt(dr * dr + dg * dg + db * db);
+  };
   const colEdge = new Float64Array(bw);
   const rowEdge = new Float64Array(bh);
   for (let x = 1; x < bw; x++) {
     let s = 0;
-    for (let y = 0; y < bh; y++) s += Math.abs(lum[y * bw + x] - lum[y * bw + x - 1]);
+    for (let y = 0; y < bh; y++) s += colorDist(y * bw + x, y * bw + x - 1);
     colEdge[x] = s / bh;
   }
   for (let y = 1; y < bh; y++) {
     let s = 0;
-    for (let x = 0; x < bw; x++) s += Math.abs(lum[y * bw + x] - lum[(y - 1) * bw + x]);
+    for (let x = 0; x < bw; x++) s += colorDist(y * bw + x, (y - 1) * bw + x);
     rowEdge[y] = s / bw;
   }
 
-  const dimCols = dimensionFor(colEdge, bw);
-  const dimRows = dimensionFor(rowEdge, bh);
-  let cols = dimCols.count;
-  let rows = dimRows.count;
-  const reliable = dimCols.reliable && dimRows.reliable;
-
-  // Las casillas del juego son cuadradas: si sólo una dirección es fiable, se
-  // usa su tamaño de casilla para estimar la otra.
-  if (reliable && Math.abs(bw / cols - bh / rows) / Math.max(bw / cols, bh / rows) > 0.2) {
-    const side = Math.sqrt((bw * bh) / (cols * rows));
-    rows = clapDim(Math.round(bh / side));
-  } else if (!dimCols.reliable && dimRows.reliable) {
-    const side = bh / rows;
-    cols = clapDim(Math.round(bw / side));
-  } else if (dimCols.reliable && !dimRows.reliable) {
-    const side = bw / cols;
-    rows = clapDim(Math.round(bh / side));
-  } else if (!reliable) {
+  // Las casillas del juego son CUADRADAS: en lugar de estimar filas y columnas
+  // por separado (donde un eje con poca señal se equivoca), se busca el lado de
+  // casilla `s` que mejor explica los bordes en los dos ejes a la vez. Así una
+  // fila llena de suelo liso no puede arrastrar la estimación.
+  const fit = squareCellFit(colEdge, rowEdge, bw, bh);
+  let cols = Math.max(1, Math.round(bw / fit.side));
+  let rows = Math.max(1, Math.round(bh / fit.side));
+  // Si los dos ejes dan un tamaño de casilla muy distinto, se respeta el eje
+  // fiable y se deriva el otro: sigue siendo rejilla cuadrada.
+  if (cols > 30 || rows > 30) {
     const side = Math.min(bw, bh) / 6;
-    cols = clapDim(Math.round(bw / side));
-    rows = clapDim(Math.round(bh / side));
+    cols = Math.max(1, Math.round(bw / side));
+    rows = Math.max(1, Math.round(bh / side));
   }
   const cellW = bw / cols, cellH = bh / rows;
   const squareness = Math.abs(cellW - cellH) / Math.max(cellW, cellH);
 
   const warnings = [];
   let confidence = 0.8;
-  if (!reliable) { confidence = 0.35; warnings.push('No se detectaron bordes de casilla con claridad: se asumió un tamaño aproximado. Confirma filas y columnas.'); }
-  if (squareness > 0.18) { confidence = Math.min(confidence, 0.4); warnings.push('Las casillas no son cuadradas: posible perspectiva, zoom o recorte.'); }
-  if (cellW < 12 || cellH < 12) { confidence = Math.min(confidence, 0.3); warnings.push('Casillas demasiado pequeñas: aumenta el zoom de la captura.'); }
-  if (cols < 2 || rows < 2) { confidence = Math.min(confidence, 0.3); warnings.push('Se detectó una sola fila o columna.'); }
+  if (!fit.reliable) {
+    confidence = 0.35;
+    warnings.push('No se detectaron bordes de casilla con claridad: se asumió un tamaño aproximado. Confirma filas y columnas.');
+  }
+  if (squareness > 0.18) {
+    confidence = Math.min(confidence, 0.4);
+    warnings.push('Las casillas no son cuadradas: posible perspectiva, zoom o recorte.');
+  }
+  if (cellW < 12 || cellH < 12) {
+    confidence = Math.min(confidence, 0.3);
+    warnings.push('Casillas demasiado pequeñas: aumenta el zoom de la captura.');
+  }
+  if (cols < 2 || rows < 2) {
+    confidence = Math.min(confidence, 0.3);
+    warnings.push('Se detectó una sola fila o columna.');
+  }
 
-  return { cols, rows, cellW, cellH, squareness: round2(squareness), cells: { x0, y0, x1, y1 }, confidence, warnings };
+  return {
+    cols, rows, cellW, cellH, squareness: round2(squareness),
+    cells: { x0, y0, x1, y1 }, confidence, warnings,
+    cellSide: fit.side,
+    gridFit: {
+      ratio: round2(fit.ratio),
+      reliable: fit.reliable,
+      coverage: round2(fit.coverage || 0),
+      peaksExplained: fit.coverage >= 0.995 ? fit.totalPeaks : Math.round(fit.coverage * fit.totalPeaks),
+      peaksFound: fit.totalPeaks || 0,
+      peaksSeen: fit.totalPeaksAll || fit.totalPeaks || 0,
+    },
+  };
 }
 
 /**
- * Dimensión (nº de casillas) que mejor explica la señal de bordes.
- * Se prueban divisores exactos del ancho: en un tablero real el borde cae
- * siempre en múltiplos del tamaño de casilla.
+ * Lado de casilla cuadrado que mejor explica los bordes de los DOS ejes.
+ *
+ * Para cada lado candidato s se mide:
+ *   borde  = energía media en los múltiplos de s (debería ser alta)
+ *   centro = energía media en los puntos medios (debería ser baja)
+ * y se puntúa `borde - 0.6·centro`. No se premia un s pequeño por tener menos
+ * cortes que acertar: un s que no es el real cae mal en sus propios centros
+ * (los centros de casilla no son bordes) y se queda atrás. Se exige además que
+ * la ventaja sobre la mediana sea clara para declarar la rejilla fiable.
  */
-function dimensionFor(signal, total) {
-  const n = signal.length;
-  if (n < 16 || total < 24) return { count: 1, reliable: false, scores: [] };
-  const candidates = [];
-  for (let k = 1; k <= Math.min(30, Math.floor(total / 12)); k++) {
-    const s = total / k;
-    let sum = 0;
-    for (let i = 1; i < k; i++) {
-      const pos = Math.round(i * s);
-      let best = 0;
-      for (let d = -2; d <= 2; d++) {
-        const idx = pos + d;
-        if (idx > 0 && idx < n) best = Math.max(best, signal[idx]);
+function squareCellFit(colEdge, rowEdge, bw, bh) {
+  // La casilla es un PERIODO. Método, en tres pasos y sin umbrales mágicos:
+  //
+  //  1. Bordes candidatos: máximos locales de la energía de borde en cada eje.
+  //     Se conservan todos, pero con su intensidad.
+  //  2. Bordes FUERTES: los que superan el 45 % del más intenso. Un borde débil
+  //     suele ser el contorno de un objeto DENTRO de su casilla, no una junta.
+  //  3. Lado de casilla: el MAYOR que explica TODOS los bordes fuertes con
+  //     residuo <= 2 px. Se recorre de mayor a menor y se acepta el primero que
+  //     encaja: el lado real también explica sus múltiplos, pero un divisor
+  //     (20 px cuando las casillas son 40) introduce casillas que no existen.
+  const strongPeaks = (signal) => {
+    const n = signal.length;
+    if (n < 12) return [];
+    // Suavizado de 3 px (sólo quita ruido de compresión).
+    const smooth = new Float64Array(n);
+    for (let i = 0; i < n; i++) {
+      let a = 0, c = 0;
+      for (let d = -1; d <= 1; d++) {
+        const j = i + d;
+        if (j >= 0 && j < n) { a += signal[j]; c++; }
       }
-      sum += best;
+      smooth[i] = c ? a / c : 0;
     }
-    candidates.push({ k, score: sum / Math.max(1, k - 1) });
-  }
-  if (!candidates.length) return { count: 1, reliable: false, scores: [] };
-  candidates.sort((a, b) => b.score - a.score);
-  const best = candidates[0];
-  const sorted = candidates.map((c) => c.score).sort((a, b) => a - b);
-  const med = sorted[Math.floor(sorted.length / 2)] || 0;
-  const reliable = best.score > 0 && best.score > med * 1.35;
-  return { count: Math.max(1, best.k), reliable, scores: candidates };
-}
-
-function clapDim(v) {
-  if (!Number.isFinite(v)) return 1;
-  return Math.max(1, Math.min(30, v));
-}
-
-/**
- * Periodo de casilla por filtro de peine: se prueba cada tamaño s y se mide la
- * energía de borde que cae exactamente en los múltiplos de s. Robusto frente a
- * los bordes internos de los objetos, que no son periódicos.
- */
-function combPeriod(signal) {
-  const n = signal.length;
-  if (n < 16) return null;
-  const maxS = Math.floor(Math.min(n / 2, 160));
-  let best = { s: 0, score: 0 };
-  const scores = [];
-  for (let s = 8; s <= maxS; s++) {
-    let sum = 0, count = 0;
-    for (let k = 1; k * s < n; k++) {
-      let bestLocal = 0;
-      for (let d = -2; d <= 2; d++) {
-        const idx = k * s + d;
-        if (idx > 0 && idx < n) bestLocal = Math.max(bestLocal, signal[idx]);
+    let max = 0;
+    for (let i = 0; i < n; i++) max = Math.max(max, smooth[i]);
+    if (max <= 0) return [];
+    // PROMINENCIA, no altura: se mide cuánto sobresale el máximo frente al fondo
+    // local. Es lo que distingue una junta de casilla de una textura repetida
+    // (el moteado de la imagen produce un rizo periódico de energía constante
+    // que, medido sólo en altura, parecería un borde en cada píxel).
+    const prominence = (i) => {
+      let lo = Infinity;
+      for (let d = -5; d <= 5; d++) {
+        const j = i + d;
+        if (j >= 0 && j < n) lo = Math.min(lo, smooth[j]);
       }
-      sum += bestLocal;
-      count++;
+      return smooth[i] - lo;
+    };
+    const out = [];
+    for (let i = 1; i < n - 1; i++) {
+      if (smooth[i] < max * 0.3) continue;
+      if (smooth[i] < smooth[i - 1] || smooth[i] < smooth[i + 1]) continue;
+      // Se ignoran los bordes del propio recorte (marco exterior).
+      if (i < 6 || i > n - 7) continue;
+      const w = prominence(i);
+      if (out.length && i - out[out.length - 1].pos <= 3) {
+        if (w > out[out.length - 1].w) out[out.length - 1] = { pos: i, w };
+        continue;
+      }
+      out.push({ pos: i, w });
     }
-    if (!count) continue;
-    const score = sum / count;
-    scores.push({ s, score });
-    if (score > best.score) best = { s, score };
-  }
-  if (!best.s) return null;
-  const sorted = scores.map((x) => x.score).sort((a, b) => a - b);
-  const medianScore = sorted[Math.floor(sorted.length / 2)] || 0;
-  // Se exige una ventaja clara sobre la mediana: si no, no hay rejilla fiable.
-  if (best.score < medianScore * 1.35) return null;
-  return best.s;
-}
+    return out.filter((p) => p.w > 0);
+  };
 
-/** Separación típica entre bordes de casilla, en píxeles. */
-function peakSpacing(signal) {
-  const n = signal.length;
-  if (n < 12) return null;
-  const smooth = new Float64Array(n);
-  for (let i = 2; i < n - 2; i++) {
-    smooth[i] = (signal[i - 2] + signal[i - 1] + signal[i] + signal[i + 1] + signal[i + 2]) / 5;
-  }
-  const vals = Array.from(smooth).filter((v) => v > 0);
-  if (!vals.length) return null;
-  const mean = vals.reduce((a, b) => a + b, 0) / vals.length;
-  const sorted = vals.slice().sort((a, b) => a - b);
-  const p80 = sorted[Math.floor(sorted.length * 0.8)];
-  const thresh = Math.max(mean * 1.15, p80 * 0.6);
-  const peaks = [];
-  for (let i = 2; i < n - 2; i++) {
-    if (smooth[i] < thresh) continue;
-    if (smooth[i] < smooth[i - 1] || smooth[i] < smooth[i + 1]) continue;
-    if (peaks.length && i - peaks[peaks.length - 1] < 4) {
-      if (smooth[i] > smooth[peaks[peaks.length - 1]]) peaks[peaks.length - 1] = i;
-      continue;
+  const all = [...strongPeaks(colEdge), ...strongPeaks(rowEdge)];
+  const empty = {
+    side: Math.max(8, Math.min(bw, bh) / 6), ratio: 0, reliable: false,
+    coverage: 0, totalPeaks: all.length,
+  };
+  if (!all.length) return empty;
+  const maxW = Math.max(...all.map((p) => p.w));
+  const strong = all.filter((p) => p.w >= maxW * 0.45);
+  const totalWeight = strong.reduce((a, p) => a + p.w, 0) || 1;
+
+  const maxSide = Math.min(bw, bh);
+  const maxCells = Math.max(bw, bh);
+  const sides = [];
+  for (let side = 10; side <= maxSide; side++) {
+    let covered = 0;
+    for (const p of strong) {
+      const k = Math.round(p.pos / side);
+      if (k >= 1 && Math.abs(p.pos - k * side) <= 2) covered += p.w;
     }
-    peaks.push(i);
+    sides.push({
+      side,
+      score: covered / totalWeight,
+      cols: Math.round(bw / side),
+      rows: Math.round(bh / side),
+    });
   }
-  if (peaks.length < 2) return null;
-  const gaps = [];
-  for (let i = 1; i < peaks.length; i++) gaps.push(peaks[i] - peaks[i - 1]);
-  return median(gaps);
+  if (!sides.length) return empty;
+
+  // Rejilla plausible: ni casillas diminutas ni un tablero de más de 30 casillas.
+  const plausible = sides.filter((c) => c.cols >= 1 && c.rows >= 1 && maxCells / c.side <= 30);
+  const exact = plausible.filter((c) => c.score >= 0.995);
+  let best;
+  if (exact.length) {
+    best = exact[exact.length - 1]; // recorrido de menor a mayor lado
+  } else {
+    const ranked = plausible.slice().sort((a, b) => (Math.abs(b.score - a.score) > 0.02 ? b.score - a.score : b.side - a.side));
+    best = ranked[0] || plausible[plausible.length - 1];
+  }
+  const others = plausible.filter((c) => Math.abs(c.side - best.side) > 3);
+  const baseline = others.length ? others.reduce((a, c) => a + c.score, 0) / others.length : 0;
+  const ratio = baseline > 0 ? (best.score + 1) / (baseline + 1) : (best.score > 0 ? 99 : 0);
+  return {
+    side: best.side,
+    score: best.score,
+    coverage: best.score,
+    totalPeaks: strong.length,
+    totalPeaksAll: all.length,
+    ratio,
+    // Fiable si hay al menos dos juntas fuertes y TODAS encajan en la rejilla.
+    reliable: strong.length >= 2 && best.score >= 0.995,
+  };
 }
 
 function median(arr) {

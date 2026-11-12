@@ -17,6 +17,14 @@ import { evaluateOutcome, parseDirective } from '../src/core/goals.js';
 import { OBJECTS, BOMB_LEVELS, defaultRules, UNRESOLVED_VISUALS } from '../src/core/catalog.js';
 import { explainImpossible, necessaryBombs, redundantBombs, hint } from '../src/analysis.js';
 import { scoreDifficulty } from '../src/difficulty.js';
+import { runSuite } from '../src/validation/harness.js';
+import { portalCases } from '../src/validation/cases.portals.js';
+import { geyserCases } from '../src/validation/cases.geysers.js';
+import {
+  synthCase, evaluateCase, summarizeCorpus, watchedConfusionReport,
+  renderReport, splitTrainEval,
+} from '../src/vision/evaluation.js';
+import { bruteForce, bruteSignature, solverSignature } from '../src/solver/bruteforce.js';
 
 const [cmd, ...rest] = process.argv.slice(2);
 const flags = parseFlags(rest);
@@ -31,6 +39,9 @@ try {
   else if (cmd === 'verify') runVerify();
   else if (cmd === 'explain') runExplain();
   else if (cmd === 'simulate') runSimulate();
+  else if (cmd === 'validate') runValidate();
+  else if (cmd === 'oracle') runOracle();
+  else if (cmd === 'vision') runVision();
   else { console.error(`Comando desconocido: ${cmd}`); printHelp(); process.exit(1); }
 } catch (err) {
   console.error('Error:', err.message);
@@ -231,6 +242,9 @@ function parseFlags(args) {
 function printHelp() {
   console.log(`BoomSolver CLI
 
+  validate [--json]              Ejecuta la batería de portales y géiseres contra el motor.
+  oracle nivel.json [--max=2]    Fuerza bruta independiente y comparación con el solver.
+  vision [--json]                Evalúa la visión sobre el corpus sintético (no hay capturas reales).
   catalog                       Muestra el catálogo de objetos y las reglas por defecto.
   solve nivel.json [opciones]   Busca soluciones.
       --mode=fewest_bombs|least_powder|pareto
@@ -244,4 +258,106 @@ function printHelp() {
   explain nivel.json            Dice por qué un nivel es imposible o difícil.
   simulate nivel.json --bombs="0,1:2;3,2:1" --mecha=0,1
 `);
+}
+
+// ------------------------------------------------------------
+// validate: batería de mecánicas contra el motor
+// ------------------------------------------------------------
+function runValidate() {
+  const grupos = [
+    { nombre: 'portales', casos: portalCases },
+    { nombre: 'géiseres', casos: geyserCases },
+  ];
+  let fallos = 0;
+  const json = { groups: [] };
+  for (const g of grupos) {
+    const suite = runSuite(g.casos);
+    fallos += suite.failed.length;
+    json.groups.push({
+      nombre: g.nombre,
+      total: suite.total,
+      asertados: suite.asserted,
+      aprobados: suite.passed,
+      observacionales: suite.observational,
+      fallos: suite.failed.map((c) => ({ id: c.id, pregunta: c.question })),
+    });
+    if (flags.json) continue;
+    console.log(`\n${g.nombre.toUpperCase()}: ${suite.passed}/${suite.asserted} casos asertados`
+      + (suite.observational ? `, ${suite.observational} observacionales` : ''));
+    for (const c of suite.failed) {
+      console.log(`  ✗ ${c.id} — ${c.question}`);
+      for (const ch of c.checks.filter((x) => !x.pass)) {
+        console.log(`      ${ch.name}: esperado ${JSON.stringify(ch.expected)} · real ${JSON.stringify(ch.actual)}`);
+      }
+    }
+    const porEstado = {};
+    for (const c of suite.results) porEstado[c.state] = (porEstado[c.state] || 0) + 1;
+    console.log('  estados: ' + Object.entries(porEstado).map(([k, v]) => `${k}=${v}`).join(' · '));
+  }
+  if (flags.json) { console.log(JSON.stringify(json, null, 2)); return; }
+  console.log('\nRecordatorio: estas pruebas demuestran que el motor cumple la especificación,');
+  console.log('no que el juego real se comporte así. Ningún caso está marcado como "verified".');
+  if (fallos) process.exitCode = 1;
+}
+
+// ------------------------------------------------------------
+// oracle: fuerza bruta independiente
+// ------------------------------------------------------------
+function runOracle() {
+  const file = positional.find((a) => a.endsWith('.json'));
+  if (!file) throw new Error('Uso: oracle nivel.json [--max=2]');
+  const level = JSON.parse(fs.readFileSync(file, 'utf8'));
+  const objectives = level.objectives || [];
+  const max = Number(flags.max || 2);
+  const bf = bruteForce(level, objectives, { maxBombs: max, includeFusions: flags.fusions === 'true' });
+  const sv = solve(level, objectives, { maxBombs: max + 1, timeBudgetMs: Number(flags.time || 15000) });
+
+  const bset = new Set(bf.solutions.map(bruteSignature));
+  const sset = new Set(sv.solutions.map(solverSignature));
+  const onlyBrute = [...bset].filter((x) => !sset.has(x));
+  const onlySolver = [...sset].filter((x) => !bset.has(x));
+
+  console.log(`Fuerza bruta: ${bf.complete ? 'completa' : 'INCOMPLETA (límite de combinaciones)'}`
+    + ` · ${bf.combosTried} jugadas probadas · ${bf.elapsedMs} ms`);
+  console.log(`Mínimo de bombas (bruto): ${bf.minimumBombs ?? 'sin solución'} · soluciones mínimas: ${bf.solutions.length}`);
+  console.log(`Solver: ${sv.status} · ${sv.solutions.length} solución(es) · ${sv.elapsedMs} ms`);
+  if (onlyBrute.length) console.log(`DISCREPANCIA — sólo la fuerza bruta encuentra: ${onlyBrute.join(' | ')}`);
+  if (onlySolver.length) console.log(`DISCREPANCIA — sólo el solver presenta: ${onlySolver.join(' | ')}`);
+  if (!onlyBrute.length && !onlySolver.length) console.log('Coinciden: el solver no pierde ni inventa soluciones óptimas.');
+  if (onlyBrute.length || onlySolver.length) process.exitCode = 1;
+}
+
+// ------------------------------------------------------------
+// vision: evaluación sobre corpus sintético
+// ------------------------------------------------------------
+function runVision() {
+  const casos = [
+    synthCase({ id: 'S1', layout: [['empty', 'gem', 'empty', 'crystal'], ['chest_wood', 'empty', 'wall', 'empty']], cellPx: 48, seed: 3 }),
+    synthCase({ id: 'S2', layout: [['portal', 'empty', 'empty'], ['empty', 'cat', 'empty'], ['empty', 'empty', 'mirror_slash']], cellPx: 56, seed: 7 }),
+    synthCase({
+      id: 'S3',
+      layout: [['portal:blue', 'empty', 'portal:purple']],
+      etiqueta: [[{ type: 'portal', color: 'blue' }, { type: 'empty' }, { type: 'portal', color: 'purple' }]],
+      cellPx: 60, seed: 11,
+    }),
+    // Tablero grande: es el tamaño donde la rejilla se confundía (10x7 → 2x3)
+    // antes de separar "borde fuerte" de "textura" en `buildGrid`.
+    synthCase({
+      id: 'S4-10x7',
+      layout: Array.from({ length: 7 }, (_, y) =>
+        Array.from({ length: 10 }, (_, x) => ((x * 3 + y * 5) % 7 === 0 ? 'gem' : ((x + y) % 4 === 0 ? 'crystal' : 'empty')))),
+      cellPx: 40, seed: 13,
+    }),
+  ];
+  const results = casos.map((c) => evaluateCase(c));
+  const summary = summarizeCorpus(results);
+  const watched = watchedConfusionReport(summary);
+  const split = splitTrainEval(casos);
+  if (flags.json) {
+    console.log(JSON.stringify({ summary, watched, split: { train: split.train.length, eval: split.eval.length } }, null, 2));
+    return;
+  }
+  console.log(renderReport(summary, watched, { realImages: 0 }));
+  console.log('');
+  console.log(`Corte train/eval: ${split.train.length} train · ${split.eval.length} eval (el detector no aprende).`);
 }

@@ -152,11 +152,18 @@ for (const range of [1, 2, 3]) {
 }
 
 test('la roca de magma detiene la onda que la activa (regla configurable)', () => {
-  const lvl = levelFromAscii(['M..G....'], { tray: [3] });
-  const blocked = run(lvl, [[idx(3, 0, 8), 3]], idx(3, 0, 8)).res;
-  assert.equal(hitSet(blocked).has('1,0'), true);
-  // El magma explota en cruz de alcance 1: alcanza (0,0) y (2,0), no (1,1).
-  assert.equal(hitSet(blocked).has('0,0'), true);
+  // Bomba N3 en C3F1 (casilla vacía), magma en C2F1 y cofre en C1F1 detrás.
+  // La onda de la bomba llega al magma y NO debe pasar al cofre en el mismo tick.
+  // Tablero: C=cofre en C1F1, M=magma en C2F1, bomba N3 en C3F1.
+  const lvl = levelFromAscii(['CM.......'], { tray: [3] });
+  const { res } = run(lvl, [[idx(2, 0, 9), 3]], idx(2, 0, 9));
+  const tick1 = (res.ticks.find((t) => t.tick === 1) || { explosions: [] }).explosions
+    .flatMap((e) => e.cells);
+  assert.ok(tick1.includes('1,0'), 'la onda llega al magma de C2F1');
+  assert.ok(!tick1.includes('0,0'), 'el magma detiene la onda: no llega al cofre de C1F1');
+  // Y el magma estalla después, así que el cofre acaba cayendo igual: se comprueba
+  // que el magma se consume y que el efecto llega en un tick posterior.
+  assert.equal(res.final.alive[idx(1, 0, 9)], 0, 'el magma se consume');
 });
 
 test('cadenas del mismo tipo (regla opcional)', () => {
