@@ -24,10 +24,11 @@ pruebas para el juego de bombas descrito en los materiales del proyecto.
 **Dificultad** | `src/difficulty.js` | Puntuación explicable por factores con peso, separando dificultad algorítmica y de jugador. |
 **Análisis** | `src/analysis.js` | Bombas necesarias/redundantes, contrafactuales, mapa de calor, diagnóstico de imposibilidad, pistas. |
 **Visión** | `src/vision/detector.js` | Región → rejilla → clasificación multi-señal con confianza, alternativas y estado `confirmed/needs_review/unknown`. |
+**Visión sobre arte REAL** | `src/vision/realClassifier.js` | Máscara de objeto + prototipos entrenados sólo con capturas de desarrollo, con abstención explícita. Resultado medido en [`VISION_REAL_INFORME.md`](VISION_REAL_INFORME.md). |
 **UI** | `public/` | Editor, solver, simulación tick a tick y generador, sobre el mismo motor. |
 **Análisis para la UI** | `src/analysis/sessions.js` | Ondas, recorrido de portales, temporizadores de géiser, libro de daño y grafo de cadena: el workbench explica *por qué* pasó cada cosa. |
 **Validación de mecánicas** | `src/validation/` | Arnés con casos P01–P18 de portales y 16 de géiseres, cada uno con estado `hypothesis`/`unknown`; **ninguno** se presenta como verificado. |
-**Evaluación de visión** | `src/vision/evaluation.js` | Métricas por clase, matriz de confusión con columna de abstención, pares vigilados, split train/eval e informe que declara cuántas capturas **reales** hay. |
+**Evaluación de visión** | `src/vision/evaluation.js` + `src/vision/realEval.js` | Métricas por clase, matriz de confusión con columna de abstención, validación cruzada dejando un nivel fuera y contabilidad aparte de casillas vacías inventadas. |
 **Lector de capturas** | `src/vision/png.js` | PNG sin dependencias (8 bits, RGB/RGBA, sin entrelazar). Rechaza con mensaje lo que no soporta en vez de aproximar píxeles. |
 **Fuerza bruta** | `src/solver/bruteforce.js` | Oráculo independiente que contrasta al buscador: si discrepan, el test falla. |
 **CLI** | `scripts/cli.mjs` | `catalog`, `solve`, `generate`, `verify`, `explain`, `simulate`, `validate`, `oracle`, `vision`. |
@@ -42,6 +43,7 @@ cd boomsolver
 node --test "tests/*.test.mjs"        # 213 pruebas
 node scripts/cli.mjs validate         # mecánicas: portales y géiseres
 node scripts/cli.mjs vision           # informe de visión (declara si hay capturas reales)
+node scripts/cli.mjs vision --real=./corpus/real   # validación sobre las 13 capturas
 node scripts/cli.mjs vision --real=./corpus/real   # capturas reales con etiqueta humana
 node scripts/serve.mjs                # http://localhost:5173
 ```
@@ -57,6 +59,7 @@ node scripts/cli.mjs simulate nivel.json --bombs=0,1:2,3,2:1 --mecha=0,1
 node scripts/cli.mjs validate                    # portales y géiseres, con su estado de confianza
 node scripts/cli.mjs oracle nivel.json --max=2   # fuerza bruta vs buscador
 node scripts/cli.mjs vision [--json]             # métricas de visión + aviso de corpus
+node scripts/cli.mjs vision --real=./corpus/real  # validación cruzada sobre capturas reales
 ```
 
 Sin claves de API, sin red, sin `node_modules`.
@@ -156,6 +159,7 @@ boomsolver/
 ├── AUDIT_FASE_0.md          auditoría verificable del punto de partida
 ├── FASE_1_INFORME.md        informe de la Fase 1 (motor, solver, generador)
 ├── FASE_2_INFORME.md        informe de la Fase 2 (validación y rejilla de visión)
+├── VISION_REAL_INFORME.md   validación sobre 13 capturas reales, con su abstención
 ├── GAME_RULES_SPEC.md       especificación del motor implementado
 ├── RULES_OPEN_QUESTIONS.md  Q1–Q12 con impacto y prueba necesaria
 ├── src/
