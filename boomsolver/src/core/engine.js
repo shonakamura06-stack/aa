@@ -312,7 +312,9 @@ export function simulate(board, placements, mechaIdx, ruleOverrides = {}) {
 
       if (spec.center) {
         hitHere.add(item.cell);
-        rays.push({ dir: 'center', cells: [origin], blocked: false, jumps: [] });
+        // Las casillas de un rayo se publican en coordenadas "x,y"; el centro
+        // también, para que la UI no tenga que mezclar dos formatos.
+        rays.push({ dir: 'center', cells: [coordOf(item.cell, cols)], blocked: false, jumps: [] });
       }
 
       for (const [dirName, range] of spec.dirs) {
@@ -321,7 +323,10 @@ export function simulate(board, placements, mechaIdx, ruleOverrides = {}) {
           pattern, fullRange: range, rayIndex: `${item.cell}:${dirName}`,
           excludeStart: !!spec.center,
         });
-        rays.push(ray);
+        // `traceRay` trabaja con índices; la explosión se publica con coordenadas
+        // "x,y" (igual que `jumps`, `source` y `cells`). Antes se publicaban
+        // índices y el workbench los pintaba como si fueran coordenadas.
+        rays.push({ ...ray, cells: ray.cells.map((i) => coordOf(i, cols)) });
         for (const cIdx of ray.cells) hitHere.add(cIdx);
         for (const j of ray.jumps) {
           tickLog.push({

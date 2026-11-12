@@ -34,6 +34,13 @@ test('ondas individuales: cada rayo de cada explosión, con sus casillas y salto
     assert.ok(Array.isArray(r.cells));
     assert.ok(['up', 'down', 'left', 'right'].includes(r.dir));
   }
+  // Las casillas del rayo se publican en coordenadas "x,y", no como índices:
+  // antes se mezclaban los dos formatos y el workbench pintaba números sueltos.
+  for (const r of w.rays) {
+    for (const c of r.cells) assert.match(c, /^\d+,\d+$/, `casilla "${c}" del rayo ${r.dir}`);
+  }
+  assert.deepEqual(w.rays[1].cells[0], '2,0', 'el rayo hacia arriba sale de la bomba, no la incluye');
+  assert.ok(w.cells.includes('2,1'), 'el origen también está en el conjunto de la explosión');
   const withJump = w.rays.find((r) => r.jumps.length > 0);
   assert.ok(withJump, 'algún rayo debe atravesar un portal');
   assert.ok(withJump.jumps[0].from && withJump.jumps[0].to);
@@ -230,8 +237,9 @@ test('cadena de punta a punta: solver → motor → análisis, sin campos invent
   const waves = waveBreakdown(sim);
   assert.ok(waves.length >= 1, 'la jugada óptima debe producir al menos una explosión');
   assert.equal(waves[0].rays.length, 5, 'una explosión en cruz son 5 rayos (centro + 4 direcciones)');
-  assert.ok(waves[0].unionFromRays.includes(at(1, 1, 8)) || waves[0].cells.includes(at(1, 1, 8)),
-    'la onda alcanza el cofre objetivo');
+  // `at` devuelve índice; las casillas publicadas son coordenadas "x,y".
+  assert.ok(waves[0].unionFromRays.includes('1,1') || waves[0].cells.includes('1,1'),
+    `la onda alcanza el cofre objetivo: ${waves[0].unionFromRays.join(' ')}`);
 
   const ledger = damageLedger(sim, board);
   assert.ok(ledger.summary.length >= 1, 'algún objeto recibió daño');

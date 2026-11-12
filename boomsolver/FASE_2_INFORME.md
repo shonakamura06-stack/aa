@@ -204,6 +204,20 @@ perfil del objeto o la regla declarada, **no** el motor.
 
 ---
 
+## 4-quater. Otro fallo silencioso: las casillas de cada rayo
+
+`explosion.rays[].cells` publicaba **índices** (`idx(x,y)`) mientras que
+`explosion.cells`, `source` y `jumps[]` publican **coordenadas `"x,y"`**. El
+workbench pintaba `rayo 2 dir=up: 1 9 17`, que parece una lista de casillas y no
+lo es: nadie puede cotejarla con el tablero.
+
+Corregido en el motor (un solo formato, `"x,y"`, en todo lo que se publica) y
+fijado con una prueba que exige `/^\d+,\d+$/` en cada casilla de cada rayo. De
+paso: el rayo `center` usaba la variable `origin` (una coordenada ya formateada)
+en vez del índice de la casilla, así que ni siquiera era coherente consigo mismo.
+
+---
+
 ## 5. Lo que esta fase NO demuestra
 
 | Afirmación | ¿Demostrada? | Por qué |
