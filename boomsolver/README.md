@@ -30,7 +30,7 @@ pruebas para el juego de bombas descrito en los materiales del proyecto.
 **Evaluación de visión** | `src/vision/evaluation.js` | Métricas por clase, matriz de confusión con columna de abstención, pares vigilados, split train/eval e informe que declara cuántas capturas **reales** hay. |
 **Fuerza bruta** | `src/solver/bruteforce.js` | Oráculo independiente que contrasta al buscador: si discrepan, el test falla. |
 **CLI** | `scripts/cli.mjs` | `catalog`, `solve`, `generate`, `verify`, `explain`, `simulate`, `validate`, `oracle`, `vision`. |
-**Pruebas** | `tests/` | 204 pruebas con `node --test`. Sin dependencias. |
+**Pruebas** | `tests/` | 205 pruebas con `node --test`. Sin dependencias. |
 
 ---
 
@@ -38,7 +38,7 @@ pruebas para el juego de bombas descrito en los materiales del proyecto.
 
 ```bash
 cd boomsolver
-node --test "tests/*.test.mjs"        # 204 pruebas
+node --test "tests/*.test.mjs"        # 205 pruebas
 node scripts/cli.mjs validate         # mecánicas: portales y géiseres
 node scripts/cli.mjs vision           # informe de visión (declara si hay capturas reales)
 node scripts/serve.mjs                # http://localhost:5173
@@ -140,7 +140,7 @@ Novedades frente al v21:
 - Los objetos con **candado** y la **figura naranja** del editor: su `typeId`
   no aparece en el código del v21. Están registrados como desconocidos.
 - **Validación contra el juego real**: ninguna mecánica está marcada como
-  verificada. Las 204 pruebas demuestran que el código cumple *nuestra*
+  verificada. Las 205 pruebas demuestran que el código cumple *nuestra*
   especificación; el contraste con el juego depende de las capturas. Ver
   `FASE_2_INFORME.md` §5 y §6.
 
@@ -165,5 +165,5 @@ boomsolver/
 │   ├── analysis.js  difficulty.js  rng.js
 ├── public/                  UI (index.html, app.js, styles.css)
 ├── scripts/                 serve.mjs, cli.mjs
-└── tests/                   204 pruebas
+└── tests/                   205 pruebas
 ```

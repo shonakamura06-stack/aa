@@ -25,6 +25,7 @@ Este informe cierra la Fase 2 con una regla por delante:
 | Rendimiento | 10 pruebas de límites: tablero grande, muchas soluciones, portales en bucle, cadenas largas, cancelación, progreso | hecho |
 | **Rejilla de visión** | Corregido el defecto que leía 10×7 como 2×3 | hecho |
 | **Corpus sintético** | Emblema por objeto: sin él, el corpus medía un caso que el juego no produce | hecho |
+| Guarda del workbench | Las funciones de análisis rechazan la salida del solver (que no es una simulación): antes los paneles mostraban «0 ondas» en silencio | hecho |
 | Capturas reales del juego | **No hay**. Sin ellas no se puede afirmar precisión real | **pendiente** |
 
 ---
@@ -33,8 +34,8 @@ Este informe cierra la Fase 2 con una regla por delante:
 
 ```
 $ cd boomsolver && node --test "tests/*.test.mjs"
-# tests 204
-# pass 204
+# tests 205
+# pass 205
 # fail 0
 # duration_ms 13731
 ```
@@ -53,7 +54,7 @@ $ cd boomsolver && node --test "tests/*.test.mjs"
 | `generator.constraints.test.mjs` | 14 | cada restricción rechaza lo que debe y acepta lo que debe, con motivo |
 | `vision.test.mjs` | 14 | región, rejilla (incluido el barrido de robustez), clasificación, temporizador, bandeja, portales, hipótesis |
 | `vision.evaluation.test.mjs` | 16 | métricas, abstención sin premiar ni penalizar, matriz, pares vigilados, split, casos no evaluables |
-| `analysis.sessions.test.mjs` | 13 | ondas, portales, temporizadores, daño, cadena, comparador, banner |
+| `analysis.sessions.test.mjs` | 14 | ondas, portales, temporizadores, daño, cadena, comparador, banner |
 | `performance.test.mjs` | 10 | límites de tiempo/tamaño y honestidad ante el truncado |
 
 Comprobaciones fuera de la suite (`node scripts/cli.mjs …`):
@@ -159,11 +160,30 @@ validación.
 
 ---
 
+## 4-bis. Un fallo silencioso que apareció al conectar la UI
+
+Al probar la tubería real del workbench (solver → «cargar jugada» → motor →
+paneles) salió un error de diseño, no de cálculo: las funciones de análisis
+recibían a veces **la salida del solver**, que se parece a una simulación pero no
+lo es. En una solución, `ticks` es un **número** (cuánto dura la jugada) y no hay
+`ticks[]`; `waves` también es un número (cuántas explosiones), no una lista.
+
+Resultado: los paneles pintaban «0 ondas» y «sin cadenas» **sin ningún error**,
+que es la peor forma de fallar: datos falsos con aspecto de dato bueno.
+
+Corrección: `asSimulation()` valida la entrada en `waveBreakdown`,
+`portalTrail`, `geyserTimers`, `damageLedger` y `chainGraph`. Si recibe la salida
+del solver, lanza un `TypeError` que dice exactamente qué hacer («simula antes de
+analizar»). Se acepta un sobre `{ log }` para los casos en que sólo hacen falta
+los eventos. Hay una prueba de la tubería completa que lo fija.
+
+---
+
 ## 5. Lo que esta fase NO demuestra
 
 | Afirmación | ¿Demostrada? | Por qué |
 |---|---|---|
-| El motor respeta la especificación escrita | sí | 204 pruebas + arnés de mecánicas |
+| El motor respeta la especificación escrita | sí | 205 pruebas + arnés de mecánicas |
 | El solver devuelve el mínimo de bombas | sí, para los niveles probados | contraste con fuerza bruta independiente |
 | Las reglas coinciden con el juego real | **no** | ningún caso del arnés está marcado `verified`; las mecánicas son `hypothesis`/`unknown` |
 | El detector reconoce capturas reales | **no** | corpus real: 0 imágenes |

@@ -190,6 +190,63 @@ test('explicación: menciona coste, bombas, objetivos y cadena cuando la hay', (
   assert.match(text, /tick/);
 });
 
+test('cadena de punta a punta: solver → motor → análisis, sin campos inventados', () => {
+  // Esta es la tubería real del workbench: el solver produce soluciones, el
+  // usuario carga una, el motor la simula y los paneles leen ESA simulación.
+  // Se comprueba aquí porque el fallo clásico es pasar el resultado del solver
+  // (que no tiene `ticks`) a las funciones de análisis: entonces la UI pinta
+  // «0 ondas» sin error visible.
+  const level = {
+    ...grid([
+      '........',
+      '.C..G...',
+      '........',
+      '........',
+      '........',
+    ]),
+    tray: [1, 2],
+    objectives: [{ kind: 'destroy', cells: ['1,1'] }, { kind: 'destroy', cells: ['4,1'] }],
+  };
+  const board = prepareBoard(level);
+  const solved = solve(level, level.objectives, { mode: 'fewest_bombs', maxSolutions: 5 });
+  assert.equal(solved.status, 'optimalityProven');
+  assert.ok(solved.solutions.length >= 1);
+  // La salida del solver no es una simulación: en la solución `ticks` es un
+  // NÚMERO (cuántos ticks dura) y no hay `log`. Pasarla a los paneles de
+  // análisis devolvía listas vacías sin avisar, así que ahora se rechaza.
+  assert.equal(typeof solved.solutions[0].ticks, 'number');
+  assert.throws(() => waveBreakdown(solved), /salida del SOLVER/);
+  assert.throws(() => damageLedger(solved, board), /salida del SOLVER/);
+  // Una solución SÍ trae su registro de eventos, así que la cadena y el
+  // recorrido de portales se pueden leer de ella: es lo que usa «Explicar».
+  assert.doesNotThrow(() => chainGraph(solved.solutions[0]));
+  assert.doesNotThrow(() => portalTrail(solved.solutions[0]));
+
+  const sol = solved.solutions[0];
+  const sim = simulate(board, new Map(sol.placements.map((p) => [p.idx, p.level])), sol.mecha.idx, board.rules);
+  assert.equal(sim.status, 'resolved');
+  assert.ok(Array.isArray(sim.ticks) && sim.ticks.length >= 1);
+
+  const waves = waveBreakdown(sim);
+  assert.ok(waves.length >= 1, 'la jugada óptima debe producir al menos una explosión');
+  assert.equal(waves[0].rays.length, 5, 'una explosión en cruz son 5 rayos (centro + 4 direcciones)');
+  assert.ok(waves[0].unionFromRays.includes(at(1, 1, 8)) || waves[0].cells.includes(at(1, 1, 8)),
+    'la onda alcanza el cofre objetivo');
+
+  const ledger = damageLedger(sim, board);
+  assert.ok(ledger.summary.length >= 1, 'algún objeto recibió daño');
+  assert.equal(ledger.hazardsReached, 0, 'esta jugada no toca peligros');
+
+  const chain = chainGraph(sim);
+  assert.equal(chain.count, 0, 'una sola bomba sin detonadores no produce cadena');
+
+  const banner = optimalityBanner(solved);
+  assert.equal(banner.tone, 'ok');
+  const plano = explainPlay(sol);
+  assert.ok(plano.lines.length >= 2);
+  assert.match(plano.lines[0], /bomba/i);
+});
+
 test('el workbench no muestra datos que el motor no produjo', () => {
   // Con una simulación inválida no debe haber ondas, saltos ni géiseres inventados.
   const { res } = run(['..........', '..E.....C.'], [[at(4, 1, 10), 1]],

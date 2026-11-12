@@ -13,10 +13,39 @@
 //   · cadenas (quién enciende a quién y en qué tick)
 //   · etiqueta honesta de optimalidad (demostrado / mejor conocido / sin demostrar)
 
+/**
+ * Normaliza lo que se le pasa a las funciones de análisis.
+ *
+ * El workbench suele tener a mano la SALIDA DEL SOLVER, que no es una
+ * simulación: tiene `waves` (un número) y no tiene `ticks` ni `log`. Si se le
+ * pasa tal cual, las funciones de abajo devuelven listas vacías y la UI pinta
+ * «0 ondas» sin ningún error: un panel que miente en silencio. Aquí se detecta
+ * y se lanza un error explícito. Además se acepta el objeto solución completo
+ * (`solution.result`) para no obligar a recordar la forma exacta.
+ */
+function asSimulation(result, fn) {
+  if (!result || typeof result !== 'object') {
+    throw new TypeError(`${fn}: falta el resultado de la simulación`);
+  }
+  // Una simulación trae `ticks` como array. En una solución del solver `ticks`
+  // es un número (la duración), así que ese campo es el discriminante bueno.
+  // También se acepta un sobre `{ log, ticks }`, que es lo que arma la UI cuando
+  // sólo necesita el registro de eventos.
+  const looksLikeSolver = !Array.isArray(result.ticks) && !Array.isArray(result.log);
+  if (looksLikeSolver) {
+    throw new TypeError(
+      `${fn}: esto parece la salida del SOLVER, no una simulación. `
+      + 'Usa simulate(board, placements, mecha, rules) del motor antes de analizar.',
+    );
+  }
+  return result;
+}
+
 // ------------------------------------------------------------
 // Ondas individuales
 // ------------------------------------------------------------
 export function waveBreakdown(result) {
+  result = asSimulation(result, 'waveBreakdown');
   const waves = [];
   for (const tick of result.ticks || []) {
     if (tick.idle) continue;
@@ -51,6 +80,7 @@ export function waveBreakdown(result) {
 // Recorrido por portal
 // ------------------------------------------------------------
 export function portalTrail(result) {
+  result = asSimulation(result, 'portalTrail');
   const jumps = (result.log || []).filter((e) => e.type === 'portal-jump');
   const cuts = (result.log || []).filter((e) => e.type === 'portal-loop-cut');
   const blocked = (result.log || []).filter((e) => e.type === 'portal-blocked');
@@ -77,6 +107,7 @@ export function portalTrail(result) {
 // Temporizadores de géiser
 // ------------------------------------------------------------
 export function geyserTimers(result) {
+  result = asSimulation(result, 'geyserTimers');
   const armed = (result.log || []).filter((e) => e.type === 'geyser-armed');
   const explosions = [];
   for (const tick of result.ticks || []) {
@@ -109,6 +140,7 @@ export function geyserTimers(result) {
 // Daño recibido
 // ------------------------------------------------------------
 export function damageLedger(result, board) {
+  result = asSimulation(result, 'damageLedger');
   const rows = [];
   for (const ev of result.log || []) {
     if (ev.type !== 'damage' && ev.type !== 'hazard-hit' && ev.type !== 'activated') continue;
@@ -149,6 +181,7 @@ function indexOfCell(coord, cols) {
 // Cadenas
 // ------------------------------------------------------------
 export function chainGraph(result) {
+  result = asSimulation(result, 'chainGraph');
   const edges = [];
   let seq = 0;
   for (const ev of result.log || []) {
@@ -304,7 +337,7 @@ export function explainPlay(sol, { board = null } = {}) {
     + (sol.fusions ? ` (con ${sol.fusions} fusión(es): ${sol.fusionSteps.join(' → ')})` : ''));
 
   // Cadenas: quién enciende a quién.
-  const chain = chainGraph({ log: sol.log || [] });
+  const chain = chainGraph(sol);
   if (chain.edges.length) {
     lines.push(`Cadena de ${chain.edges.length} reacción(es):`);
     for (const e of chain.edges.slice(0, 12)) {
@@ -313,7 +346,7 @@ export function explainPlay(sol, { board = null } = {}) {
     if (chain.edges.length > 12) lines.push(`  · … y ${chain.edges.length - 12} más`);
   }
 
-  const trail = portalTrail({ log: sol.log || [] });
+  const trail = portalTrail(sol);
   if (trail.total) {
     lines.push(`Recorrido por portales (${trail.total} salto(s)):`);
     for (const j of trail.jumps) {
