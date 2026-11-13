@@ -221,13 +221,17 @@ son **poco representadas** (1–4 muestras) y el modelo prefiere callarse.
 ```bash
 cd boomsolver
 
+# Panel en la interfaz: botón «Calcular validación» en la sección
+# «Validación real de la visión» (necesita `node scripts/serve.mjs`).
+node scripts/serve.mjs   # http://localhost:5173
+
 # Informe completo (texto)
 node scripts/cli.mjs vision --real=./corpus/real
 
 # Lo mismo en JSON, para trazabilidad
 node scripts/cli.mjs vision --real=./corpus/real --json > vision.json
 
-# Pruebas del módulo real (18) + suite completa (231)
+# Pruebas del módulo real (20) + suite completa (233)
 node --test tests/vision.real.test.mjs
 node --test "tests/*.test.mjs"
 ```

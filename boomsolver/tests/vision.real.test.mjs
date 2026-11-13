@@ -290,3 +290,38 @@ test('el prototipo de una clase con una sola muestra es esa muestra normalizada'
   assert.deepEqual(modelo.prototypes.gem, v);
   assert.equal(modelo.spread.gem, 0);
 });
+
+// ------------------------------------------------------------
+// Evaluación completa del corpus (validación cruzada)
+// ------------------------------------------------------------
+test('`crossValidateByLevel` nunca evalúa una captura con su propio nivel', async () => {
+  const { crossValidateByLevel } = await import('../src/vision/realEval.js');
+  const casos = [
+    { id: 'a', nivel: 1 }, { id: 'b', nivel: 1 }, { id: 'c', nivel: 2 }, { id: 'd', nivel: null },
+  ];
+  const pliegues = crossValidateByLevel(casos);
+  assert.equal(pliegues.length, 3, 'un pliegue por nivel (y uno por caso sin nivel)');
+  const porGrupo = Object.fromEntries(pliegues.map((p) => [p.grupo, p]));
+  // las dos capturas del nivel 1 van juntas y ninguna está en su desarrollo
+  assert.deepEqual(porGrupo['n:1'].eval.map((c) => c.id), ['a', 'b']);
+  assert.deepEqual(porGrupo['n:1'].dev.map((c) => c.id), ['c', 'd']);
+  for (const p of pliegues) {
+    for (const c of p.eval) {
+      assert.ok(!p.dev.some((d) => d.id === c.id), `${c.id} no puede estar en su propio desarrollo`);
+    }
+  }
+});
+
+test('`splitByLevel` es determinista y no separa capturas del mismo nivel', async () => {
+  const { splitByLevel } = await import('../src/vision/realEval.js');
+  const casos = [1, 2, 3, 4, 5].flatMap((n) => [
+    { id: `x${n}a`, nivel: n }, { id: `x${n}b`, nivel: n },
+  ]);
+  const a = splitByLevel(casos, { evalRatio: 0.4 });
+  const b = splitByLevel(casos, { evalRatio: 0.4 });
+  assert.deepEqual(a.nivelesEval, b.nivelesEval, 'el reparto no se sortea');
+  for (const n of a.nivelesEval) {
+    const enEval = a.eval.filter((c) => c.nivel === n).length;
+    assert.equal(enEval, 2, `el nivel ${n} entra entero en evaluación o no entra`);
+  }
+});

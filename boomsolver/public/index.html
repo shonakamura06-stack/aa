@@ -175,6 +175,43 @@
     <div id="cmpResult" class="sim-log" aria-live="polite"></div>
   </section>
 
+  <!-- ---------------- Validación real de la visión ---------------- -->
+  <section class="card real-card">
+    <div class="card-head">
+      <h2>Validación real de la visión</h2>
+      <span class="pill" id="realBadge">sin cargar</span>
+    </div>
+    <p class="hint">
+      Resultado medido sobre las capturas del juego de <code>corpus/real</code>,
+      con validación cruzada: cada captura se evalúa con un modelo entrenado
+      <strong>sin su nivel</strong>. La abstención va al mismo nivel que el acierto:
+      un detector que acierta poco pero dice cuándo no sabe es utilizable; uno que
+      acierta mucho y nunca se calla, no.
+    </p>
+    <button id="btnRealEval" class="primary" type="button">Calcular validación (≈12 s)</button>
+    <p class="hint" id="realNote"></p>
+
+    <div id="realResult" hidden>
+      <div class="real-grid">
+        <div class="real-kpi"><span class="real-kpi-v" id="kpiObjetos">—</span><span class="real-kpi-l">objetos evaluables</span></div>
+        <div class="real-kpi ok"><span class="real-kpi-v" id="kpiAciertos">—</span><span class="real-kpi-l">aciertos</span></div>
+        <div class="real-kpi warn"><span class="real-kpi-v" id="kpiAbst">—</span><span class="real-kpi-l">abstenciones</span></div>
+        <div class="real-kpi bad"><span class="real-kpi-v" id="kpiErr">—</span><span class="real-kpi-l">clase equivocada</span></div>
+        <div class="real-kpi"><span class="real-kpi-v" id="kpiPrec">—</span><span class="real-kpi-l">precisión sobre lo afirmado</span></div>
+        <div class="real-kpi" id="kpiInvWrap"><span class="real-kpi-v" id="kpiInv">—</span><span class="real-kpi-l">casillas vacías inventadas</span></div>
+      </div>
+
+      <h3 class="real-h3">Por clase</h3>
+      <div class="real-table" id="realClasses"></div>
+
+      <h3 class="real-h3">Por pliegue (un nivel fuera)</h3>
+      <div class="real-table" id="realFolds"></div>
+
+      <h3 class="real-h3">Confusiones</h3>
+      <div class="real-table" id="realConfusion"></div>
+    </div>
+  </section>
+
   <!-- ---------------- Generador ---------------- -->
   <section class="card gen-card">
     <div class="card-head"><h2>Generador</h2></div>

@@ -849,6 +849,90 @@ $('btnPrevTick').addEventListener('click', () => stepTick(-1));
 $('btnNextTick').addEventListener('click', () => stepTick(1));
 $('btnPlay').addEventListener('click', playTicks);
 $('btnGenerate').addEventListener('click', runGenerator);
+// ------------------------------------------------------------
+// Validación real de la visión
+// ------------------------------------------------------------
+/**
+ * Pinta el informe medido sobre las capturas del juego.
+ *
+ * El cálculo NO se hace aquí: `realEval.js` usa `node:fs` y el navegador no
+ * puede importarlo. El servidor lo calcula en `/api/validacion-real` y esto
+ * sólo pinta. Si el endpoint no está (por ejemplo sirviendo `public/` con otro
+ * servidor estático), se dice claramente en vez de quedarse en blanco.
+ *
+ * La abstención se pinta como un KPI más, del mismo tamaño que el acierto: es
+ * la cifra que hace interpretable la precisión, no un detalle al pie.
+ */
+const pct = (v) => (v === null || v === undefined ? '—' : `${(v * 100).toFixed(1)} %`);
+
+function table(headers, rows) {
+  const head = `<tr>${headers.map((h) => `<th>${h}</th>`).join('')}</tr>`;
+  const body = rows.map((r) => `<tr class="${r.cls || ''}">${r.cells.map((c) => `<td>${c}</td>`).join('')}</tr>`).join('');
+  return `<table><thead>${head}</thead><tbody>${body}</tbody></table>`;
+}
+
+async function cargarValidacionReal() {
+  const btn = $('btnRealEval');
+  const note = $('realNote');
+  btn.disabled = true;
+  btn.textContent = 'Calculando…';
+  setStatus('evaluando capturas reales', 'warn');
+  try {
+    const res = await fetch('/api/validacion-real');
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    pintarValidacionReal(data);
+    $('realBadge').textContent = `${data.capturas} capturas · ${data.niveles} niveles`;
+    note.textContent = '';
+    setStatus('listo', 'ok');
+  } catch (err) {
+    note.textContent = `No se pudo calcular: ${err.message}. Hace falta servir la app con \`node scripts/serve.mjs\` (el cálculo usa el sistema de ficheros).`;
+    $('realBadge').textContent = 'no disponible';
+    setStatus('sin validación real', 'bad');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Recalcular validación';
+  }
+}
+
+function pintarValidacionReal(d) {
+  $('realResult').hidden = false;
+  const o = d.objetos;
+  $('kpiObjetos').textContent = o.evaluables;
+  $('kpiAciertos').textContent = o.correctos;
+  $('kpiAbst').textContent = `${o.abstenidos} (${pct(o.abstencion)})`;
+  $('kpiErr').textContent = o.erroneos;
+  $('kpiPrec').textContent = pct(o.precision);
+  $('kpiInv').textContent = `${d.vacias.inventadas} de ${d.vacias.total}`;
+  $('kpiInvWrap').className = `real-kpi ${d.vacias.inventadas > d.vacias.total * 0.05 ? 'bad' : 'ok'}`;
+
+  $('realClasses').innerHTML = table(
+    ['clase', 'etiquetados', 'aciertos', 'equiv', 'absten', 'precisión', 'exhaustividad'],
+    d.porClase.map((c) => ({
+      cls: c.aciertos === 0 ? 'dim' : '',
+      cells: [c.tipo, c.etiquetados, c.aciertos, c.confusiones, c.abstenidos, pct(c.precision), pct(c.exhaustividad)],
+    })),
+  );
+
+  $('realFolds').innerHTML = table(
+    ['nivel', 'capturas evaluadas', 'dev (entrena sin ellas)', 'aciertos', 'equiv', 'absten', 'inventadas'],
+    d.pliegues.map((p) => ({
+      cells: [
+        p.grupo.replace(/^n:|^id:/, ''),
+        p.eval.join(', ') || '—',
+        p.dev.length,
+        p.ok, p.equivocadas, p.abstenidas, p.inventadas,
+      ],
+    })),
+  );
+
+  const conf = Object.entries(d.confusiones || {});
+  $('realConfusion').innerHTML = conf.length
+    ? table(['real → visto', 'casos'], conf.map(([k, n]) => ({ cells: [k, n] })))
+    : '<p class="real-empty">Sin confusiones: cuando el sistema se equivoca, se abstiene.</p>';
+}
+
+$('btnRealEval').addEventListener('click', cargarValidacionReal);
 $('btnHelp').addEventListener('click', () => $('helpDialog').showModal());
 $('btnCloseHelp').addEventListener('click', () => $('helpDialog').close());
 

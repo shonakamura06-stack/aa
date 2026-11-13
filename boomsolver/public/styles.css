@@ -163,3 +163,35 @@ dialog::backdrop { background: rgba(0, 0, 0, 0.6); }
 .sim-log th, .sim-log td { text-align: left; padding: .2rem .4rem; border-bottom: 1px solid #232a3d; }
 .sim-log .ok { color: #8ef0be; }
 .sim-log .bad { color: #ff9aa5; }
+
+/* ---------------- Validación real de la visión ---------------- */
+.real-card { grid-column: 1 / -1; }
+.real-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  margin: 14px 0 6px;
+}
+.real-kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  border: 1px solid var(--border, #2c2f38);
+  border-left: 3px solid var(--border, #2c2f38);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.02);
+}
+.real-kpi.ok { border-left-color: #3fa96b; }
+.real-kpi.warn { border-left-color: #d8a13a; }
+.real-kpi.bad { border-left-color: #c9503f; }
+.real-kpi-v { font-size: 24px; font-weight: 700; line-height: 1.1; }
+.real-kpi-l { font-size: 11px; opacity: 0.72; text-transform: uppercase; letter-spacing: 0.04em; }
+.real-h3 { margin: 18px 0 8px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.75; }
+.real-table { overflow-x: auto; }
+.real-table table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.real-table th, .real-table td { padding: 5px 8px; text-align: right; border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
+.real-table th:first-child, .real-table td:first-child { text-align: left; }
+.real-table th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; opacity: 0.6; font-weight: 600; }
+.real-table tr.dim td { opacity: 0.55; }
+.real-empty { opacity: 0.6; font-style: italic; }
