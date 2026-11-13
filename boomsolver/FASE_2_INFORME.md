@@ -24,9 +24,10 @@ Este informe cierra la Fase 2 con una regla por delante:
 4. Aparecieron y se corrigieron **dos fallos silenciosos** en la UI: los paneles
    de análisis aceptaban la salida del solver y las casillas de cada rayo se
    publicaban como índices. Ambos «pintaban datos» sin error.
-5. Sigue **sin haber capturas reales**. El canal para meterlas ya está hecho
-   (lector PNG sin dependencias + `vision --real=DIR` + plantilla de etiqueta):
-   falta la imagen.
+5. ~~Sigue sin haber capturas reales.~~ **Resuelto en la Fase 2.1**: hay 13
+   capturas del juego etiquetadas a mano y un reconocedor de arte real. Ver
+   [`VISION_REAL_INFORME.md`](VISION_REAL_INFORME.md): 54 % de acierto, 39 % de
+   abstención y 91 % de precisión sobre lo afirmado.
 
 ---
 
@@ -44,7 +45,7 @@ Este informe cierra la Fase 2 con una regla por delante:
 | **Rejilla de visión** | Corregido el defecto que leía 10×7 como 2×3 | hecho |
 | **Corpus sintético** | Emblema por objeto: sin él, el corpus medía un caso que el juego no produce | hecho |
 | Guarda del workbench | Las funciones de análisis rechazan la salida del solver (que no es una simulación): antes los paneles mostraban «0 ondas» en silencio | hecho |
-| Capturas reales del juego | **No hay**. Sin ellas no se puede afirmar precisión real | **pendiente** |
+| Capturas reales del juego | 13 capturas del tutorial, etiquetadas a mano y auditadas | **hecho (Fase 2.1)** |
 
 ---
 
@@ -52,11 +53,13 @@ Este informe cierra la Fase 2 con una regla por delante:
 
 ```
 $ cd boomsolver && node --test "tests/*.test.mjs"
-# tests 213
-# pass 213
+# tests 233
+# pass 233
 # fail 0
-# duration_ms 13731
 ```
+
+(Las 20 pruebas del reconocedor de arte real están en
+`tests/vision.real.test.mjs`; ver Fase 2.1.)
 
 | Archivo | Pruebas | Qué cubre |
 |---|---|---|
@@ -243,7 +246,7 @@ en vez del índice de la casilla, así que ni siquiera era coherente consigo mis
 | El motor respeta la especificación escrita | sí | 213 pruebas + arnés de mecánicas |
 | El solver devuelve el mínimo de bombas | sí, para los niveles probados | contraste con fuerza bruta independiente |
 | Las reglas coinciden con el juego real | **no** | ningún caso del arnés está marcado `verified`; las mecánicas son `hypothesis`/`unknown` |
-| El detector reconoce capturas reales | **no** | corpus real: 0 imágenes |
+| El detector reconoce capturas reales | **parcial** | 13 capturas reales: 54 % de acierto, 39 % de abstención, 91 % de precisión sobre lo afirmado (ver `VISION_REAL_INFORME.md`) |
 | La UI funciona en un navegador | **no** | no hay navegador en el entorno; se valida por HTTP y por lógica pura (no hay prueba de DOM) |
 
 ---
