@@ -32,7 +32,7 @@
 
 import { detectBoard, detectBoardRegion, REVIEW } from './detector.js';
 import { classificarCapturaReal, entrenarModelo } from './realPipeline.js';
-import { estimateRealGrid, gridCellBoxes } from './grid.js';
+import { estimateRealGrid, estimateGridFromFloor, gridCellBoxes } from './grid.js';
 import { decodePng } from './png.js';
 
 export const UNKNOWN_TYPE = '*';
@@ -311,25 +311,45 @@ export function evaluateRealCase(caso, opts = {}) {
     out.notas.push('cuadrícula humana: mide el clasificador, no la rejilla');
   } else {
     // Sistema completo sobre la imagen tal cual se capturó.
-    let region = null;
+    // Se prueba primero el estimador por DAMERO sobre la captura entera
+    // (`estimateGridFromFloor`) y sólo si falla se recurre a la detección de
+    // región + `estimateRealGrid`. El orden importa: el segundo necesita una
+    // región de tablero que en estas capturas —recortadas al tablero— no existe
+    // como objeto separado, y por eso devolvía rejillas de 4x4 o null.
+    let grid = null;
     try {
-      region = opts.region || detectBoardRegion(data, width, height);
+      grid = estimateGridFromFloor(data, width, height);
+      out.rejilla.metodo = 'damero (captura completa)';
     } catch (err) {
-      out.notas.push(`región: ${err.message}`);
+      out.notas.push(`rejilla damero: ${err.message}`);
     }
-    if (!region || region.width < 40) {
-      out.notas.push('no se encontró una región de tablero plausible');
-    } else {
-      const grid = (() => {
-        try { return estimateRealGrid(data, width, region); } catch (err) { out.notas.push(`rejilla: ${err.message}`); return null; }
-      })();
-      if (grid) {
-        out.rejilla.estimado = `${grid.cols}x${grid.rows}`;
-        out.rejilla.lado = grid.cell;
-        out.rejilla.confianza = grid.confidence;
-        out.rejilla.acierto = grid.cols === caso.cuadricula.cols && grid.rows === caso.cuadricula.rows;
-        cellGrid = gridCellBoxes(grid);
+    if (!grid) {
+      let region = null;
+      try {
+        region = opts.region || detectBoardRegion(data, width, height);
+      } catch (err) {
+        out.notas.push(`región: ${err.message}`);
       }
+      if (!region || region.width < 40) {
+        out.notas.push('no se encontró una región de tablero plausible');
+        out.notas.push('segunda vía (región + juntas) no aplicable');
+      } else {
+        try {
+          grid = estimateRealGrid(data, width, region);
+          out.rejilla.metodo = 'juntas sobre región';
+        } catch (err) {
+          out.notas.push(`rejilla: ${err.message}`);
+        }
+      }
+    }
+    if (grid) {
+      out.rejilla.estimado = `${grid.cols}x${grid.rows}`;
+      out.rejilla.lado = grid.cell;
+      out.rejilla.confianza = grid.confidence;
+      out.rejilla.origen = grid.origin;
+      out.rejilla.acierto = grid.cols === caso.cuadricula.cols && grid.rows === caso.cuadricula.rows;
+      cellGrid = gridCellBoxes(grid);
+      if (grid.warnings?.length) out.notas.push(...grid.warnings);
     }
   }
 
@@ -352,9 +372,9 @@ export function evaluateRealCase(caso, opts = {}) {
   // En modo `clasificador` manda el reconocedor de arte real (prototipos
   // entrenados sólo con capturas de desarrollo). En `end-to-end` se usa la
   // canalización completa del detector sintético sobre la imagen tal cual.
-  const det = mode === 'clasificador'
-    ? classificarCapturaReal({ data, width, height, cellGrid, modelo: opts.modelo })
-    : detectBoard({ data, width, height }, { region, cols, rows, cellGrid, traySlots: caso.traySlots });
+  const det = mode === 'sintetico'
+    ? detectBoard({ data, width, height }, { region, cols, rows, cellGrid, traySlots: caso.traySlots })
+    : classificarCapturaReal({ data, width, height, cellGrid, modelo: opts.modelo });
   out.comparacion = compareObjects(caso, det);
   out.comparacion.modo = mode;
   // Casillas que la etiqueta declara VACÍAS: la otra mitad de la verdad. Un
@@ -405,7 +425,12 @@ export function summarizeReal(results) {
     capturas: results.length,
     capturasEvaluadas: comparaciones.length,
     niveles: new Set(results.map((r) => r.nivel).filter((n) => n !== null && n !== undefined)).size,
-    rejilla: { aciertos: gridOk, total: gridTotal, exactitud: gridTotal ? round(gridOk / gridTotal) : null },
+    rejilla: {
+      aciertos: gridOk,
+      total: gridTotal,
+      exactitud: gridTotal ? round(gridOk / gridTotal) : null,
+      metodo: results.find((r) => r.rejilla?.metodo)?.rejilla.metodo || null,
+    },
     objetos: {
       etiquetados: totalLabelled,
       evaluables,
@@ -552,12 +577,16 @@ export function casoCellGrid(caso) {
 /**
  * Evalúa el corpus real de principio a fin con validación cruzada por nivel.
  *
+ * `mode` elige qué se mide (ver `evaluateRealCase`):
+ *   `clasificador` (por defecto) rejilla humana → aísla el reconocedor de arte.
+ *   `estimada`     rejilla ESTIMADA de la captura → mide el sistema completo.
+ *
  * Devuelve `{ pliegues, agregado, porClase, confusiones, notas }`. Cada pliegue
  * lleva su modelo entrenado sólo con las capturas de desarrollo y la evaluación
  * de las de reserva, de modo que quien lea el resultado pueda comprobar qué
  * capturas entrenaron qué.
  */
-export function evaluateRealCorpus(casos, { opciones = {} } = {}) {
+export function evaluateRealCorpus(casos, { opciones = {}, mode = 'clasificador' } = {}) {
   const pliegues = [];
   const todas = [];
   const notas = [];
@@ -573,7 +602,7 @@ export function evaluateRealCorpus(casos, { opciones = {} } = {}) {
     );
     const resultados = [];
     for (const caso of ev) {
-      const r = evaluateRealCase(caso, { mode: 'clasificador', modelo, opciones });
+      const r = evaluateRealCase(caso, { mode, modelo, opciones });
       resultados.push(r);
       todas.push(r);
     }
@@ -664,6 +693,17 @@ export function renderRealCrossReport(cross) {
   L.push(`  abstenidas                     ${v.abstenidas}`);
   L.push(`  INVENTADAS (objeto donde no hay) ${v.inventadas}  (${pct(v.invencion)})`);
   L.push('');
+  L.push('REJILLA');
+  L.push('-'.repeat(64));
+  if (a.rejilla.metodo && a.rejilla.metodo !== 'dada (humana)') {
+    L.push(`  capturas con rejilla estimada y comparada: ${a.rejilla.total}`);
+    L.push(`  rejilla exacta (columnas Y filas)        ${a.rejilla.aciertos}  (${pct(a.rejilla.exactitud)})`);
+    L.push(`  método: ${a.rejilla.metodo}`);
+  } else {
+    L.push('  no se estima: en este modo la rejilla la da la etiqueta humana.');
+    L.push('  Para medirla, ejecuta con `--grid=estimada`.');
+  }
+  L.push('');
   L.push('POR PLIEGUE');
   L.push('-'.repeat(64));
   L.push('  nivel        captura(s)                          ok  equiv  absten  vacías-inventadas');
@@ -698,8 +738,16 @@ export function renderRealCrossReport(cross) {
   L.push('-'.repeat(64));
   L.push('  · No dice que el detector "reconozca capturas reales" en general: son 13');
   L.push('    capturas de un tutorial, con un solo estilo de arte.');
-  L.push('  · No mide la rejilla: aquí se le da hecha. La estimación automática de');
-  L.push('    rejilla (`estimateRealGrid`) sigue sin ser fiable y va aparte.');
+  if (a.rejilla.metodo === 'dada (humana)') {
+    L.push('  · La rejilla aquí es la HUMANA: se le da hecha al clasificador, así que');
+    L.push('    esto mide el reconocimiento de arte, no la rejilla. El sistema completo');
+    L.push('    (con la rejilla que él mismo estima) se mide con `--grid=estimada`, y');
+    L.push('    sus fallos de rejilla se cuentan allí como fallos de objetos.');
+  } else {
+    L.push('  · La rejilla aquí es la ESTIMADA por el sistema, no la humana: las');
+    L.push('    cifras incluyen los errores de rejilla. Para separar el reconocimiento');
+    L.push('    de arte del resto, usa el modo por defecto (rejilla humana).');
+  }
   L.push('  · La abstención no es un fallo del sistema: es el sistema diciendo que no');
   L.push('    lo sabe. Se cuenta aparte, nunca se suma a los aciertos.');
   return L.join('\n');

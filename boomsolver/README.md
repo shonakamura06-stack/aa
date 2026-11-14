@@ -32,7 +32,7 @@ pruebas para el juego de bombas descrito en los materiales del proyecto.
 **Lector de capturas** | `src/vision/png.js` | PNG sin dependencias (8 bits, RGB/RGBA, sin entrelazar). Rechaza con mensaje lo que no soporta en vez de aproximar píxeles. |
 **Fuerza bruta** | `src/solver/bruteforce.js` | Oráculo independiente que contrasta al buscador: si discrepan, el test falla. |
 **CLI** | `scripts/cli.mjs` | `catalog`, `solve`, `generate`, `verify`, `explain`, `simulate`, `validate`, `oracle`, `vision`. |
-**Pruebas** | `tests/` | 213 pruebas con `node --test`. Sin dependencias. |
+**Pruebas** | `tests/` | 237 pruebas con `node --test`. Sin dependencias. |
 
 ---
 
@@ -40,11 +40,11 @@ pruebas para el juego de bombas descrito en los materiales del proyecto.
 
 ```bash
 cd boomsolver
-node --test "tests/*.test.mjs"        # 213 pruebas
+node --test "tests/*.test.mjs"        # 237 pruebas
 node scripts/cli.mjs validate         # mecánicas: portales y géiseres
 node scripts/cli.mjs vision           # informe de visión (declara si hay capturas reales)
-node scripts/cli.mjs vision --real=./corpus/real   # validación sobre las 13 capturas
-node scripts/cli.mjs vision --real=./corpus/real   # capturas reales con etiqueta humana
+node scripts/cli.mjs vision --real=./corpus/real   # rejilla humana: reconocimiento de arte
+node scripts/cli.mjs vision --real=./corpus/real --grid=estimada  # sistema completo
 node scripts/serve.mjs                # http://localhost:5173
 ```
 
@@ -60,6 +60,8 @@ node scripts/cli.mjs validate                    # portales y géiseres, con su 
 node scripts/cli.mjs oracle nivel.json --max=2   # fuerza bruta vs buscador
 node scripts/cli.mjs vision [--json]             # métricas de visión + aviso de corpus
 node scripts/cli.mjs vision --real=./corpus/real  # validación cruzada sobre capturas reales
+node scripts/cli.mjs vision --real=./corpus/real --grid=estimada
+                                                  # ídem, con la rejilla que estima el sistema
 ```
 
 Sin claves de API, sin red, sin `node_modules`.
@@ -146,7 +148,7 @@ Novedades frente al v21:
 - Los objetos con **candado** y la **figura naranja** del editor: su `typeId`
   no aparece en el código del v21. Están registrados como desconocidos.
 - **Validación contra el juego real**: ninguna mecánica está marcada como
-  verificada. Las 213 pruebas demuestran que el código cumple *nuestra*
+  verificada. Las 237 pruebas demuestran que el código cumple *nuestra*
   especificación; el contraste con el juego depende de las capturas. Ver
   `FASE_2_INFORME.md` §5 y §6.
 
@@ -173,5 +175,5 @@ boomsolver/
 ├── corpus/real/             capturas del juego + etiqueta humana (plantilla en README)
 ├── public/                  UI (index.html, app.js, styles.css)
 ├── scripts/                 serve.mjs, cli.mjs
-└── tests/                   213 pruebas
+└── tests/                   237 pruebas
 ```

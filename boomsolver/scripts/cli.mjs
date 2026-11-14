@@ -250,7 +250,11 @@ function printHelp() {
 
   validate [--json]              Ejecuta la batería de portales y géiseres contra el motor.
   oracle nivel.json [--max=2]    Fuerza bruta independiente y comparación con el solver.
-  vision [--json] [--real=DIR]   Evalúa visión: corpus sintético y, si se pasa --real, capturas reales.
+  vision [--json] [--real=DIR] [--grid=estimada]
+                                 Evalúa visión sobre el corpus sintético y, con
+                                 --real=DIR, sobre capturas reales.
+                                 --grid=estimada usa la rejilla que calcula el
+                                 sistema en vez de la humana.
   catalog                       Muestra el catálogo de objetos y las reglas por defecto.
   solve nivel.json [opciones]   Busca soluciones.
       --mode=fewest_bombs|least_powder|pareto
@@ -263,7 +267,7 @@ function printHelp() {
   verify nivel.json sol.json     Revalida una solución con el simulador oficial.
   explain nivel.json            Dice por qué un nivel es imposible o difícil.
   simulate nivel.json --bombs="0,1:2;3,2:1" --mecha=0,1
-`);
+  `);
 }
 
 // ------------------------------------------------------------
@@ -376,7 +380,11 @@ function runVision() {
 
   const syntheticResults = casos.map((c) => evaluateCase(c));
   const syntheticSummary = summarizeCorpus(syntheticResults);
-  const realCross = real.casos.length ? evaluateRealCorpus(real.casos) : null;
+  // Modo del corpus real:
+  //   por defecto, `clasificador` (rejilla humana: mide el reconocimiento de arte);
+  //   con `--grid=estimada`, el sistema completo con la rejilla que él mismo saca.
+  const realMode = flags.grid === 'estimada' ? 'estimada' : 'clasificador';
+  const realCross = real.casos.length ? evaluateRealCorpus(real.casos, { mode: realMode }) : null;
   const realSummary = realCross ? realCross.agregado : null;
   // `watchedConfusionReport` espera un resumen del corpus SINTÉTICO (con su
   // matriz); el real trae la suya en `confusiones`. Mezclarlos reventaba.
@@ -387,6 +395,7 @@ function runVision() {
     console.log(JSON.stringify({
       synthetic: { summary: syntheticSummary, watched: watchedConfusionReport(syntheticSummary) },
       real: realCross ? {
+        modo: realMode,
         agregado: realCross.agregado,
         pliegues: realCross.pliegues.map((p) => ({
           grupo: p.grupo, dev: p.dev, eval: p.eval, resumen: p.resumen,

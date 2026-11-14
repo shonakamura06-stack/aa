@@ -325,3 +325,115 @@ test('`splitByLevel` es determinista y no separa capturas del mismo nivel', asyn
     assert.equal(enEval, 2, `el nivel ${n} entra entero en evaluación o no entra`);
   }
 });
+
+// ------------------------------------------------------------
+// Rejilla estimada por DAMERO (Fase 2.2)
+// ------------------------------------------------------------
+// El tablero real es un damero de dos tonos planos. Sobre un damero sintético
+// la rejilla tiene que salir EXACTA —paso, columnas, filas y origen—, y sobre
+// una imagen sin damero tiene que devolver `null` en vez de inventarla.
+/** Damero de `cols`×`rows` casillas de lado `L`, con fase (`ox`,`oy`). */
+function damero({ cols, rows, L, ox = 0, oy = 0, a = [160, 200, 120], b = [140, 180, 104] }) {
+  const w = Math.round(cols * L + ox);
+  const h = Math.round(rows * L + oy);
+  const data = new Uint8ClampedArray(w * h * 4);
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const c = Math.floor((x - ox) / L);
+      const r = Math.floor((y - oy) / L);
+      const t = (c + r) % 2 === 0 ? a : b;
+      const i = (y * w + x) * 4;
+      data[i] = t[0]; data[i + 1] = t[1]; data[i + 2] = t[2]; data[i + 3] = 255;
+    }
+  }
+  return { data, width: w, height: h };
+}
+
+test('`estimateGridFromFloor` mide un damero sintético exacto', async () => {
+  const { estimateGridFromFloor } = await import('../src/vision/grid.js');
+  const img = damero({ cols: 8, rows: 5, L: 74.5 });
+  const g = estimateGridFromFloor(img.data, img.width, img.height);
+  assert.ok(g, 'debe encontrar rejilla');
+  assert.equal(g.cols, 8);
+  assert.equal(g.rows, 5);
+  assert.ok(Math.abs(g.cell - 74.5) <= 1.0, `paso ${g.cell}`);
+  assert.equal(g.afinado, true, 'el ajuste por mínimos cuadrados debe aplicarse');
+  // El origen es modular: -L/2 < origen <= L/2.
+  assert.ok(g.origin.x > -g.cell / 2 && g.origin.x <= g.cell / 2, `origen.x ${g.origin.x}`);
+  assert.ok(g.origin.y > -g.cell / 2 && g.origin.y <= g.cell / 2, `origen.y ${g.origin.y}`);
+  // Y con el damero empezando en 0, el origen tiene que caer ahí (±2 px).
+  assert.ok(Math.abs(g.origin.x) <= 2, `origen.x ${g.origin.x}`);
+  assert.ok(Math.abs(g.origin.y) <= 2, `origen.y ${g.origin.y}`);
+});
+
+test('`estimateGridFromFloor` recupera una captura que empieza a media casilla', async () => {
+  const { estimateGridFromFloor } = await import('../src/vision/grid.js');
+  // El tablero ocupa sólo una parte del lienzo: una casilla (60 px) se sale por
+  // la izquierda y otra por arriba. El número de casillas se cuenta por el ancho
+  // del lienzo, así que se espera 400/60 → 7 y 343/60 → 6.
+  const img = damero({ cols: 7, rows: 6, L: 60, ox: 20, oy: 17 });
+  const g = estimateGridFromFloor(img.data, img.width, img.height);
+  assert.ok(g);
+  assert.equal(g.cols, 7);
+  assert.equal(g.rows, 6);
+  // La frontera real está en +20/+17; canonizada, en 20 y 17.
+  assert.ok(Math.abs(g.origin.x - 20) <= 2, `origen.x ${g.origin.x}`);
+  assert.ok(Math.abs(g.origin.y - 17) <= 2, `origen.y ${g.origin.y}`);
+});
+
+test('`estimateGridFromFloor` devuelve `null` si no hay damero', async () => {
+  const { estimateGridFromFloor } = await import('../src/vision/grid.js');
+  // Ruido uniforme: no hay dos tonos dominantes ni periodicidad.
+  let seed = 12345;
+  const rnd = () => ((seed = (seed * 1103515245 + 12345) & 0x7fffffff) % 256);
+  const w = 200, h = 200;
+  const data = new Uint8ClampedArray(w * h * 4);
+  for (let i = 0; i < w * h; i++) {
+    data[i * 4] = rnd(); data[i * 4 + 1] = rnd(); data[i * 4 + 2] = rnd(); data[i * 4 + 3] = 255;
+  }
+  assert.equal(estimateGridFromFloor(data, w, h), null);
+  // Un lienzo de un solo color tampoco es un damero.
+  const plano = canvas(200, 200, [120, 160, 90]);
+  assert.equal(estimateGridFromFloor(plano.data, 200, 200), null);
+});
+
+test('el modo `estimada` no usa la cuadrícula humana', async () => {
+  const { evaluateRealCase } = await import('../src/vision/realEval.js');
+  // 7×6 para que la rejilla tenga evidencia suficiente: con muy pocas casillas
+  // el estimador es prudente y devuelve `null` (que es lo correcto).
+  const img = damero({ cols: 7, rows: 6, L: 50 });
+  const base = {
+    id: 'x', nivel: 1, nombre: 'x', image: img,
+    cuadricula: { cols: 7, rows: 6 },
+    geometria: { lado: 50, origen_recorte: { x: 0, y: 0 }, fase_casilla: { x: 0, y: 0 } },
+    objetos: [], bandeja: null, temporizadores: null, enlaces: [],
+  };
+  // Un modelo con una clase cualquiera: aquí interesa la rejilla, no el acierto.
+  const dev = damero({ cols: 4, rows: 3, L: 50 });
+  for (let y = 120; y < 145; y++) {
+    for (let x = 120; x < 145; x++) {
+      const i = (y * dev.width + x) * 4;
+      dev.data[i] = 40; dev.data[i + 1] = 90; dev.data[i + 2] = 220;
+    }
+  }
+  const modelo = entrenarModelo([{
+    id: 'dev', image: dev,
+    cellGrid: [
+      [box(0, 0, 49, 49), box(50, 0, 99, 49), box(100, 0, 149, 49), box(150, 0, 199, 49)],
+      [box(0, 50, 49, 99), box(50, 50, 99, 99), box(100, 50, 149, 99), box(150, 50, 199, 99)],
+      [box(0, 100, 49, 149), box(50, 100, 99, 149), box(100, 100, 149, 149), box(150, 100, 199, 149)],
+    ],
+    objetos: [{ x: 2, y: 2, type: 'gem' }],
+  }]);
+  // Con una geometría humana ABSURDA, el modo `estimada` tiene que ignorarla
+  // y sacar la rejilla de la imagen.
+  const roto = { ...base, geometria: { lado: 999, origen_recorte: { x: 700, y: 900 }, fase_casilla: { x: 33, y: 44 } } };
+  const r = evaluateRealCase(roto, { mode: 'estimada', modelo });
+  assert.equal(r.modo, 'estimada');
+  assert.equal(r.rejilla.metodo, 'damero (captura completa)');
+  assert.equal(r.rejilla.estimado, '7x6');
+  assert.equal(r.rejilla.acierto, true);
+  // Y el modo `clasificador` sí la usa (aquí, para mal).
+  const r2 = evaluateRealCase(roto, { mode: 'clasificador', modelo });
+  assert.equal(r2.rejilla.estimado, 'dada (humana)');
+});

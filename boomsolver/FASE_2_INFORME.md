@@ -14,7 +14,7 @@ Este informe cierra la Fase 2 con una regla por delante:
 
 ## 0. Resumen en cinco líneas
 
-1. **213 pruebas, 0 fallos**; `validate` y `oracle` en verde. Eso valida la
+1. **237 pruebas, 0 fallos**; `validate` y `oracle` en verde. Eso valida la
    *especificación*, no el juego.
 2. Se corrigió el defecto que leía un tablero **10×7 como 2×3**; ahora 240/240
    rejillas exactas en el barrido de tamaño, zoom, ruido y marco.
@@ -28,6 +28,11 @@ Este informe cierra la Fase 2 con una regla por delante:
    capturas del juego etiquetadas a mano y un reconocedor de arte real. Ver
    [`VISION_REAL_INFORME.md`](VISION_REAL_INFORME.md): 54 % de acierto, 39 % de
    abstención y 91 % de precisión sobre lo afirmado.
+6. ~~La rejilla automática era un bloqueo abierto.~~ **Resuelto en la Fase 2.2**:
+   `estimateGridFromFloor` estima la rejilla por el damero del suelo con
+   **13/13** de acierto y el origen a ≤ 4 px. El sistema completo, sin geometría
+   humana, baja a 52 % de acierto y 85 % de precisión afirmando; ambas cifras se
+   publican por separado (`--grid=estimada`).
 
 ---
 
@@ -46,6 +51,7 @@ Este informe cierra la Fase 2 con una regla por delante:
 | **Corpus sintético** | Emblema por objeto: sin él, el corpus medía un caso que el juego no produce | hecho |
 | Guarda del workbench | Las funciones de análisis rechazan la salida del solver (que no es una simulación): antes los paneles mostraban «0 ondas» en silencio | hecho |
 | Capturas reales del juego | 13 capturas del tutorial, etiquetadas a mano y auditadas | **hecho (Fase 2.1)** |
+| **Rejilla automática (Fase 2.2)** | `estimateGridFromFloor`: damero de dos tonos + período por autocorrelación + ajuste por mínimos cuadrados | **hecho (13/13)** |
 
 ---
 
@@ -53,13 +59,13 @@ Este informe cierra la Fase 2 con una regla por delante:
 
 ```
 $ cd boomsolver && node --test "tests/*.test.mjs"
-# tests 233
-# pass 233
+# tests 237
+# pass 237
 # fail 0
 ```
 
-(Las 20 pruebas del reconocedor de arte real están en
-`tests/vision.real.test.mjs`; ver Fase 2.1.)
+(Las 24 pruebas del reconocedor de arte real y de la rejilla por damero están
+en `tests/vision.real.test.mjs`; ver Fases 2.1 y 2.2.)
 
 | Archivo | Pruebas | Qué cubre |
 |---|---|---|
@@ -243,7 +249,7 @@ en vez del índice de la casilla, así que ni siquiera era coherente consigo mis
 
 | Afirmación | ¿Demostrada? | Por qué |
 |---|---|---|
-| El motor respeta la especificación escrita | sí | 213 pruebas + arnés de mecánicas |
+| El motor respeta la especificación escrita | sí | 237 pruebas + arnés de mecánicas |
 | El solver devuelve el mínimo de bombas | sí, para los niveles probados | contraste con fuerza bruta independiente |
 | Las reglas coinciden con el juego real | **no** | ningún caso del arnés está marcado `verified`; las mecánicas son `hypothesis`/`unknown` |
 | El detector reconoce capturas reales | **parcial** | 13 capturas reales: 54 % de acierto, 39 % de abstención, 91 % de precisión sobre lo afirmado (ver `VISION_REAL_INFORME.md`) |

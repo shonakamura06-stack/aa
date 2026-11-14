@@ -926,6 +926,21 @@ function pintarValidacionReal(d) {
     })),
   );
 
+  // Sistema completo: la misma captura, pero con la rejilla que calcula el
+  // sistema en vez de la etiqueta humana. Es la cifra honesta de "qué haría
+  // esto solo", y por eso va aparte y no promediada con la de arriba.
+  const full = d.sistemaCompleto;
+  if (full) {
+    const g = full.rejilla || {};
+    $('kpiGrid').textContent = g.total ? `${g.aciertos}/${g.total} (${pct(g.exactitud)})` : '—';
+    $('kpiFullOk').textContent = full.objetos.correctos;
+    $('kpiFullAbst').textContent = `${full.objetos.abstenidos} (${pct(full.objetos.abstencion)})`;
+    $('kpiFullPrec').textContent = pct(full.objetos.precision);
+    $('kpiFullInv').textContent = `${full.vacias.inventadas} de ${full.vacias.total}`;
+    $('realFullNote').textContent = `Método de rejilla: ${g.metodo || '—'}. `
+      + 'Aquí los errores de rejilla se cuentan como errores de objetos: es el sistema tal cual, sin ayuda.';
+  }
+
   const conf = Object.entries(d.confusiones || {});
   $('realConfusion').innerHTML = conf.length
     ? table(['real → visto', 'casos'], conf.map(([k, n]) => ({ cells: [k, n] })))

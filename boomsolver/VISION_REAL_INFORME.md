@@ -1,4 +1,4 @@
-# Validación real de la visión — Fase 2.1
+# Validación real de la visión — Fases 2.1 y 2.2
 
 Estado: **la visión funciona sobre capturas reales, con abstención declarada**.
 Este informe sustituye a la fila «El detector reconoce capturas reales: **no**»
@@ -10,6 +10,12 @@ del informe de Fase 2. La fila nueva es más incómoda y más útil:
 
 Y lo que **no** dice: que reconozca el juego en general. El corpus son 13
 capturas de un tutorial, con un solo estilo de arte.
+
+Desde la Fase 2.2, además, la rejilla de casillas **ya no se le da hecha**: el
+sistema la estima por el damero del suelo con **13/13** de acierto. El coste de
+quitarle esa ayuda está medido y publicado aparte (sección 6b): 51,7 % de
+aciertos y 84,5 % de precisión afirmando, frente a 54,3 % y 91,3 % con la
+rejilla humana.
 
 ---
 
@@ -203,16 +209,80 @@ son **poco representadas** (1–4 muestras) y el modelo prefiere callarse.
 - **No dice que el detector lea capturas del juego en general.** Son 13 capturas
   de un tutorial, un solo estilo de arte, una sola resolución. Un tema nuevo
   (otro color de suelo, otro dibujo de cofre) no está representado.
-- **No mide la rejilla.** `estimateRealGrid` sigue sin ser fiable: acierta el
-  paso pero cuenta mal (p01 7×6 en vez de 7×7, p09 y p13 devuelven `null`). En
-  este informe la rejilla se da hecha a propósito, para que un fallo de rejilla
-  no se disfrace de fallo de clasificación.
+- **La rejilla ya NO es un bloqueo abierto** (desde la Fase 2.2). El estimador
+  por damero `estimateGridFromFloor` acierta las **13/13** geometrías del corpus
+  con el origen a ≤ 4 px de la frontera real, y el modo completo se publica
+  aparte (sección 6b) porque arrastra sus fallos a la cuenta de objetos. Lo que
+  sigue abierto es que ese estimador depende de que haya damero: un tablero de
+  un solo tono, o una captura con el HUD encima, no lo tienen.
+- **La rejilla de esta tabla es la humana.** A propósito: así un fallo de
+  rejilla no se disfraza de fallo de clasificación. La cifra del sistema
+  completo está en la sección 6b y es peor, como debe ser.
 - **No mide bandeja, temporizadores ni cables.** El módulo devuelve `null` en
   esos campos en vez de inventar. La bandeja de bombas de las capturas se leyó a
   mano (está en los JSON) pero no hay lector automático.
 - **La abstención no es un fallo.** Es el sistema diciendo que no lo sabe. Se
   cuenta aparte y nunca se suma a los aciertos. Un cambio que suba el acierto
   bajando la abstención sin subir la precisión es un empeoramiento.
+
+---
+
+## 6b. La rejilla, resuelta (Fase 2.2)
+
+La sección 6 decía que la rejilla era un bloqueo. Ya no lo es.
+
+**Cómo se mide el suelo.** El tablero del juego es un damero de dos tonos
+planos. Se toman los 6 colores más frecuentes (cuantizados a 3 bits), y para
+cada pareja que cubra ≥ 20 % de la imagen se etiqueta cada píxel como `A`,
+`B` u «otra cosa»; el perfil de transiciones `A↔B` a lo largo de cada eje tiene
+exactamente un pico por frontera de casilla. El paso sale del período de ese
+perfil (el más pequeño que alcanza el 90 % del máximo, para no enganchar el
+armónico doble), y después se **afina por mínimos cuadrados** sobre las
+posiciones de los picos (`t ≈ o + k·L`): la autocorrelación tiene 0,5 px de
+resolución y ese error se acumula 8 veces en un tablero de 8 columnas.
+
+Dos detalles que costaron su intento fallido:
+
+- **La cobertura importa.** Una columna que cruza un objeto puede tener 2
+  píxeles de suelo y uno de ellos cambiar de tono: puntúa 0,5 como si fuera una
+  frontera. Los picos se filtran por cobertura (≥ 35 %) y se ponderan por
+  contraste × cobertura.
+- **La fase es modular.** Un origen de 74 con lado 74,5 es la MISMA retícula que
+  uno de −0,5. Se canoniza a (−L/2, L/2] o la mitad del corpus aparece «una
+  casilla desplazado» sin estarlo.
+
+**Resultado sobre las 13 capturas:**
+
+| | |
+|---|---|
+| geometría exacta (columnas Y filas) | **13 / 13** |
+| origen a ≤ 4 px de la frontera humana | **13 / 13** (mediana 2 px) |
+| tiempo | ≈ 0,1 s por captura |
+
+**Lo que cuesta mirar la rejilla en vez de darla.** El sistema completo
+(rejilla estimada, sin geometría humana) sobre el mismo corpus y la misma
+validación cruzada:
+
+| | rejilla humana | rejilla estimada |
+|---|---|---|
+| aciertos | 63 (54,3 %) | 60 (51,7 %) |
+| abstenciones | 45 (38,8 %) | 46 (39,7 %) |
+| clase equivocada | 4 | 4 |
+| falsos positivos | 2 | 7 |
+| precisión sobre lo afirmado | 91,3 % | 84,5 % |
+| vacías inventadas | 2 de 440 | 7 de 440 |
+
+Es decir: saber la rejilla «gratis» vale unos 2,6 puntos de acierto y 5 falsos
+positivos. La caída es pequeña porque el estimador acierta 13/13, pero **no es
+cero**, y por eso las dos cifras se publican por separado en vez de elegir la
+bonita.
+
+**Fallos conocidos del estimador:** p05 tiene una fila de suelo fuera del
+tablero en el pie de la captura; la retícula sale idéntica pero con la paridad
+de fase desplazada una casilla en el eje Y. No afecta al recuento (7×5) y sí
+puede afectar a qué casilla es cuál. Un tablero de un solo tono, o sin damero
+visible, devuelve `null`: el estimador prefiere no dar rejilla antes que
+inventarla.
 
 ---
 
@@ -225,13 +295,16 @@ cd boomsolver
 # «Validación real de la visión» (necesita `node scripts/serve.mjs`).
 node scripts/serve.mjs   # http://localhost:5173
 
-# Informe completo (texto)
+# Informe completo (texto) — rejilla humana: mide el reconocimiento de arte
 node scripts/cli.mjs vision --real=./corpus/real
+
+# Sistema completo: rejilla estimada por el propio sistema (Fase 2.2)
+node scripts/cli.mjs vision --real=./corpus/real --grid=estimada
 
 # Lo mismo en JSON, para trazabilidad
 node scripts/cli.mjs vision --real=./corpus/real --json > vision.json
 
-# Pruebas del módulo real (20) + suite completa (233)
+# Pruebas del módulo real (24) + suite completa (237)
 node --test tests/vision.real.test.mjs
 node --test "tests/*.test.mjs"
 ```
@@ -254,7 +327,8 @@ Por orden de impacto medido, no de facilidad:
    importante y la que este corpus NO puede contestar.
 3. **Un lector de bandeja** (franja inferior con los slots de bombas). Es un
    problema más fácil que el tablero —cuatro ranuras fijas— y hoy no existe.
-4. **Resolver la rejilla**: con la fase de casilla calibrada por página, el paso
-   ya se mide bien. Lo que falla es el recuento de filas y columnas.
+4. ~~Resolver la rejilla~~ — hecho en la Fase 2.2 (13/13). Lo que queda es su
+   caso límite: tableros sin damero visible o con HUD encima, donde el estimador
+   devuelve `null` a propósito.
 5. **Cofres**: sólo si aparece arte que los distinga. Más datos de los mismos
    cofres no cambiará nada.

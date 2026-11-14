@@ -16,8 +16,9 @@
 //
 // LO QUE NO HACE
 // --------------
-// · No estima la rejilla: la recibe hecha. La estimación de rejilla es otro
-//   problema (y hoy no está resuelto: ver `estimateRealGrid`).
+// · No estima la rejilla: la recibe hecha. La estimación de rejilla vive en
+//   `grid.js` (`estimateGridFromFloor`, 13/13 sobre el corpus real) y se
+//   conecta en `realEval.js` para el modo `estimada`.
 // · No lee la bandeja ni los cables: eso está fuera del alcance de esta fase y
 //   se contesta con `null` en vez de con una invención.
 

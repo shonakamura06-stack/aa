@@ -42,7 +42,11 @@ async function validacionReal() {
     readFile: (f) => fs.readFileSync(f),
     readDir: (d) => fs.readdirSync(d),
   });
+  // Dos modos, los mismos que el CLI:
+  //   `clasificador` — rejilla humana, aísla el reconocimiento de arte;
+  //   `estimada`     — rejilla calculada por el sistema (damero), sistema completo.
   const r = evaluateRealCorpus(casos);
+  const rEstimada = evaluateRealCorpus(casos, { mode: 'estimada' });
   cacheValidacion = {
     capturas: r.agregado.capturas,
     niveles: r.agregado.niveles,
@@ -60,6 +64,12 @@ async function validacionReal() {
       inventadas: p.resumen.vacias.inventadas,
     })),
     errores,
+    rejilla: rEstimada.agregado.rejilla,
+    sistemaCompleto: {
+      objetos: rEstimada.agregado.objetos,
+      vacias: rEstimada.agregado.vacias,
+      rejilla: rEstimada.agregado.rejilla,
+    },
   };
   return cacheValidacion;
 }
